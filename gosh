@@ -691,28 +691,28 @@ set style_begin(bibitem)    {^\[\w+]}
 set style_continue(bibitem) {^.+\n}
 
 ### CHAPTER ###
-set style_begin(chapter)     {^.+}
+set style_begin(chapter)     $style_begin(plain)
 set style_next(chapter)      {^\#{3}}
 set style_continue(chapter)  {.*}
 set style_contnext(chapter)  {^#{0,2}[^#]}
 set style_substyles(chapter) {section paragraph image table annotation raw itemize enumeration description verbatim plain}
 
 ### SECTION ###
-set style_begin(section)     {^.+}
+set style_begin(section)     $style_begin(plain)
 set style_next(section)      {^\={3}}
 set style_continue(section)  {.*}
 set style_contnext(section)  {^\={0,2}[^\=]}
 set style_substyles(section) {subsection paragraph image table annotation raw itemize enumeration description verbatim plain}
 
 ### SUBSECTION ###
-set style_begin(subsection)     {^.+}
+set style_begin(subsection)     $style_begin(plain)
 set style_next(subsection)      {^\~{3}}
 set style_continue(subsection)  {.*}
 set style_contnext(subsection)  {^\~{0,2}[^\~]}
 set style_substyles(subsection) {paragraph image table annotation raw itemize enumeration description verbatim plain}
 
 ### PARAGRAPH ###
-set style_begin(paragraph)     {^.+}
+set style_begin(paragraph)     $style_begin(plain)
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
 set style_contnext(paragraph)  {^\-{0,2}[^\-]}
