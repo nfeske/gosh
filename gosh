@@ -54,7 +54,8 @@ proc out_latex {string} {
 		}
 	}
 	
-	regsub -all {"} $string "\"\"" string
+	regsub -all {"(\w)} $string "``\\1" string
+	regsub -all {([\.\?\!\w])"} $string "\\1''" string
 	regsub -all {\^} $string "\\^" string
 	regsub -all {_} $string "\\_" string
 	regsub -all {%} $string "\\%" string
