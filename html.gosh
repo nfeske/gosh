@@ -72,6 +72,9 @@ proc out_html {string} {
 		}
 	}
 	regsub -all {_§%and%§_} $string {\&} string
+
+	# clear spaces at the end of a line #
+	regsub { +$} $string "" string
 	
 	return $string
 }
