@@ -89,7 +89,7 @@ proc produce_head_latex {} {
 	puts {\usepackage[T1]{fontenc}}
 	puts {\usepackage[latin1]{inputenc}}
 	puts {\usepackage[small,bf,hang]{caption2}}
-	puts {\usepackage[german]{babel}}
+	puts {\usepackage[ngerman]{babel}}
 	puts {\usepackage{epsfig}}
 	puts {\emergencystretch = 10pt}
 	puts {\clubpenalty = 10000}
