@@ -6,6 +6,41 @@
 ################
 
 
+### UTILITY: PRINT BEGIN TAG OF FONT STYLE BLOCK ###
+proc font_style_begin {} {
+	global curr_section_type
+	global config_html_p_colored text_color
+	if {!$config_html_p_colored} {
+		return ""
+	}
+	return "<font color=\"$text_color($curr_section_type)\">"
+}
+
+### UTILITY PRINT END TAG OF FONT STYLE BLOCK ###
+proc font_style_end {} {
+	global config_html_p_colored
+	if {!$config_html_p_colored} {
+		return ""
+	}
+	return "</font>"
+}
+
+### UTILITY: PRINT BEGIN TAG OF PARAGRAPH BLOCK ###
+proc p_style_begin {} {
+	global config_html_p_justify
+	set p_tag "<p"
+	if {$config_html_p_justify == 1} {
+		append p_tag " align=\"justify\""
+	}
+	append p_tag ">"
+	return $p_tag
+}
+
+### UTILITY: PRINT END TAG OF PARAGRAPH BLOCK ###
+proc p_style_end {} {
+	return "</p>"
+}
+
 ### FILTER TEXTUAL OUTPUT ###
 proc out_html {string} {
 	global references
@@ -75,6 +110,7 @@ proc out_html {string} {
 
 	# clear spaces at the end of a line #
 	regsub { +$} $string "" string
+	regsub {^ } $string "" string
 	
 	return $string
 }
@@ -87,43 +123,45 @@ proc label_html {string} {
 
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_html {} {
-	global title authors references toc_refs
-	puts "<html><head><title>$title</title></head>"
-	puts "<body>"
+	global title authors references toc_refs config_html_toc
+	printline "<html><head><title>$title</title></head>"
+	printline "<body>"
 	if {$title != ""} {
-		puts "<h1><center>$title</center></h1>"
+		printline "<h1><center>$title</center></h1>"
 	}
 	if {$authors != ""} {
-		puts "<b><center>$authors</center></b>"
+		printline "<b><center>$authors</center></b>"
 	}
-	puts "<center>[exec date --iso-8601]</center>"
-	puts "[indent]<hr/>"
+	printline "<center>[exec date --iso-8601]</center>"
 	
 	# table of contents #
-	puts "[indent]<table align=\"center\" cellpadding=\"5\"><tr><td>"
-	puts "<h3>Table of contents</h3>"
-	foreach ref_name $toc_refs {
-		if {$references($ref_name,type) == "chapter"} {
-			puts "[indent]<b><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a></b><br/>"
+	if {$config_html_toc} {
+		printline "<hr/>"
+		printline "<table align=\"center\" cellpadding=\"5\"><tr><td>"
+		printline "<h3>Table of contents</h3>"
+		foreach ref_name $toc_refs {
+			if {$references($ref_name,type) == "chapter"} {
+				printline "<b><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a></b><br/>"
+			}
+			if {$references($ref_name,type) == "section"} {
+				printline "<code>&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
+			}
+			if {$references($ref_name,type) == "subsection"} {
+				printline "<code>&nbsp;&nbsp;&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
+			}
 		}
-		if {$references($ref_name,type) == "section"} {
-			puts "[indent]<code>&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
-		}
-		if {$references($ref_name,type) == "subsection"} {
-			puts "[indent]<code>&nbsp;&nbsp;&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
-		}
+		printline "</td></tr></table>"
 	}
-	puts "[indent]</td></tr></table>"
-	puts "[indent]<hr/><br/>"
+	printline "<hr/><br/>"
 }
 
 ### WRITE TAIL OF TEX FILE ###
 proc produce_tail_html {} {
 	global authors
-	puts "<hr/><br/>"
-	puts "<i>$authors</i>"
-	puts "</body>"
-	puts "</html>"
+	printline "<hr/><br/>"
+	printline "<i>$authors</i>"
+	printline "</body>"
+	printline "</html>"
 }
 
 ### VERBATIM  ###
@@ -131,27 +169,25 @@ proc process_verbatim_html {txtblock} {
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
-	puts "[indent]<pre>"
+	puts "<pre>"
 	foreach txtline $txtblock {
 		regsub {^\!} $txtline "" txtline
 		regsub -all {\t} $txtline "  " txtline
 		puts "$txtline"
 	}
-	puts "[indent]</pre>"
+	puts "</pre>"
 }
 
 ### ITEMIZE ###
 proc process_itemize_html {txtblock} {
-#	puts "[indent]\\begin{itemize}"
-	puts "[indent]<ul>"
+	printline "<ul>"
 	handle_txtblock itemize $txtblock
-	puts "[indent]</ul>"
-#	puts "[indent]\\end{itemize}"
+	printline "</ul>"
 }
 
 ### ITEM ###
 proc process_item_html {itemtxtblock} {
-	puts "[indent]<li>"
+	printline "<li>"
 	set txtline [lindex $itemtxtblock 0]
 	regsub {^\*\ } $txtline "" txtline
 	regsub {^\#\ } $txtline "" txtline
@@ -161,13 +197,15 @@ proc process_item_html {itemtxtblock} {
 		lappend txtblock $txtline
 	}
 	handle_txtblock item $txtblock
-	puts "[indent]</li>"
+	printline "</li>"
 }
 
 ### DESCRIPTION ###
 proc process_description_html {txtblock} {
+	printline "<dl>"
 	handle_txtblock description $txtblock
-	puts "[indent]<br/>"
+	printline "</dl>"
+#	printline "<br/>"
 }
 
 ### DESCRIPTION ITEM ###
@@ -176,20 +214,22 @@ proc process_descitem_html {itemtxtblock} {
 	set desc_name ""
 	regexp {^\:(.+)\:} $txtline dummy desc_name
 	regsub {^\:(.+)\: *} $txtline "" txtline
-	puts "[indent]<b><i>[out_html $desc_name]</i></b>"
+	printline "<dt>[out_html $desc_name]</dt>"
+	printline "<dd>"
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
 		regsub {^\ \ } $txtline "" txtline
 		lappend txtblock $txtline
 	}
 	handle_txtblock descitem $txtblock
+	printline "</dd>"
 }
 
 ### ENUMERATION ###
 proc process_enumeration_html {txtblock} {
-	puts "[indent]<ol>"
+	printline "<ol>"
 	handle_txtblock enumeration $txtblock
-	puts "[indent]</ol>"
+	printline "</ol>"
 }
 
 ### ENUM ITEM ###
@@ -197,73 +237,64 @@ proc process_enum_html {itemtxtblock} {
 	process_item_html $itemtxtblock
 }
 
+
 ### PLAIN ###
 proc process_plain_html {plaintxtblock} {
-	global curr_section_type text_color
-	puts "[indent]<font color=\"$text_color($curr_section_type)\">"
-	#puts "<p align=\"justify\">"
-	while {[lindex $plaintxtblock end] == ""} {
-		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
-	}
+	global depth
+	printline "[p_style_begin][font_style_begin]"
+	incr depth
 	foreach txtline $plaintxtblock {
-		if {$txtline != ""} {
-			puts -nonewline [indent]
-		} else {
-			puts "[indent]<p></p>"
-		}
-		puts [out_html $txtline]
+		printline "[out_html $txtline]"
 	}
-	#puts "</p>"
-	puts "[indent]<p></p>"
-	puts "[indent]</font>"
+	incr depth -1
+	printline "[font_style_end][p_style_end]"
 }
 
 ### ABSTRACT ###
 proc process_abstract_html {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]<h1>Abstract</h1>"
-	puts "[indent]<i>"
+	printline "<h1>Abstract</h1>"
+	printline "<i>"
 	handle_txtblock abstract [lrange $txtblock 2 end]
-	puts "[indent]</i><hr/><br/>"
+	printline "</i><hr/><br/>"
 }
 
 ### CHAPTER ###
 proc process_chapter_html {txtblock} {
-	global references curr_chapter curr_section_type text_color sec_enum
+	global references curr_chapter curr_section_type config_html_sec_enum
 	set curr_section_type chapter
 	set title [lindex $txtblock 0]
 	set curr_chapter $references($title,index)
 	set sec_prefix ""
-	if {$sec_enum} { set sec_prefix "$curr_chapter " }
-	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "\n[indent]<h1><font color=\"$text_color(chapter)\">$sec_prefix[out_html $title]</font></h1>"
+	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter " }
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h1>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h1>"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_html {txtblock} {
-	global references curr_chapter curr_section curr_section_type text_color sec_enum
+	global references curr_chapter curr_section curr_section_type text_color config_html_sec_enum
 	set curr_section_type section
 	set title [lindex $txtblock 0]
 	set curr_section $references($title,index)
 	set sec_prefix ""
-	if {$sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
-	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h2><font color=\"$text_color(section)\">$sec_prefix[out_html $title]</font></h2>"
+	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h2>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h2>"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_html {txtblock} {
-	global references curr_chapter curr_section curr_subsection curr_section_type text_color sec_enum
+	global references curr_chapter curr_section curr_subsection curr_section_type text_color config_html_sec_enum
 	set curr_section_type subsection
 	set title [lindex $txtblock 0]
 	set curr_subsection $references($title,index)
 	set sec_prefix ""
-	if {$sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
-	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h3><font color=\"$text_color(subsection)\">$sec_prefix[out_html $title]</font></h3>"
+	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h3>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h3>"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
@@ -272,8 +303,8 @@ proc process_paragraph_html {txtblock} {
 	global curr_section_type text_color
 	set curr_section_type paragraph
 	set title [lindex $txtblock 0]
-	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h4><font color=\"$text_color(paragraph)\">[out_html $title]</font></h4>"
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h4>[font_style_begin][out_html $title][font_style_end]</h4>"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
@@ -296,13 +327,13 @@ proc process_image_html {txtblock} {
 	}
 	regsub { *$} $img_cap "" img_cap
 	
-	puts "[indent]<table cellspacing=\"10\"><tr><td>"
-	puts "[indent]  <img src=\"$img_name.jpg\" border=\"0\">"
+	printline "<table cellspacing=\"10\"><tr><td>"
+	printline "  <img src=\"$img_name.jpg\" border=\"0\">"
 	if {$img_cap != ""} {
-		puts "[indent]</td><td valign=\"center\">"
-		puts "[indent]  <font size=\"-1\">$img_cap</font>"
+		printline "</td><td valign=\"center\">"
+		printline "  <font size=\"-1\">$img_cap</font>"
 	}
-	puts "[indent]</td></tr></table>"
+	printline "</td></tr></table>"
 }
 
 
@@ -315,33 +346,33 @@ proc output_table_html {head rows caption} {
 		append cap $capline
 	}
 	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
-		puts "[indent]<a name=\"[label_html \"$caplab\"]\"></a>"
+		printline "<a name=\"[label_html \"$caplab\"]\"></a>"
 	}
-	puts "[indent]<br/><center><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\">"
+	printline "<br/><center><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\">"
 	
-	puts -nonewline "[indent]<tr>"
+	print "[indent]<tr>"
 	foreach headcell [lrange $head 0 end] {
-		puts -nonewline "[indent]<th bgcolor=#f0f7ff>[lindex $headcell 1]<br/></th>"
+		print "[indent]<th bgcolor=#f0f7ff>[lindex $headcell 1]<br/></th>"
 	}
-	puts "[indent]</tr>"
+	printline "</tr>"
 	
 	foreach row $rows {
 		if {[lindex $row 0] == "text"} {
-			puts "<tr>"
+			printline "<tr>"
 			set cells [lindex $row 1]
 			foreach cell [lrange $cells 0 end] {
-				puts -nonewline "[indent]<td>[out_html $cell]</td>"
+				printline "<td>[out_html $cell]</td>"
 			}
-			puts "</tr>"
+			printline "</tr>"
 		}
 	}
-	puts "[indent]</table>"
+	printline "</table>"
 
 	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
 		regsub  {^ +} $captxt ""  captxt
-		puts "[indent]Table $references($caplab,index): [out_html $captxt]"
+		printline "Table $references($caplab,index): [out_html $captxt]"
 	}
-	puts "</center><br/>"
+	printline "</center><br/>"
 }
 
 set text_color(default)    "#000000"
@@ -349,6 +380,13 @@ set text_color(chapter)    "#000014"
 set text_color(section)    "#202040"
 set text_color(subsection) "#404060"
 set text_color(paragraph)  "#505090"
-set sec_enum 1
 set curr_section_type default
 set outmode html
+
+#
+# Process command line arguments
+#
+set config_html_toc       [regexp {\--html-toc}       $argv dummy]
+set config_html_p_justify [regexp {\--html-p-justify} $argv dummy]
+set config_html_p_colored [regexp {\--html-p-colored} $argv dummy]
+set config_html_sec_enum  [regexp {\--html-sec-enum}  $argv dummy]
