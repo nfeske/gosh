@@ -1,0 +1,270 @@
+
+################
+#              #
+# HTML BACKEND #
+#              #
+################
+
+
+### FILTER TEXTUAL OUTPUT ###
+proc out_html {string} {
+
+	set string " $string "
+	
+	# italic style #
+	while {[regexp { _([^ ]+)_ } $string dummy emph_text]} {
+		regsub -all {_} $emph_text " " emph_text
+		regsub { _([^ ]+)_ } $string " <i>$emph_text</i> " string
+	}
+	
+	# bold style #
+	while {[regexp {\*([^ ]+)\*} $string dummy bf_text]} {
+		regsub -all {\*} $bf_text " " bf_text
+		regsub {\*([^ ]+)\*} $string " <b>$bf_text</b> " string
+	}
+	
+	# monospace style #
+	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
+		regsub -all {\#} $code_text " " code_text
+		regsub {\#([^#]+)\#} $string " <code>$code_text</code> " string
+	}
+	
+	# hexadecimal numbers #
+	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "<code>&</code>" string
+	
+	# insert references and citations #
+	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
+		if {[info exists references($ref_text,type)]} {
+			regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
+		} else {
+			regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
+		}
+	}
+	
+	return $string
+}
+
+### FILTER LABEL ###
+proc label_html {string} {
+	regsub -all {"} $string "" string
+	return $string
+}
+
+### WRITE HEADER OF TEX FILE ###
+proc produce_head_html {} {
+	global title authors
+	puts "<html><head><title>$title</title></head>"
+	puts "<body>"
+	if {$title != ""} {
+		puts "<h1><center>$title</center></h1>"
+	}
+	if {$authors != ""} {
+		puts "<center>$authors</center>"
+	}
+	puts "[indent]<hr/><br/>"
+}
+
+### WRITE TAIL OF TEX FILE ###
+proc produce_tail_html {} {
+	global authors
+	puts "<hr/><br/>"
+	puts "<i>$authors</i>"
+	puts "</body>"
+	puts "</html>"
+}
+
+### VERBATIM  ###
+proc process_verbatim_html {txtblock} {
+	while {[lindex $txtblock end] == ""} {
+		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
+	}
+	puts "[indent]<pre>"
+	foreach txtline $txtblock {
+		regsub {^\!} $txtline "" txtline
+		regsub -all {\t} $txtline "  " txtline
+		puts "$txtline"
+	}
+	puts "[indent]</pre>"
+}
+
+### ITEMIZE ###
+proc process_itemize_html {txtblock} {
+#	puts "[indent]\\begin{itemize}"
+	puts "[indent]<ul>"
+	handle_txtblock itemize $txtblock
+	puts "[indent]</ul>"
+#	puts "[indent]\\end{itemize}"
+}
+
+### ITEM ###
+proc process_item_html {itemtxtblock} {
+	puts "[indent]<li>"
+	set txtline [lindex $itemtxtblock 0]
+	regsub {^\*\ } $txtline "" txtline
+	regsub {^\#\ } $txtline "" txtline
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		regsub {^\ \ } $txtline "" txtline
+		lappend txtblock $txtline
+	}
+	handle_txtblock item $txtblock
+	puts "[indent]</li>"
+}
+
+### DESCRIPTION ###
+proc process_description_html {txtblock} {
+	handle_txtblock description $txtblock
+	puts "[indent]<br/>"
+}
+
+### DESCRIPTION ITEM ###
+proc process_descitem_html {itemtxtblock} {
+	set txtline [lindex $itemtxtblock 0]
+	set desc_name ""
+	regexp {^\:(.+)\:} $txtline dummy desc_name
+	regsub {^\:(.+)\: *} $txtline "" txtline
+	puts "[indent]<b><i>[out_html $desc_name]</i></b>"
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		regsub {^\ \ } $txtline "" txtline
+		lappend txtblock $txtline
+	}
+	handle_txtblock descitem $txtblock
+}
+
+### ENUMERATION ###
+proc process_enumeration_html {txtblock} {
+	puts "[indent]<ol>"
+	handle_txtblock enumeration $txtblock
+	puts "[indent]</ol>"
+}
+
+### ENUM ITEM ###
+proc process_enum_html {itemtxtblock} {
+	process_item_html $itemtxtblock
+}
+
+### PLAIN ###
+proc process_plain_html {plaintxtblock} {
+	while {[lindex $plaintxtblock end] == ""} {
+		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
+	}
+	foreach txtline $plaintxtblock {
+		if {$txtline != ""} {
+			puts -nonewline [indent]
+		} else {
+			puts "[indent]<p></p>"
+		}
+		puts [out_html $txtline]
+	}
+	puts "[indent]<p></p>"
+}
+
+### ABSTRACT ###
+proc process_abstract_html {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]<h1>Abstract</h1>"
+	puts "[indent]<i>"
+	handle_txtblock abstract [lrange $txtblock 2 end]
+	puts "[indent]</i><hr/><br/>"
+}
+
+### CHAPTER ###
+proc process_chapter_html {txtblock} {
+	global references curr_chapter
+	set title [lindex $txtblock 0]
+	set curr_chapter $references($title,index)
+	puts "\n[indent]<h1>$curr_chapter [out_html $title]</h1>"
+	handle_txtblock chapter [lrange $txtblock 2 end]
+}
+
+### SECTION ###
+proc process_section_html {txtblock} {
+	global references curr_chapter curr_section
+	set title [lindex $txtblock 0]
+	set curr_section $references($title,index)
+	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
+	puts "[indent]<h2>$curr_chapter.$curr_section [out_html $title]</h2>"
+	handle_txtblock section [lrange $txtblock 2 end]
+}
+
+### SUBSECTION ###
+proc process_subsection_html {txtblock} {
+	global references curr_chapter curr_section curr_subsection
+	set title [lindex $txtblock 0]
+	set curr_subsection $references($title,index)
+	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
+	puts "[indent]<h3>$curr_chapter.$curr_section.$curr_subsection [out_html $title]</h3>"
+	handle_txtblock subsection [lrange $txtblock 2 end]
+}
+
+### PARAGRAPH ###
+proc process_paragraph_html {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
+	puts "[indent]<h4>[out_html $title]</h4>"
+	handle_txtblock paragraph [lrange $txtblock 2 end]
+}
+
+### IMAGE ###
+proc process_image_html {txtblock} {
+	set img_info ""
+	set img_size 80
+	set img_angle "0"
+	regexp {\[(image \w+.*)\]} [lindex $txtblock 0] dummy img_info
+	if {$img_info == ""} return
+	set img_name [lindex $img_info 1]
+	regexp { (\d+)%} $img_info dummy img_size
+	regexp { (\d+)°} $img_info dummy img_angle
+	
+	set img_cap ""
+	foreach img_capline $txtblock {
+		regsub {^\[.*\]} $img_capline "" img_capline
+		regsub {^ *} $img_capline "" img_capline
+		append img_cap $img_capline " "
+	}
+	regsub { *$} $img_cap "" img_cap
+	
+#	puts "[indent]\n[indent]\\begin{figure}\[tbp\]\n[indent] \\begin{center}"
+#	puts "[indent]  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\columnwidth}"
+#	puts "[indent]  \\caption{[out_html $img_cap]}"
+#	puts "[indent]  \\label{[label_html $img_name]}"
+#	puts "[indent] \\end{center}\n[indent]\\end{figure}\n"
+}
+
+### TABLE ###
+proc output_table_html {head rows caption} {
+	puts "[indent]<br/><center><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\">"
+	
+	puts -nonewline "[indent]<tr>"
+	foreach headcell [lrange $head 0 end] {
+		puts -nonewline "[indent]<th bgcolor=#f0f7ff>[lindex $headcell 1]<br/></th>"
+	}
+	puts "[indent]</tr>"
+	
+	foreach row $rows {
+		if {[lindex $row 0] == "text"} {
+			puts "<tr>"
+			set cells [lindex $row 1]
+			foreach cell [lrange $cells 0 end] {
+				puts -nonewline "[indent]<td>[out_html $cell]</td>"
+			}
+			puts "</tr>"
+		}
+	}
+	puts "[indent]</table>"
+
+	set cap ""
+	foreach capline $caption {
+		regsub  {^ +} $capline " "  capline
+		append cap $capline
+	}
+	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
+		regsub  {^ +} $captxt ""  captxt
+		puts "[indent]Table: [out_html $captxt]"
+	}
+	puts "</center><br/>"
+}
+
+set outmode html
