@@ -49,7 +49,7 @@ Plain text looks like this.
 
 Paragraph 1 is here.
 
-; FIXME: comments eat newlines
+; comments between paragraphs are not a problem 
 
 Paragraph 2 should be here.
 
