@@ -235,6 +235,9 @@
   There was also a bug where a
   \cite{reference} caused the start of a new paragraph.
 
+  There was even a bug where a
+  ``quotes'' caused the start of a new paragraph.
+
   Just to test, how -- and --- are handled by the backend.
   BTW, what happens when they appear inside \cite{refer --- ences}?
 
