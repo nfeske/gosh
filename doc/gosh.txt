@@ -53,7 +53,7 @@ Paragraph 1 is here.
 
 Paragraph 2 should be here.
 
-Use 'apostrophes for monospaced text'.
+Use 'apostrophes for monospaced text', but #hash# works too for compatibility.
 
 Trigger bug in newline handling:
 
