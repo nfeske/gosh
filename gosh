@@ -332,9 +332,9 @@ proc output_table_latex {head rows caption} {
 	}
 	puts "\}"
 	puts "[indent] \\hline"
-	puts -nonewline "[lindex [lindex $head 0] 1]"
+	puts -nonewline "[out_latex [lindex [lindex $head 0] 1]]"
 	foreach headcell [lrange $head 1 end] {
-		puts -nonewline "& [lindex $headcell 1]"
+		puts -nonewline "& [out_latex [lindex $headcell 1]]"
 	}
 	puts "  \\\\"
 	puts "[indent]  \\hline"
