@@ -332,10 +332,6 @@ proc process_header_struct {txtblock} {
 	}
 }
 
-proc process_comment_struct {txtblock} {
-	puts "[indent]COMMENT"
-}
-
 proc process_verbatim_struct {txtblock} {
 	puts "[indent]VERBATIM"
 }
@@ -444,7 +440,7 @@ proc output_table_struct {head cells caption} {
 proc process_table {txtblock} {
 	global outmode
 
-	set split_tab [style_split {tabmain tabcap comment empty undefined} $txtblock]
+	set split_tab [style_split {tabmain tabcap empty undefined} $txtblock]
 	set tabmain ""
 	set cap  ""
 	foreach tabpart $split_tab {
@@ -494,10 +490,6 @@ proc process_undefined {txtblock} {
 }
 
 
-### COMMENT ###
-proc process_comment {txtblock} {}
-
-
 ### HEADER - FIND OUT ABOUT TITLE AND AUTHORS ###
 proc process_header {txtblock} {
 	global title authors
@@ -534,10 +526,6 @@ set style_continue(header) {(^\ +.+)|(^\n)}
 ### EVERYTHING AFTER HEADER ###
 set style_begin(afterheader)    {^[^\ ]}
 set style_continue(afterheader) {()}
-
-### COMMENT ###
-set style_begin(comment)    {^[;].*}
-set style_continue(comment) {(^\;.*)|(^\n)}
 
 ### VERBATIM ###
 set style_begin(verbatim)    {^\!}
@@ -730,7 +718,7 @@ proc style_split {styles txtblock} {
 proc handle_txtblock {txtstyle txtcontent} {
 	global style_process style_substyles outmode depth
 	set styles $style_substyles($txtstyle)
-	lappend styles comment empty undefined
+	lappend styles empty undefined
 	set style_blocks [style_split $styles $txtcontent]
 	foreach style_block $style_blocks {
 		set style [lindex $style_block 0]
@@ -816,29 +804,29 @@ proc collect_references {txtblock} {
 #              #
 ################
 
-proc print_help {} {
+
+# assist the user a bit #
+if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 	puts "Convert ASCII to Latex"
 	puts "  usage: gosh <document.txt> > <document.tex>"
 	puts "         gosh --style <backend.gosh> <document.txt> > <document.tex>"
+	exit
 }
 
-if {[llength $argv] == 0} {
-	print_help
-	exit
-} else {
-	if {[regexp {\--help} $argv]} {
-		print_help
-		exit
-	}
+# read text file and kick out any comments #
+set txtfilename [lindex $argv end]
+set txtlines [split [exec cat $txtfilename] "\n"]
+set txtcontent {}
+foreach txtline $txtlines {
+	if {![regexp {^;} $txtline]} {lappend txtcontent $txtline}
 }
 
 set outmode latex
-set txtfilename [lindex $argv end]
-set txtcontent [split [exec cat $txtfilename] "\n"]
 set depth 0
 set title ""
 set authors ""
 
+# process arguments #
 while {[regexp {\--style ([^ ]+)} $argv dummy style_file]} {
 	if {[file exists $style_file]} {
 		source $style_file
