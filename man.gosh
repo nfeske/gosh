@@ -102,12 +102,14 @@ proc process_verbatim_man {txtblock} {
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
-	puts ".br"
+	puts ".PP"
+	puts ".ll +1i"
 	foreach txtline $txtblock {
 		regsub {^!} $txtline "" txtline
 		puts "$txtline\n.br"
 	}
-	puts ".br"
+	puts ".ll"
+	puts ".PP"
 }
 
 ### ITEMIZE ###
@@ -217,14 +219,14 @@ proc process_section_man {txtblock} {
 ### SUBSECTION ###
 proc process_subsection_man {txtblock} {
 	set title [lindex $txtblock 0]
-	puts ".SS \"[out_man $title]\""
+	puts ".PP\n[man_mkboldline [out_man $title]]\n.br"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
 ### PARAGRAPH ###
 proc process_paragraph_man {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[man_mbbold [out_man $title]]\""
+	puts ".PP\n[man_mkboldline [out_man $title.]]"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
