@@ -250,9 +250,6 @@ proc process_enum_latex {itemtxtblock} {
 
 ### PLAIN ###
 proc process_plain_latex {plaintxtblock} {
-#	while {[lindex $plaintxtblock end] == ""} {
-#		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
-#	}
 	foreach txtline $plaintxtblock {
 		printline [out_latex $txtline]
 	}
@@ -626,8 +623,8 @@ set style_continue(annotation)  {^\|}
 set style_substyles(annotation) {itemize enumeration description verbatim plain}
 
 ### RAW ###
-set style_begin(raw)     {(^\: )|(^\:)}
-set style_continue(raw)  {(^\: )|(^\:)}
+set style_begin(raw)     {(^\: )|(^\:$)}
+set style_continue(raw)  {(^\: )|(^\:$)}
 
 ### ITEMIZE ###
 set style_begin(itemize)     {^\*\ .+}
