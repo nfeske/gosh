@@ -1,0 +1,854 @@
+#!/usr/bin/tclsh
+
+##                                                                          ##
+## GOSH - a script by Norman Feske written in July'2003                     ##
+##                                                                          ##
+## This script converts plain ASCII text to a more eye-candy textual format ##
+## such as tex. It was written with expandability in mind.  Thus, it should ##
+## be a  childs play  to add more  backends. The only thing a  child has to ##
+## know about are regular expressions.                                      ##
+##                                                                          ##
+## This file is released under the terms of the  GNU General Public Licence ##
+##                                                                          ##
+
+
+#############################
+#                           #
+# LATEX BACKEND DEFINITIONS #
+#                           #
+#############################
+
+### FILTER TEXTUAL OUTPUT ###
+proc out_latex {string} {
+	global references
+	
+	set string " $string "
+	
+	# italic style #
+	while {[regexp { _([^ ]+)_[ \.]} $string dummy emph_text]} {
+		regsub -all {_} $emph_text " " emph_text
+		regsub { _([^ ]+)_[ \.]} $string " \\emph{$emph_text} " string
+	}
+
+	# bold style #
+	while {[regexp {\*([^ ]+)\*} $string dummy bf_text]} {
+		regsub -all {\*} $bf_text " " bf_text
+		regsub {\*([^ ]+)\*} $string " \\textbf{$bf_text} " string
+	}
+	
+	# monospace style #
+	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
+		regsub -all {\#} $code_text " " code_text
+		regsub {\#([^#]+)\#} $string " \\texttt{$code_text} " string
+	}
+	
+	# hexadecimal numbers #
+	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
+	
+	# insert references and citations #
+	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
+		if {[info exists references($ref_text,type)]} {
+			regsub {\[([^\]]+)\]} $string "\\ref{[label_latex $ref_text]}" string
+		} else {
+			regsub {\[([^\]]+)\]} $string "\\cite{[label_latex $ref_text]}" string
+		}
+	}
+	
+	regsub -all {"} $string "\"\"" string
+	regsub -all {\^} $string "\\^" string
+	regsub -all {_} $string "\\_" string
+	regsub -all {%} $string "\\%" string
+	regsub -all {\$} $string "\\$" string
+	regsub -all {&} $string {\\&} string
+	regsub -all {^ *} $string "" string
+	regsub -all { *$} $string "" string
+	regsub -all {µ} $string "\$\\mu\$" string
+	return $string
+}
+
+### FILTER LABEL ###
+proc label_latex {string} {
+	
+	regsub -all {ä} $string "ae" string
+	regsub -all {ö} $string "oe" string
+	regsub -all {ü} $string "ue" string
+	regsub -all {Ä} $string "Ae" string
+	regsub -all {Ö} $string "Oe" string
+	regsub -all {Ü} $string "Ue" string
+	regsub -all {ß} $string "ss" string
+	regsub -all {[^a-zA-Z0-9 ]} $string "" string
+	return $string
+}
+
+### WRITE HEADER OF TEX FILE ###
+proc produce_head_latex {} {
+	global title authors
+	
+	puts {\documentclass[10pt,german,a4paper,normalheadings,DIV14]{scrartcl}}
+	puts {\usepackage{times}}
+	puts {\usepackage[T1]{fontenc}}
+	puts {\usepackage[latin1]{inputenc}}
+	puts {\usepackage[small,bf,hang]{caption2}}
+	puts {\usepackage[german]{babel}}
+	puts {\usepackage{epsfig}}
+	puts {\emergencystretch = 10pt}
+	puts {\clubpenalty = 10000}
+	puts {\widowpenalty = 10000}
+	puts {\displaywidowpenalty = 10000}
+	puts {\usepackage{amsmath}}
+	puts {\usepackage{amssymb}}
+	puts {\begin{document}}
+	
+	if {$title != ""} {
+		puts "\\title{[out_latex $title]}"
+		if {$authors != ""} {
+			puts "\\author{[out_latex $authors]}"
+		}
+		puts {\maketitle}
+	}
+}
+
+### WRITE TAIL OF TEX FILE ###
+proc produce_tail_latex {} {
+	puts "\\newpage"
+	puts "\\bibliographystyle{plain}"
+	puts "\\bibliography{own}"
+	puts "\\end{document}"
+}
+
+
+### VERBATIM  ###
+proc process_verbatim_latex {txtblock} {
+	while {[lindex $txtblock end] == ""} {
+		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
+	}
+	puts "[indent]\\begin{verbatim}"
+	foreach txtline $txtblock {
+		regsub {^\!} $txtline "" txtline
+		regsub -all {\t} $txtline "  " txtline
+		puts "$txtline"
+	}
+	puts "[indent]\\end{verbatim}"
+}
+
+### ITEMIZE ###
+proc process_itemize_latex {txtblock} {
+	puts "[indent]\\begin{itemize}"
+	handle_txtblock itemize $txtblock
+	puts "[indent]\\end{itemize}"
+}
+
+### ITEM ###
+proc process_item_latex {itemtxtblock} {
+	puts "[indent]\\item"
+	set txtline [lindex $itemtxtblock 0]
+	regsub {^\*\ } $txtline "" txtline
+	regsub {^\#\ } $txtline "" txtline
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		regsub {^\ \ } $txtline "" txtline
+		lappend txtblock $txtline
+	}
+	handle_txtblock item $txtblock
+}
+
+### DESCRIPTION ###
+proc process_description_latex {txtblock} {
+	puts "[indent]\\begin{description}"
+	handle_txtblock description $txtblock
+	puts "[indent]\\end{description}"
+}
+
+### DESCRIPTION ITEM ###
+proc process_descitem_latex {itemtxtblock} {
+	set txtline [lindex $itemtxtblock 0]
+	set desc_name ""
+	regexp {^\:([^\:]+)\:} $txtline dummy desc_name
+	regsub {^\:([^\:]+)\: *} $txtline "" txtline
+	puts "[indent]\\item\[[out_latex $desc_name]\]"
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		regsub {^\ \ } $txtline "" txtline
+		lappend txtblock $txtline
+	}
+	handle_txtblock descitem $txtblock
+}
+
+### ENUMERATION ###
+proc process_enumeration_latex {txtblock} {
+	puts "[indent]\\begin{enumerate}"
+	handle_txtblock enumeration $txtblock
+	puts "[indent]\\end{enumerate}"
+}
+
+### ENUM ITEM ###
+proc process_enum_latex {itemtxtblock} {
+	process_item_latex $itemtxtblock
+}
+
+### PLAIN ###
+proc process_plain_latex {plaintxtblock} {
+	while {[lindex $plaintxtblock end] == ""} {
+		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
+	}
+	foreach txtline $plaintxtblock {
+		if {$txtline != ""} {
+			puts -nonewline [indent]
+		}
+		puts [out_latex $txtline]
+	}
+}
+
+### ABSTRACT ###
+proc process_abstract_latex {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\begin{abstract} \\label{$title}"
+	handle_txtblock abstract [lrange $txtblock 2 end]
+	puts "[indent]\\end{abstract}"
+}
+
+### CHAPTER ###
+proc process_chapter_latex {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\section{[out_latex $title]} \\label{[label_latex $title]}"
+	handle_txtblock chapter [lrange $txtblock 2 end]
+}
+
+### SECTION ###
+proc process_section_latex {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\subsection{[out_latex $title]} \\label{[label_latex $title]}"
+	handle_txtblock section [lrange $txtblock 2 end]
+}
+
+### SUBSECTION ###
+proc process_subsection_latex {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\subsubsection{[out_latex $title]} \\label{[label_latex $title]}"
+	handle_txtblock subsection [lrange $txtblock 2 end]
+}
+
+### PARAGRAPH ###
+proc process_paragraph_latex {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\paragraph{[out_latex $title]}"
+	handle_txtblock paragraph [lrange $txtblock 2 end]
+}
+
+### IMAGE ###
+proc process_image_latex {txtblock} {
+	set img_info ""
+	set img_size 80
+	set img_angle "0"
+	regexp {\[(image \w+.*)\]} [lindex $txtblock 0] dummy img_info
+	if {$img_info == ""} return
+	set img_name [lindex $img_info 1]
+	regexp { (\d+)%} $img_info dummy img_size
+	regexp { (\d+)°} $img_info dummy img_angle
+	
+	set img_cap ""
+	foreach img_capline $txtblock {
+		regsub {^\[.*\]} $img_capline "" img_capline
+		regsub {^ *} $img_capline "" img_capline
+		append img_cap $img_capline " "
+	}
+	regsub { *$} $img_cap "" img_cap
+	
+	puts "[indent]\n[indent]\\begin{figure}\[tbp\]\n[indent] \\begin{center}"
+	puts "[indent]  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\columnwidth}"
+	puts "[indent]  \\caption{[out_latex $img_cap]}"
+	puts "[indent]  \\label{[label_latex $img_name]}"
+	puts "[indent] \\end{center}\n[indent]\\end{figure}\n"
+	
+}
+
+### TABLE ###
+proc output_table_latex {head rows caption} {
+	puts "[indent]\\begin\{table\}\[h\]"
+	puts "[indent]\\center \{"
+	puts -nonewline "[indent] \\begin\{tabular\}\{|"
+	foreach headcell $head {
+		if {[lindex $headcell 0] == "left"} {
+			puts -nonewline "l|"
+		} else {
+			puts -nonewline "r|"
+		}
+	}
+	puts "\}"
+	puts "[indent] \\hline"
+	puts -nonewline "[lindex [lindex $head 0] 1]"
+	foreach headcell [lrange $head 1 end] {
+		puts -nonewline "& [lindex $headcell 1]"
+	}
+	puts "  \\\\"
+	puts "[indent]  \\hline"
+	puts "[indent]  \\hline"
+	foreach row $rows {
+		if {[lindex $row 0] == "hline"} {
+			puts "[indent]  \\hline"
+		}
+		if {[lindex $row 0] == "text"} {
+			set cells [lindex $row 1]
+			puts -nonewline "[indent]  [out_latex [lindex $cells 0]]"
+			foreach cell [lrange $cells 1 end] {
+				puts -nonewline "& [out_latex $cell]"
+			}
+			puts "  \\\\"
+		}
+	}
+	puts "[indent]  \\hline"
+	puts "[indent] \\end\{tabular\}"
+
+	set cap ""
+	foreach capline $caption {
+		regsub  {^ +} $capline " "  capline
+		append cap $capline
+	}
+	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
+		regsub  {^ +} $captxt ""  captxt
+		puts "[indent] \\caption\{[out_latex $captxt]\}"
+		puts "[indent] \\label\{[label_latex $caplab]\}"
+	}
+	puts "[indent]\}"
+	puts "[indent]\\end\{table\}"
+}
+
+
+##############################
+#                            #
+# DOCUMENT STRUCTURE BACKEND #
+#                            #
+##############################
+
+proc process_header_struct {txtblock} {
+	puts "[indent]HEADER"
+	foreach txtline $txtblock {
+		puts "[indent] $txtline"
+	}
+}
+
+proc process_comment_struct {txtblock} {
+	puts "[indent]COMMENT"
+}
+
+proc process_verbatim_struct {txtblock} {
+	puts "[indent]VERBATIM"
+}
+
+proc process_itemize_struct {txtblock} {
+	puts "[indent]ITEMIZE"
+	handle_txtblock itemize $txtblock
+}
+
+proc process_description_struct {txtblock} {
+	if {[regexp {^\:([^\:]+)\:} [lindex $txtblock 0] dummy identifier]} {
+		puts "[indent]DESCRIPTION $identifier"
+	}
+}
+
+proc process_item_struct {itemtxtblock} {
+	puts "[indent]ITEM"
+	set txtline [lindex $itemtxtblock 0]
+	regsub {^\*\ } $txtline "" txtline
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		regsub {^\ \ } $txtline "" txtline
+		lappend txtblock $txtline
+	}
+	handle_txtblock item $txtblock
+}
+
+proc process_enumeration_struct {txtblock} {
+	puts "[indent]ENUMERATION"
+	handle_txtblock enumeration $txtblock
+}
+
+proc process_enum_struct {itemtxtblock} {
+	puts "[indent]ENUMERATION ITEM"
+	set txtline [lindex $itemtxtblock 0]
+	regsub {^\#\ } $txtline "" txtline
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		regsub {^\ \ } $txtline "" txtline
+		lappend txtblock $txtline
+	}
+	handle_txtblock enum $txtblock
+}
+
+proc process_plain_struct {txtblock} {
+	puts "[indent]PLAIN"
+	foreach txtline $txtblock {
+		puts "[indent] $txtline"
+	}
+}
+
+proc process_abstract_struct {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "[indent]ABSTRACT \"$title\""
+	handle_txtblock abstract [lrange $txtblock 2 end]
+}
+
+proc process_bibliography_struct {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "[indent]BIBLIOGRAPHY \"$title\""
+	handle_txtblock bibliography [lrange $txtblock 2 end]
+}
+
+proc process_bibitem_struct {txtblock} {
+	puts "[indent]BIBITEM"
+	foreach txtline $txtblock {
+		puts "[indent] $txtline"
+	}
+}
+
+proc process_chapter_struct {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "[indent]CHAPTER \"$title\""
+	handle_txtblock chapter [lrange $txtblock 2 end]
+}
+
+proc process_section_struct {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "[indent]SECTION \"$title\""
+	handle_txtblock section [lrange $txtblock 2 end]
+}
+
+proc process_subsection_struct {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "[indent]SUBSECTION \"$title\""
+	handle_txtblock subsection [lrange $txtblock 2 end]
+}
+
+proc process_paragraph_struct {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "[indent]PARAGRAPH \"$title\""
+	handle_txtblock paragraph [lrange $txtblock 2 end]
+}
+
+proc process_image_struct {txtblock} {
+	puts "[indent]IMAGE"
+	foreach txtline $txtblock {
+		puts "[indent] $txtline"
+	}
+}
+
+proc output_table_struct {head cells caption} {
+	puts "[indent]TABLE"
+}
+
+proc process_table {txtblock} {
+	global outmode
+
+	set split_tab [style_split {tabmain tabcap comment empty undefined} $txtblock]
+	set tabmain ""
+	set cap  ""
+	foreach tabpart $split_tab {
+		if {[lindex $tabpart 0] == "tabmain"} {
+			append tabmain [lindex $tabpart 1]
+		}
+		if {[lindex $tabpart 0] == "tabcap"} {
+			append cap [lindex $tabpart 1]
+		}
+	}
+	
+	set tabhead [lindex $tabmain 0];
+	set headcells [split $tabhead "|"]
+	
+	set head {};
+	foreach headcell $headcells {
+		set align "left"
+		if {[regexp {[^ ] $} $headcell]} { set align "right" }
+		if {[regexp {^ [^ ]} $headcell]} { set align "left" }
+		lappend head [list $align $headcell]
+	}
+	set tabmain [lrange $tabmain 2 end]
+	set cells {}
+	foreach row $tabmain {
+		if {[regexp {\-\-\-\-} $row]} {
+			lappend cells "hline"
+		} elseif {[regexp {^[\| ]*$} $row]} {
+			lappend cells "space"
+		} else {
+			set tabcells [split $row "|"]
+			lappend cells [list "text" $tabcells]
+		}
+	}
+
+	set tabout_function "output_table_"
+	append tabout_function $outmode
+	if {[info procs $tabout_function] == $tabout_function} {
+		eval "$tabout_function \$head \$cells \$cap"
+	}
+}
+
+proc process_undefined {txtblock} {
+	puts stderr "Error: can not figure out what you mean with"
+#	foreach txtline $txtblock {
+#		puts stderr "[indent] $txtline"
+#	}
+}
+
+
+### COMMENT ###
+proc process_comment {txtblock} {}
+
+
+### HEADER - FIND OUT ABOUT TITLE AND AUTHORS ###
+proc process_header {txtblock} {
+	global title authors
+	
+	set block ""
+	foreach txtline $txtblock {
+		regsub {^\ +} $txtline "" txtline
+		if {$txtline != ""} {
+			set block [append block " " $txtline]
+		} else {
+			regsub {^\ +} $block "" block
+			if {$block != ""} {
+				if {$title == ""} {
+					set title $block
+				} else {
+					set authors $block
+				}
+			}
+			set block ""
+		}
+	}
+}
+
+##############################
+#                            #
+# TEXT STRUCTURE DEFINITIONS #
+#                            #
+##############################
+
+### HEADER ###
+set style_begin(header)    {^\ +.+}
+set style_continue(header) {(^\ +.+)|(^\n)}
+
+### EVERYTHING AFTER HEADER ###
+set style_begin(afterheader)    {^[^\ ]}
+set style_continue(afterheader) {()}
+
+### COMMENT ###
+set style_begin(comment)    {^[;].*}
+set style_continue(comment) {(^\;.*)|(^\n)}
+
+### VERBATIM ###
+set style_begin(verbatim)    {^\!}
+set style_continue(verbatim) {^\!}
+
+### ITEMIZE ###
+set style_begin(itemize)     {^\*\ .+}
+set style_continue(itemize)  {(^\ \ +[^\ ])|(^\n)|(^\*\ .+)}
+set style_contnext(itemize)  {^[^|]*$}
+set style_substyles(itemize) {item}
+
+### ITEM ###
+set style_begin(item)     {^\*\ .+}
+set style_continue(item)  {(^\ \ .+)|(^\n)}
+set style_substyles(item) {itemize enumeration description verbatim plain}
+
+### DESCRIPTION ###
+set style_begin(description)     {^\:[^\:]+\:}
+set style_continue(description)  {(^\ \ +[^\ ])|(^\n)|(^\:[\w ]+\:)}
+set style_contnext(description)  {^[^|]*$}
+set style_substyles(description) {descitem}
+
+### DESCRIPTION ITEM ###
+set style_begin(descitem)     {^\:[^\:]+\:}
+set style_continue(descitem)  {(^\ \ .+)|(^\n)}
+set style_substyles(descitem) {itemize enumeration description verbatim plain}
+
+### ENUMERATION ###
+set style_begin(enumeration)     {^\#\ .+}
+set style_continue(enumeration)  {(^\ \ +[^\ ])|(^\n)|(^\#\ .+)}
+set style_contnext(enumeration)  {^[^|]*$}
+set style_substyles(enumeration) {enum}
+
+### ENUM ITEM ###
+set style_begin(enum)     {^\#\ .+}
+set style_continue(enum)  {(^\ \ .+)|(^\n)}
+set style_substyles(enum) {itemize enumeration description verbatim plain}
+
+### PLAIN ###
+set style_begin(plain)    {^[^\ \n;].*}
+set style_continue(plain) {(^\w)|(^\n)}
+set style_contnext(plain) {(^\w)|(^\n)}
+
+### ABSTRACT ###
+set style_begin(abstract)     {^Abstract.*}
+set style_next(abstract)      {^\#\#\#}
+set style_continue(abstract)  {.*}
+set style_contnext(abstract)  {(^[^(\#\#\#)])|(^\n)}
+set style_substyles(abstract) {itemize enumeration plain}
+
+### BIBLIOGRAPHY ###
+set style_begin(bibliography)     {^Bibliography}
+set style_next(bibliography)      {^\#\#\#}
+set style_continue(bibliography)  {.*}
+set style_contnext(bibliography)  {(^[^(\#\#\#)])|(^\n)}
+set style_substyles(bibliography) {bibitem}
+
+### BIBLIOGRAPHY ITEM ###
+set style_begin(bibitem)    {^\[\w+]}
+set style_continue(bibitem) {^.+\n}
+
+### CHAPTER ###
+set style_begin(chapter)     {^.+}
+set style_next(chapter)      {^\#{3}}
+set style_continue(chapter)  {.*}
+set style_contnext(chapter)  {^#{0,2}[^#]}
+set style_substyles(chapter) {section paragraph image table itemize enumeration description verbatim plain}
+
+### SECTION ###
+set style_begin(section)     {^.+}
+set style_next(section)      {^\={3}}
+set style_continue(section)  {.*}
+set style_contnext(section)  {^\={0,2}[^\=]}
+set style_substyles(section) {subsection paragraph image table itemize enumeration description verbatim plain}
+
+### SUBSECTION ###
+set style_begin(subsection)     {^.+}
+set style_next(subsection)      {^\~{3}}
+set style_continue(subsection)  {.*}
+set style_contnext(subsection)  {^\~{0,2}[^\~]}
+set style_substyles(subsection) {paragraph image table itemize enumeration description verbatim plain}
+
+### PARAGRAPH ###
+set style_begin(paragraph)     {^.+}
+set style_next(paragraph)      {^\-{3}}
+set style_continue(paragraph)  {.*}
+set style_contnext(paragraph)  {^\-{0,2}[^\-]}
+set style_substyles(paragraph) {table itemize enumeration description verbatim plain}
+
+### IMAGE ###
+set style_begin(image)     {^\[image .+\]}
+set style_continue(image)  {^.+\n}
+
+### TABLE ###
+set style_begin(table)     {\|}
+set style_next(table)      {\-\-\-}
+set style_continue(table)  {(\|)|(\-\-\-)|(^\n)|(^\[table.*\])|(^  .+\n)}
+
+### TABLE CAPTION ###
+set style_begin(tabcap)     {^\[table .+\]}
+set style_continue(tabcap)  {^.+\n}
+
+### MAIN PART OF TABLE ###
+set style_begin(tabmain)    {\|}
+set style_next(tabmain)     {\-\-\-}
+set style_continue(tabmain) {(\|)|(\-\-\-)}
+
+### CAPTION OF TABLE ###
+set style_begin(tabcap)     {^\[table .+\]}
+set style_continue(tabcap)  {^.+\n}
+
+### EMPTY ###
+set style_begin(empty)    {^ *$}
+set style_continue(empty) {^ *$}
+
+### UNDEFINED ###
+set style_begin(undefined)    {.*}
+set style_continue(undefined) {\\{100}}
+
+### DOCUMENT HEAD ###
+set style_substyles(documenthead) {header afterheader}
+
+### DOCUMENT MAIN ###
+set style_substyles(documentmain) {header abstract bibliography chapter paragraph image table itemize enumeration description verbatim plain}
+
+####################
+#                  #
+# PARSER FUNCTIONS #
+#                  #
+####################
+
+### DETERMINE STYLE OF SPECIFIED LINE ###
+proc get_style {styles txtline next_txtline} {
+	global style_begin style_next
+	foreach style $styles {
+		if {[regexp $style_begin($style) $txtline]} {
+			if {![info exists style_next($style)]} {
+				return $style
+			}
+			if {[regexp $style_next($style) $next_txtline]} {
+				return $style
+			}
+		}
+	}
+	return nostyle
+}
+
+### DETERMINE IF THE GIVEN STYLE IS STILL VALID ###
+proc style_continues {style txtline next_txtline} {
+	global style_continue style_contnext
+	if {[regexp $style_continue($style) $txtline]} {
+		if {![info exists style_contnext($style)]} {
+			return 1
+		}
+		if {[regexp $style_contnext($style) $next_txtline]} {
+			return 1
+		}
+	}
+	return 0
+}
+
+### SPLIT A TEXTUAL BLOCK INTO A LIST OF DIFFERENT STYLES ###
+proc style_split {styles txtblock} {
+	set style_block_list {}
+	set i 0
+	set txtlen [llength $txtblock]
+	set curr_txtline [lindex $txtblock 0]
+	set next_txtline [lindex $txtblock 1]
+	while {$i < $txtlen} {
+		
+		set style [get_style $styles $curr_txtline $next_txtline]
+		
+		# read current style block until its end #
+		set style_block [list $curr_txtline]
+		incr i
+		set curr_txtline [lindex $txtblock $i]
+		set next_txtline [lindex $txtblock [expr $i+1]]
+		while {(([style_continues $style "$curr_txtline\n" "$next_txtline\n"]) & ($i < $txtlen))} {
+			lappend style_block $curr_txtline
+			incr i
+			set curr_txtline [lindex $txtblock $i]
+			set next_txtline [lindex $txtblock [expr $i+1]]
+		}
+		lappend style_block_list [list $style $style_block]
+	}
+	return $style_block_list
+}
+
+### APPLY THE GIVEN STYLES TO THE SPECIFIED TEXT BLOCK ###
+proc handle_txtblock {txtstyle txtcontent} {
+	global style_process style_substyles outmode depth
+	set styles $style_substyles($txtstyle)
+	lappend styles comment empty undefined
+	set style_blocks [style_split $styles $txtcontent]
+	foreach style_block $style_blocks {
+		set style [lindex $style_block 0]
+		set content [lindex $style_block 1]
+		set process_function [append process_ $style _ $outmode]
+		
+		incr depth
+		set spec_function process_
+		append spec_function $style
+		set gen_function $spec_function
+		append spec_function _ $outmode
+		
+		if {[info procs $spec_function] == $spec_function} {
+			eval "$spec_function [list $content]"
+		} elseif {[info procs $gen_function] == $gen_function} {
+			eval "$gen_function [list $content]"
+		}
+		incr depth -1
+	}
+}
+
+### RETURN A STRING WITH CURRENT NUMBER OF INDENTATION BLANKS ###
+proc indent {} {
+	global depth
+	set result ""
+	for {set i 0} {$i<$depth} {incr i} {
+		append result " "
+	}
+	return $result
+}
+
+### FIND OUT ABOUT REFERENCES PROVIDED BY THE DOCUMENT ###
+proc collect_references {txtblock} {
+	global references
+	foreach var {chapter_cnt section_cnt subsection_cnt image_cnt table_cnt} {set $var 0}
+	set curr_chapter ""
+	set curr_section ""
+	set curr_line [lindex $txtblock 0]
+	foreach next_line [lrange $txtblock 1 end] {
+		set style [get_style [list chapter section subsection image tabcap] $curr_line $next_line]
+		if {(($style == "chapter") || ($style == "section") || ($style == "subsection"))} {
+			set references($curr_line,type) $style
+			if {$style == "chapter"} {
+				incr chapter_cnt
+				set curr_chapter $curr_line
+				set section_cnt 0
+				set subsection_cnt 0
+				set references($curr_line,index) $chapter_cnt
+			} elseif {$style == "section"} {
+				incr section_cnt
+				set curr_section $curr_line
+				set subsection_cnt 0
+				set references($curr_line,chapter) $curr_chapter
+				set references($curr_line,index) $section_cnt
+			} elseif {$style == "subsection"} {
+				incr subsection_cnt
+				set references($curr_line,section) $curr_section
+				set references($curr_line,index) $subsection_cnt
+			}
+		} elseif {$style == "image"} {
+			if {[regexp {\[(image \w+.*)\]} $curr_line dummy img_info]} {
+				incr image_cnt
+				set img_name [lindex $img_info 1]
+				set references($img_name,type) $style
+				set references($img_name,index) $image_cnt
+			}
+		} elseif {$style == "tabcap"} {
+			if {[regexp {\[(table \w+.*)\]} $curr_line dummy tab_info]} {
+				incr table_cnt
+				set tab_name [lindex $tab_info 1]
+				set references($tab_name,type) $style
+				set references($tab_name,index) $table_cnt
+			}
+		}
+		
+		set curr_line $next_line
+	}
+}
+
+################
+#              #
+# MAIN PROGRAM #
+#              #
+################
+
+set outmode latex
+set txtfilename [lindex $argv end]
+set txtcontent [split [exec cat $txtfilename] "\n"]
+set depth 0
+set title ""
+set authors ""
+
+while {[regexp {\--style ([^ ]+)} $argv dummy style_file]} {
+	if {[file exists $style_file]} {
+		source $style_file
+	} else {
+		puts "Error: style file $style_file does not exist"
+	}
+	regsub {\--style [^ ]+} $argv "" argv
+}
+
+# find out about title and authors #
+handle_txtblock documenthead $txtcontent
+
+# find out about internal references #
+collect_references $txtcontent
+
+# generate output head #
+set produce_function "produce_head_$outmode"
+if {[info procs $produce_function] == $produce_function} {
+	eval $produce_function
+}
+
+# generate main output #
+handle_txtblock documentmain $txtcontent
+
+# generate output tail 
+set produce_function "produce_tail_$outmode"
+if {[info procs $produce_function] == $produce_function} {
+	eval $produce_function
+}
