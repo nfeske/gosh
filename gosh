@@ -59,12 +59,15 @@ proc out_latex {string} {
 		} else {
 			if {[regexp {^http://} $ref_text dummy]} {
 				regsub {\[([^\]]+)\]} $string "\\texttt{$ref_text}" string
+			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
+				regsub {\[([^\]]+)\]} $string "_citation_gap_" string
 			} else {
 				regsub {\[([^\]]+)\]} $string "\\cite{$ref_text}" string
 			}
 		}
 	}
 	
+	regsub -all {_citation_gap_} $string "\[\\ldots\{\}\]" string
 	regsub -all {"(\w)} $string "``\\1" string
 	regsub -all {([\.\?\!\w])"} $string "\\1''" string
 	regsub -all {\^} $string "\\^" string
