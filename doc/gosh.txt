@@ -273,6 +273,30 @@ A title can be optionally specified with parenthesis:
 ! [http://www.dhs.nu - Dead Hackers Society (click here)]
 
 
+The HTML backend
+################
+
+By default, the HTML produces pure HTML code without any fancyness.
+For the different textual styles, the corresponding HTML tags are used.
+
+There exist the following command line options, which take effect on the HTML
+output:
+
+:'--html-toc': This option lets GOSH create a table of contents. The entries
+  of the table link to their corresponding section.
+
+:'--html-sec-enum': By default, chapters and sections are not enumerized.
+  By using this option, you can make GOSH to prepend section numbers to the
+  headlines.
+
+:'--html-p-colored': This option allows any section type to be colored by a
+  different color. The colors are defined inside the backend and can be
+  over-defined via an additional style as described in section
+  [Tweaking the GOSH output].
+
+:'--html-p-justify': This option sets the alignment of paragraphs to justified.
+
+
 Advanced features
 #################
 
