@@ -40,6 +40,7 @@ proc out_html {string} {
 	# hexadecimal numbers #
 	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "<code>&</code>" string
 	
+	set linktext ""
 	# insert references and citations #
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
@@ -51,7 +52,7 @@ proc out_html {string} {
 		} else {
 			set url ""
 			set linktext ""
-			set tooltip " "
+			set tooltip ""
 			regexp {^(\w+:[^ ]+)} $ref_text url
 			regexp {^(\w+:[^ ]+) - ([^\(]+)} $ref_text dummy dummy linktext
 			regexp {\((.*)\)} $ref_text dummy tooltip
@@ -61,10 +62,16 @@ proc out_html {string} {
 			if {$linktext == ""} {
 				set linktext $url
 			}
+			set tooltiptext " title=\"$tooltip\""
+			if {$tooltip == ""} {
+				set tooltiptext ""
+			}
 			regsub { +$} $linktext "" linktext
-			regsub {\[([^\]]+)\]} $string "<a href=\"$url\" alt=\"$linktext\" title=\"$tooltip\">$linktext</a>" string
+			regsub -all {&} $url "_§%and%§_" url
+			regsub {\[([^\]]+)\]} $string "<a href=\"$url\" alt=\"$linktext\"$tooltiptext>$linktext</a>" string
 		}
 	}
+	regsub -all {_§%and%§_} $string {\&} string
 	
 	return $string
 }
