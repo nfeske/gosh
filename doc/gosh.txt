@@ -53,6 +53,8 @@ Paragraph 1 is here.
 
 Paragraph 2 should be here.
 
+Use 'apostrophes for monospaced text'.
+
 Trigger bug in newline handling:
 
 BUG appears if a new line starts with non-words.
@@ -60,9 +62,9 @@ BUG appears if a new line starts with non-words.
 BUG this should be a new paragraph, but it is'nt.
 (because of the bracket)
 
-_Just_emphasize_this_point_
+_Just_emphasize_this_point_ but only this point.
 
-Trigger bug in emph: (_BUG_)
+Trigger bug in emph: (_BUG_) - *GOTCHA* This bug is no more.
 
 
 * itemize is nice.
@@ -76,7 +78,9 @@ Trigger bug in emph: (_BUG_)
 
 
 :Description: Use this "for descriptions."
-  The "description" continues here.
+  The "description" continues here...
+
+  and here.
 
 :Advice: Watch the step!
 
