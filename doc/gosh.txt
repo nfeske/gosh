@@ -132,6 +132,12 @@ Images
 
 _TODO_
 
+;; usage as follows
+;; <image_file_without_extension> will be label with some things
+;; stripped of (e.g. '_')
+;[image <image_file_without_extension> <scale>% <angle>°]
+;caption
+;more caption
 
 "Bibliography"
 ##############
