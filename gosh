@@ -99,6 +99,19 @@ proc out_latex {string} {
 	return $string
 }
 
+
+proc print {string} {
+	puts $string
+}
+
+
+proc printline {string} {
+	set string "[indent]$string"
+	regsub {^ *$} $string "" string
+	puts $string
+}
+
+
 ### FILTER LABEL ###
 proc label_latex {string} {
 	
@@ -117,36 +130,36 @@ proc label_latex {string} {
 proc produce_head_latex {} {
 	global title authors
 	
-	puts {\documentclass[10pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
-	puts {\usepackage{times}}
-	puts {\usepackage[T1]{fontenc}}
-	puts {\usepackage[latin1]{inputenc}}
-	puts {\usepackage[small,bf,hang]{caption2}}
-	puts {\usepackage[ngerman]{babel}}
-	puts {\usepackage{epsfig}}
-	puts {\emergencystretch = 10pt}
-	puts {\clubpenalty = 10000}
-	puts {\widowpenalty = 10000}
-	puts {\displaywidowpenalty = 10000}
-	puts {\usepackage{amsmath}}
-	puts {\usepackage{amssymb}}
-	puts {\begin{document}}
+	printline {\documentclass[10pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
+	printline {\usepackage{times}}
+	printline {\usepackage[T1]{fontenc}}
+	printline {\usepackage[latin1]{inputenc}}
+	printline {\usepackage[small,bf,hang]{caption2}}
+	printline {\usepackage[ngerman]{babel}}
+	printline {\usepackage{epsfig}}
+	printline {\emergencystretch = 10pt}
+	printline {\clubpenalty = 10000}
+	printline {\widowpenalty = 10000}
+	printline {\displaywidowpenalty = 10000}
+	printline {\usepackage{amsmath}}
+	printline {\usepackage{amssymb}}
+	printline {\begin{document}}
 	
 	if {$title != ""} {
-		puts "\\title{[out_latex $title]}"
+		printline "\\title{[out_latex $title]}"
 		if {$authors != ""} {
-			puts "\\author{[out_latex $authors]}"
+			printline "\\author{[out_latex $authors]}"
 		}
-		puts {\maketitle}
+		printline {\maketitle}
 	}
 }
 
 ### WRITE TAIL OF TEX FILE ###
 proc produce_tail_latex {} {
-	puts "\\newpage"
-	puts "\\bibliographystyle{plain}"
-	puts "\\bibliography{own}"
-	puts "\\end{document}"
+	printline "\\newpage"
+	printline "\\bibliographystyle{plain}"
+	printline "\\bibliography{own}"
+	printline "\\end{document}"
 }
 
 
@@ -155,25 +168,25 @@ proc process_verbatim_latex {txtblock} {
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
-	puts "[indent]\\begin{verbatim}"
+	printline "\\begin{verbatim}"
 	foreach txtline $txtblock {
 		regsub {^\!} $txtline "" txtline
 		regsub -all {\t} $txtline "  " txtline
-		puts "$txtline"
+		printline "$txtline"
 	}
-	puts "[indent]\\end{verbatim}"
+	printline "\\end{verbatim}"
 }
 
 ### ITEMIZE ###
 proc process_itemize_latex {txtblock} {
-	puts "[indent]\\begin{itemize}"
+	printline "\\begin{itemize}"
 	handle_txtblock itemize $txtblock
-	puts "[indent]\\end{itemize}"
+	printline "\\end{itemize}"
 }
 
 ### ITEM ###
 proc process_item_latex {itemtxtblock} {
-	puts "[indent]\\item"
+	printline "\\item"
 	set txtline [lindex $itemtxtblock 0]
 	regsub {^[^\ ]\ } $txtline "" txtline
 	regsub {^\#\ } $txtline "" txtline
@@ -187,9 +200,9 @@ proc process_item_latex {itemtxtblock} {
 
 ### DESCRIPTION ###
 proc process_description_latex {txtblock} {
-	puts "[indent]\\begin{description}"
+	printline "\\begin{description}"
 	handle_txtblock description $txtblock
-	puts "[indent]\\end{description}"
+	printline "\\end{description}"
 }
 
 ### DESCRIPTION ITEM ###
@@ -198,7 +211,7 @@ proc process_descitem_latex {itemtxtblock} {
 	set desc_name ""
 	regexp {^\:([^\:]+)\:} $txtline dummy desc_name
 	regsub {^\:([^\:]+)\: *} $txtline "" txtline
-	puts "[indent]\\item\[[out_latex $desc_name]\]"
+	printline "\\item\[[out_latex $desc_name]\]"
 	if {$txtline == ""} {
 		lappend txtblock "\\mbox{}$txtline"
 	} else {
@@ -214,9 +227,9 @@ proc process_descitem_latex {itemtxtblock} {
 
 ### ENUMERATION ###
 proc process_enumeration_latex {txtblock} {
-	puts "[indent]\\begin{enumerate}"
+	printline "\\begin{enumerate}"
 	handle_txtblock enumeration $txtblock
-	puts "[indent]\\end{enumerate}"
+	printline "\\end{enumerate}"
 }
 
 ### ENUM ITEM ###
@@ -230,58 +243,60 @@ proc process_plain_latex {plaintxtblock} {
 #		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
 #	}
 	foreach txtline $plaintxtblock {
-		if {$txtline != ""} {
-			puts -nonewline [indent]
-		}
-		puts [out_latex $txtline]
+		printline [out_latex $txtline]
 	}
 }
 
 ### EMPTY ###
 proc process_empty_latex {emptytxtblock} {
 	foreach txtline $emptytxtblock {
-		puts "[indent]$txtline"
+		printline "$txtline"
 	}
 }
 
 ### ABSTRACT ###
 proc process_abstract_latex {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]\\begin{abstract} \\label{$title}"
+	printline ""
+	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
+	printline "\\begin{abstract} \\label{$title}"
 	handle_txtblock abstract [lrange $txtblock 2 end]
-	puts "[indent]\\end{abstract}"
+	printline "\\end{abstract}"
 }
 
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]\\section{[out_latex $title]} \\label{[label_latex $title]}"
+	printline ""
+	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
+	printline "\\section{[out_latex $title]} \\label{[label_latex $title]}"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_latex {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]\\subsection{[out_latex $title]} \\label{[label_latex $title]}"
+	printline ""
+	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
+	printline "\\subsection{[out_latex $title]} \\label{[label_latex $title]}"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_latex {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]\\subsubsection{[out_latex $title]} \\label{[label_latex $title]}"
+	printline ""
+	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
+	printline "\\subsubsection{[out_latex $title]} \\label{[label_latex $title]}"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
 ### PARAGRAPH ###
 proc process_paragraph_latex {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]\\paragraph{[out_latex $title]}"
+	printline ""
+	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
+	printline "\\paragraph{[out_latex $title]}"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
@@ -310,50 +325,51 @@ proc process_image_latex {txtblock} {
 	}
 	regsub { *$} $img_cap "" img_cap
 	
-	puts "[indent]\n[indent]\\begin{figure$img_star}\[tbp\]\n[indent] \\begin{center}"
-	puts "[indent]  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\$img_relw}"
-	puts "[indent]  \\caption{[out_latex $img_cap]}"
-	puts "[indent]  \\label{[label_latex $img_name]}"
-	puts "[indent] \\end{center}\n[indent]\\end{figure$img_star}\n"
+	printline ""
+	printline "\\begin{figure$img_star}\[tbp\]\n[indent] \\begin{center}"
+	printline "  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\$img_relw}"
+	printline "  \\caption{[out_latex $img_cap]}"
+	printline "  \\label{[label_latex $img_name]}"
+	printline " \\end{center}\n[indent]\\end{figure$img_star}\n"
 	
 }
 
 ### TABLE ###
 proc output_table_latex {head rows caption} {
-	puts "[indent]\\begin\{table\}\[h\]"
-	puts "[indent]\\center \{"
-	puts -nonewline "[indent] \\begin\{tabular\}\{|"
+	printline "\\begin\{table\}\[h\]"
+	printline "\\center \{"
+	print "[indent] \\begin\{tabular\}\{|"
 	foreach headcell $head {
 		if {[lindex $headcell 0] == "left"} {
-			puts -nonewline "l|"
+			print "l|"
 		} else {
-			puts -nonewline "r|"
+			print "r|"
 		}
 	}
-	puts "\}"
-	puts "[indent] \\hline"
-	puts -nonewline "[out_latex [lindex [lindex $head 0] 1]]"
+	printline "\}"
+	printline " \\hline"
+	print "[indent][out_latex [lindex [lindex $head 0] 1]]"
 	foreach headcell [lrange $head 1 end] {
-		puts -nonewline "& [out_latex [lindex $headcell 1]]"
+		print "& [out_latex [lindex $headcell 1]]"
 	}
-	puts "  \\\\"
-	puts "[indent]  \\hline"
-	puts "[indent]  \\hline"
+	printline "  \\\\"
+	printline "  \\hline"
+	printline "  \\hline"
 	foreach row $rows {
 		if {[lindex $row 0] == "hline"} {
-			puts "[indent]  \\hline"
+			printline "[indent]  \\hline"
 		}
 		if {[lindex $row 0] == "text"} {
 			set cells [lindex $row 1]
-			puts -nonewline "[indent]  [out_latex [lindex $cells 0]]"
+			print "[indent]  [out_latex [lindex $cells 0]]"
 			foreach cell [lrange $cells 1 end] {
-				puts -nonewline "& [out_latex $cell]"
+				print "& [out_latex $cell]"
 			}
-			puts "  \\\\"
+			printline "  \\\\"
 		}
 	}
-	puts "[indent]  \\hline"
-	puts "[indent] \\end\{tabular\}"
+	printline "  \\hline"
+	printline " \\end\{tabular\}"
 
 	set cap ""
 	foreach capline $caption {
@@ -362,11 +378,11 @@ proc output_table_latex {head rows caption} {
 	}
 	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
 		regsub  {^ +} $captxt ""  captxt
-		puts "[indent] \\caption\{[out_latex $captxt]\}"
-		puts "[indent] \\label\{[label_latex $caplab]\}"
+		printline " \\caption\{[out_latex $captxt]\}"
+		printline " \\label\{[label_latex $caplab]\}"
 	}
-	puts "[indent]\}"
-	puts "[indent]\\end\{table\}"
+	printline "\}"
+	printline "\\end\{table\}"
 }
 
 
@@ -377,29 +393,29 @@ proc output_table_latex {head rows caption} {
 ##############################
 
 proc process_header_struct {txtblock} {
-	puts "[indent]HEADER"
+	printline "HEADER"
 	foreach txtline $txtblock {
-		puts "[indent] $txtline"
+		printline " $txtline"
 	}
 }
 
 proc process_verbatim_struct {txtblock} {
-	puts "[indent]VERBATIM"
+	printline "VERBATIM"
 }
 
 proc process_itemize_struct {txtblock} {
-	puts "[indent]ITEMIZE"
+	printline "ITEMIZE"
 	handle_txtblock itemize $txtblock
 }
 
 proc process_description_struct {txtblock} {
 	if {[regexp {^\:([^\:]+)\:} [lindex $txtblock 0] dummy identifier]} {
-		puts "[indent]DESCRIPTION $identifier"
+		printline "DESCRIPTION $identifier"
 	}
 }
 
 proc process_item_struct {itemtxtblock} {
-	puts "[indent]ITEM"
+	printline "ITEM"
 	set txtline [lindex $itemtxtblock 0]
 	regsub {^\*\ } $txtline "" txtline
 	lappend txtblock $txtline
@@ -411,12 +427,12 @@ proc process_item_struct {itemtxtblock} {
 }
 
 proc process_enumeration_struct {txtblock} {
-	puts "[indent]ENUMERATION"
+	printline "ENUMERATION"
 	handle_txtblock enumeration $txtblock
 }
 
 proc process_enum_struct {itemtxtblock} {
-	puts "[indent]ENUMERATION ITEM"
+	printline "ENUMERATION ITEM"
 	set txtline [lindex $itemtxtblock 0]
 	regsub {^\#\ } $txtline "" txtline
 	lappend txtblock $txtline
@@ -428,64 +444,64 @@ proc process_enum_struct {itemtxtblock} {
 }
 
 proc process_plain_struct {txtblock} {
-	puts "[indent]PLAIN"
+	printline "PLAIN"
 	foreach txtline $txtblock {
-		puts "[indent] $txtline"
+		printline " $txtline"
 	}
 }
 
 proc process_abstract_struct {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[indent]ABSTRACT \"$title\""
+	printline "ABSTRACT \"$title\""
 	handle_txtblock abstract [lrange $txtblock 2 end]
 }
 
 proc process_bibliography_struct {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[indent]BIBLIOGRAPHY \"$title\""
+	printline "BIBLIOGRAPHY \"$title\""
 	handle_txtblock bibliography [lrange $txtblock 2 end]
 }
 
 proc process_bibitem_struct {txtblock} {
-	puts "[indent]BIBITEM"
+	printline "BIBITEM"
 	foreach txtline $txtblock {
-		puts "[indent] $txtline"
+		printline " $txtline"
 	}
 }
 
 proc process_chapter_struct {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[indent]CHAPTER \"$title\""
+	printline "CHAPTER \"$title\""
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 proc process_section_struct {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[indent]SECTION \"$title\""
+	printline "SECTION \"$title\""
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 proc process_subsection_struct {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[indent]SUBSECTION \"$title\""
+	printline "SUBSECTION \"$title\""
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
 proc process_paragraph_struct {txtblock} {
 	set title [lindex $txtblock 0]
-	puts "[indent]PARAGRAPH \"$title\""
+	printline "PARAGRAPH \"$title\""
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
 proc process_image_struct {txtblock} {
-	puts "[indent]IMAGE"
+	printline "IMAGE"
 	foreach txtline $txtblock {
-		puts "[indent] $txtline"
+		printline " $txtline"
 	}
 }
 
 proc output_table_struct {head cells caption} {
-	puts "[indent]TABLE"
+	printline "TABLE"
 }
 
 proc process_table {txtblock} {
@@ -534,9 +550,9 @@ proc process_table {txtblock} {
 }
 
 proc process_undefined {txtblock} {
-	puts stderr "Error: can not figure out what you mean with"
+	printline stderr "Error: can not figure out what you mean with"
 	foreach txtline $txtblock {
-		puts stderr "       $txtline"
+		printline stderr "       $txtline"
 	}
 	exit 1
 }
@@ -860,9 +876,9 @@ proc collect_references {txtblock} {
 
 # assist the user a bit #
 if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
-	puts "Convert ASCII to Latex"
-	puts "  usage: gosh <document.txt> > <document.tex>"
-	puts "         gosh --style <backend.gosh> <document.txt> > <document.tex>"
+	printline "Convert ASCII to Latex"
+	printline "  usage: gosh <document.txt> > <document.tex>"
+	printline "         gosh --style <backend.gosh> <document.txt> > <document.tex>"
 	exit
 }
 
@@ -885,7 +901,8 @@ while {[regexp {\--style ([^ ]+)} $argv dummy style_file]} {
 	if {[file exists $style_file]} {
 		source $style_file
 	} else {
-		puts "Error: style file $style_file does not exist"
+		puts stderr "Error: style file $style_file does not exist"
+	iegsub {^ *$} $string "" string
 	}
 	regsub {\--style [^ ]+} $argv "" argv
 }
