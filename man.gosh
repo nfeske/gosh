@@ -36,8 +36,6 @@ proc man_mkboldline {string} {
 ### FILTER TEXTUAL OUTPUT ###
 proc out_man {string} {
 
-	regsub {^\.} $string {\.} string
-
 	set string " $string "
 	
 	# italic style #
@@ -62,6 +60,9 @@ proc out_man {string} {
 	regsub -all {"} $string "\"" string
 	regsub {^ } $string "" string
 	regsub { $} $string "" string
+
+	regsub {^\.} $string {\.} string
+	regsub {^'} $string {\(cq} string
 
 	return $string
 }
