@@ -207,34 +207,40 @@ proc process_abstract_html {txtblock} {
 
 ### CHAPTER ###
 proc process_chapter_html {txtblock} {
-	global references curr_chapter curr_section_type text_color
+	global references curr_chapter curr_section_type text_color sec_enum
 	set curr_section_type chapter
 	set title [lindex $txtblock 0]
 	set curr_chapter $references($title,index)
+	set sec_prefix ""
+	if {$sec_enum} { set sec_prefix "$curr_chapter " }
 	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "\n[indent]<h1><font color=\"$text_color(chapter)\">$curr_chapter [out_html $title]</font></h1>"
+	puts "\n[indent]<h1><font color=\"$text_color(chapter)\">$sec_prefix[out_html $title]</font></h1>"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_html {txtblock} {
-	global references curr_chapter curr_section curr_section_type text_color
+	global references curr_chapter curr_section curr_section_type text_color sec_enum
 	set curr_section_type section
 	set title [lindex $txtblock 0]
 	set curr_section $references($title,index)
+	set sec_prefix ""
+	if {$sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
 	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h2><font color=\"$text_color(section)\">$curr_chapter.$curr_section [out_html $title]</font></h2>"
+	puts "[indent]<h2><font color=\"$text_color(section)\">$sec_prefix[out_html $title]</font></h2>"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_html {txtblock} {
-	global references curr_chapter curr_section curr_subsection curr_section_type text_color
+	global references curr_chapter curr_section curr_subsection curr_section_type text_color sec_enum
 	set curr_section_type subsection
 	set title [lindex $txtblock 0]
 	set curr_subsection $references($title,index)
+	set sec_prefix ""
+	if {$sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
 	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h3><font color=\"$text_color(subsection)\">$curr_chapter.$curr_section.$curr_subsection [out_html $title]</font></h3>"
+	puts "[indent]<h3><font color=\"$text_color(subsection)\">$sec_prefix[out_html $title]</font></h3>"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
@@ -271,7 +277,7 @@ proc process_image_html {txtblock} {
 	puts "[indent]  <img src=\"$img_name.jpg\" border=\"0\">"
 	if {$img_cap != ""} {
 		puts "[indent]</td><td valign=\"center\">"
-		puts "[indent]  $img_cap"
+		puts "[indent]  <font size=\"-1\">$img_cap</font>"
 	}
 	puts "[indent]</td></tr></table>"
 }
@@ -320,6 +326,6 @@ set text_color(chapter)    "#000014"
 set text_color(section)    "#202040"
 set text_color(subsection) "#404060"
 set text_color(paragraph)  "#505090"
-
+set sec_enum 1
 set curr_section_type default
 set outmode html
