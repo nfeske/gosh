@@ -1,43 +1,292 @@
-<html><head><title>Document Title</title></head>
+<html><head><title>TITLE TEXT can _be_ multi-line</title></head>
 <body>
-<h1><center>Document Title</center></h1>
-<b><center>Norman Feske</center></b>
+<h1><center>TITLE TEXT can _be_ multi-line</center></h1>
+<b><center>Authors</center></b>
 <center>2004-07-30</center>
 <hr/>
 <table align="center" cellpadding="5"><tr><td>
 <h3>Table of contents</h3>
-<b><a href="#Abstract">1. Abstract</a></b><br/>
-<b><a href="#Chapter One">2. Chapter One</a></b><br/>
+<b><a href="#Intro">1. Intro</a></b><br/>
+<b><a href="#1st Order Heading -- Chapter">2. 1st Order Heading -- Chapter</a></b><br/>
+<code>&nbsp;&nbsp;</code><a href="#2nd Order Haeding -- Section">1. 2nd Order Haeding -- Section</a><br/>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;</code><a href="#3rd Order Heading -- SubSection">1. 3rd Order Heading -- SubSection</a><br/>
+<b><a href="#Text styles">3. Text styles</a></b><br/>
+<b><a href="#Abstract">4. "Abstract"</a></b><br/>
+<b><a href="#References">5. References</a></b><br/>
+<code>&nbsp;&nbsp;</code><a href="#Ref section A">1. Ref section A</a><br/>
+<code>&nbsp;&nbsp;</code><a href="#Ref section B">2. Ref section B</a><br/>
+<b><a href="#Tables">6. Tables</a></b><br/>
+<b><a href="#Images">7. Images</a></b><br/>
+<b><a href="#Bibliography">8. "Bibliography"</a></b><br/>
+<b><a href="#Source file of this document">9. Source file of this document</a></b><br/>
 </td></tr></table>
 <hr/><br/>
- <font color="#000000">
-  A paragraph without a chapter. 
- <p></p>
- </font>
 
- %     -+*|[ ABSTRACT ]|*+-
+ <a name="Intro"></a>
 
- <h1>Abstract</h1>
- <i>
-  <font color="#000000">
-   Ohh.. .wie abstrakt.... 
+ <h1><font color="#000014">1  Intro</font></h1>
+  <font color="#000014">
+   Howto build this file:
   <p></p>
   </font>
- </i><hr/><br/>
+  <pre>
+# cat gosh.txt > out.txt
+# sed s/^/\!/ gosh.txt >> out.txt
+# gosh out.txt > gosh.tex
+# rm out.txt
+  </pre>
 
- <a name="Chapter One"></a>
+ <a name="1st Order Heading -- Chapter"></a>
 
- <h1><font color="#000014">2  Chapter One </font></h1>
+ <h1><font color="#000014">2  1st Order Heading -- Chapter</font></h1>
+
+  <a name="2nd Order Haeding -- Section"></a>
+  <h2><font color="#202040">2.1  2nd Order Haeding -- Section</font></h2>
+
+   <a name="3rd Order Heading -- SubSection"></a>
+   <h3><font color="#404060">2.1.1  3rd Order Heading -- SubSection</font></h3>
+
+    <a name="4th Order Heading -- Paragraph"></a>
+    <h4><font color="#505090"> 4th Order Heading -- Paragraph</font></h4>
+
+ <a name="Text styles"></a>
+
+ <h1><font color="#000014">3  Text styles</font></h1>
   <font color="#000014">
-   Some <i>accentuations with spaces in-between</i> 
+   Plain text looks like this.
   <p></p>
   </font>
   <font color="#000014">
-   A paragraph with an 
-   <code>apostroph</code> at the beginning of the line. 
+   Paragraph 1 is here.
+  <p></p>
+  </font>
+  <font color="#000014">
+   Paragraph 2 should be here.
+  <p></p>
+  </font>
+  <font color="#000014">
+   Use <code>apostrophes for monospaced text</code>, but  <code>hash</code>  works too for compatibility.
+  <p></p>
+  </font>
+  <font color="#000014">
+   Trigger bug in newline handling:
+  <p></p>
+  </font>
+  <font color="#000014">
+   BUG appears if a new line starts with non-words.
+  <p></p>
+  </font>
+  <font color="#000014">
+   BUG this should be a new paragraph, but it is'nt.
+   (because of the bracket)
+  <p></p>
+  </font>
+  <font color="#000014">
+   <i>Just emphasize this point</i> but only this point.
+  <p></p>
+  </font>
+  <font color="#000014">
+   Trigger bug in emph: (<i>BUG</i>) - <b>GOTCHA</b> This bug is no more.
+  <p></p>
+  </font>
+  <ul>
+   <li>
+    <font color="#000014">
+     itemize is nice.
+    <p></p>
+    </font>
+   </li>
+   <li>
+    <font color="#000014">
+     what do you think?
+    <p></p>
+    </font>
+    <ul>
+     <li>
+      <font color="#000014">
+       Yes?
+      <p></p>
+      </font>
+     </li>
+     <li>
+      <font color="#000014">
+       No?
+      <p></p>
+      </font>
+     </li>
+     <li>
+      <font color="#000014">
+       Maybe!
+      <p></p>
+      </font>
+     </li>
+    </ul>
+   </li>
+  </ul>
+  <ol>
+   <li>
+    <font color="#000014">
+     Let's enumerate some points.
+    <p></p>
+    </font>
+   </li>
+   <li>
+    <font color="#000014">
+     Test point
+    <p></p>
+    </font>
+   </li>
+  </ol>
+   <b><i> Description</i></b>
+    <font color="#000014">
+     Use this "for descriptions."
+     The "description" continues here...
+    <p></p>
+    </font>
+    <font color="#000014">
+     and here.
+    <p></p>
+    </font>
+   <b><i> Advice</i></b>
+    <font color="#000014">
+     Watch the step!
+    <p></p>
+    </font>
+  <br/>
+  <font color="#000014">
+   Trigger bug in itemize newline handling:
+  <p></p>
+  </font>
+  <font color="#000014">
+   BUG paragraph one
+  <p></p>
+  </font>
+  <font color="#000014">
+   BUG paragraph two
+  <p></p>
+  </font>
+  <font color="#000014">
+   BUG paragraph three
+  <p></p>
+  </font>
+  <ul>
+   <li>
+    <font color="#000014">
+     item 1
+    <p></p>
+    </font>
+   </li>
+   <li>
+    <font color="#000014">
+     item 2
+    <p></p>
+    </font>
+   </li>
+  </ul>
+  <font color="#000014">
+   BUG paragraph four
+  <p></p>
+  </font>
+  <pre>
+Whole line is verbatim. Maybe used for sources ...
+/** MAIN */
+void main(void) {
+    exit(0);
+}
+  </pre>
+
+ <a name="Abstract"></a>
+
+ <h1><font color="#000014">4  "Abstract"</font></h1>
+  <font color="#000014">
+   <i>TODO</i>
+  <p></p>
+  </font>
+
+ <a name="References"></a>
+
+ <h1><font color="#000014">5  References</font></h1>
+
+  <a name="Ref section A"></a>
+  <h2><font color="#202040">5.1  Ref section A</font></h2>
+   <font color="#202040">
+    Forward refer to section <a href="#Ref section B">Ref section B</a>.
+   <p></p>
+   </font>
+
+  <a name="Ref section B"></a>
+  <h2><font color="#202040">5.2  Ref section B</font></h2>
+   <font color="#202040">
+    Refer to section <a href="#Ref section A">Ref section A</a> and trigger <i>linebreak bug</i> [Ref
+    section A].
+   <p></p>
+   </font>
+   <font color="#202040">
+    <i>TODO:</i> bibs, figures, ...
+   <p></p>
+   </font>
+
+ <a name="Tables"></a>
+
+ <h1><font color="#000014">6  Tables</font></h1>
+  <font color="#000014">
+   Some Text could be here. Maybe more ...
+  <p></p>
+  </font>
+  <a name="LABEL"></a>
+  <br/><center><table cellspacing="0" cellpadding="3" border="1">
+  <tr>  <th bgcolor=#f0f7ff> col1 <br/></th>  <th bgcolor=#f0f7ff> col2 <br/></th>  <th bgcolor=#f0f7ff> col3<br/></th>  </tr>
+<tr>
+  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
+<tr>
+  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
+<tr>
+  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
+<tr>
+  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
+<tr>
+  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
+  </table>
+  Table 1:  TEXT
+</center><br/>
+  <font color="#000014">
+   More Text for Tab. <a href="#LABEL">1</a> follows here.
+  <p></p>
+  </font>
+
+ <a name="Images"></a>
+
+ <h1><font color="#000014">7  Images</font></h1>
+  <font color="#000014">
+   <i>TODO</i>
+  <p></p>
+  </font>
+
+ <a name="Bibliography"></a>
+
+ <h1><font color="#000014">8  "Bibliography"</font></h1>
+  <font color="#000014">
+   <i>TODO</i>
+  <p></p>
+  </font>
+
+ <a name="Source file of this document"></a>
+
+ <h1><font color="#000014">9  Source file of this document</font></h1>
+  <font color="#000014">
+   A damn url <a href="http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375&ViewPropertyHomePage=&formName=ViewPropertyHomePageForm" alt="Hilton">Hilton</a>
+  <p></p>
+  </font>
+  <font color="#000014">
+   Underlines in Latex citations text <a href="xaz_123" alt="xaz_123">xaz_123</a> text
+  <p></p>
+  </font>
+  <font color="#000014">
+   There was a bug where an
+   <code>apostroph</code> caused the start of a new paragraph.
   <p></p>
   </font>
 <hr/><br/>
-<i>Norman Feske</i>
+<i>Authors</i>
 </body>
 </html>

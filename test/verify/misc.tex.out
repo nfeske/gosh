@@ -1,3 +1,4 @@
+
 \documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}
 \usepackage{times}
 \usepackage[T1]{fontenc}
@@ -12,30 +13,224 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \begin{document}
-\title{Document Title}
-\author{Norman Feske}
+\title{TITLE TEXT can \emph{be} multi-line}
+\author{Authors}
 \maketitle
- A paragraph without a chapter.
 
 
- %     -+*|[ ABSTRACT ]|*+-
+ %     -+*|[ INTRO ]|*+-
 
- \begin{abstract} \label{Abstract}
+ \section{Intro} \label{Intro}
 
-  Ohh.. .wie abstrakt....
-
- \end{abstract}
-
- %     -+*|[ CHAPTER ONE ]|*+-
-
- \section{Chapter One} \label{Chapter One}
-
-  Some \emph{accentuations with spaces in-between}
-
-  A paragraph with an
-  \texttt{apostroph} at the beginning of the line.
+  Howto build this file:
 
 
+  \begin{verbatim}
+  # cat gosh.txt > out.txt
+  # sed s/^/\!/ gosh.txt >> out.txt
+  # gosh out.txt > gosh.tex
+  # rm out.txt
+  \end{verbatim}
+
+
+
+ %     -+*|[ 1ST ORDER HEADING -- CHAPTER ]|*+-
+
+ \section{1st Order Heading -- Chapter} \label{1st Order Heading  Chapter}
+
+
+  %     -+*|[ 2ND ORDER HAEDING -- SECTION ]|*+-
+
+  \subsection{2nd Order Haeding -- Section} \label{2nd Order Haeding  Section}
+
+
+   %     -+*|[ 3RD ORDER HEADING -- SUBSECTION ]|*+-
+
+   \subsubsection{3rd Order Heading -- SubSection} \label{3rd Order Heading  SubSection}
+
+
+    %     -+*|[ 4TH ORDER HEADING -- PARAGRAPH ]|*+-
+
+    \paragraph{4th Order Heading -- Paragraph}
+
+
+
+ %     -+*|[ TEXT STYLES ]|*+-
+
+ \section{Text styles} \label{Text styles}
+
+  Plain text looks like this.
+
+  Paragraph 1 is here.
+
+
+  Paragraph 2 should be here.
+
+  Use \texttt{apostrophes for monospaced text}, but  \texttt{hash}  works too for compatibility.
+
+  Trigger bug in newline handling:
+
+  BUG appears if a new line starts with non-words.
+
+  BUG this should be a new paragraph, but it is'nt.
+  (because of the bracket)
+
+  \emph{Just emphasize this point} but only this point.
+
+  Trigger bug in emph: (\emph{BUG}) - \textbf{GOTCHA} This bug is no more.
+
+
+  \begin{itemize}
+   \item
+    itemize is nice.
+   \item
+    what do you think?
+    \begin{itemize}
+     \item
+      Yes?
+     \item
+      No?
+     \item
+      Maybe!
+
+    \end{itemize}
+  \end{itemize}
+  \begin{enumerate}
+   \item
+    Let's enumerate some points.
+   \item
+    Test point
+
+
+  \end{enumerate}
+  \begin{description}
+   \item[Description]
+    Use this ``for descriptions.''
+    The ``description'' continues here...
+
+    and here.
+
+   \item[Advice]
+    Watch the step!
+
+
+  \end{description}
+  Trigger bug in itemize newline handling:
+
+  BUG paragraph one
+
+  BUG paragraph two
+
+  BUG paragraph three
+  \begin{itemize}
+   \item
+    item 1
+   \item
+    item 2
+  \end{itemize}
+  BUG paragraph four
+
+
+  \begin{verbatim}
+  Whole line is verbatim. Maybe used for sources ...
+  /** MAIN */
+  void main(void) {
+      exit(0);
+  }
+  \end{verbatim}
+
+
+
+ %     -+*|[ "ABSTRACT" ]|*+-
+
+ \section{``Abstract''} \label{Abstract}
+
+  \emph{TODO}
+
+
+
+ %     -+*|[ REFERENCES ]|*+-
+
+ \section{References} \label{References}
+
+
+  %     -+*|[ REF SECTION A ]|*+-
+
+  \subsection{Ref section A} \label{Ref section A}
+
+   Forward refer to section \ref{Ref section B}.
+
+
+
+  %     -+*|[ REF SECTION B ]|*+-
+
+  \subsection{Ref section B} \label{Ref section B}
+
+   Refer to section \ref{Ref section A} and trigger \emph{linebreak bug} [Ref
+   section A].
+
+   \emph{TODO:} bibs, figures, ...
+
+
+
+ %     -+*|[ TABLES ]|*+-
+
+ \section{Tables} \label{Tables}
+
+  Some Text could be here. Maybe more ...
+
+
+  \begin{table}[h]
+  \center {
+   \begin{tabular}{|l|l|l|}
+   \hline
+  col1& col2& col3    \\
+    \hline
+    \hline
+    col1& col2& col3    \\
+    col1& col2& col3    \\
+    col1& col2& col3    \\
+    col1& col2& col3    \\
+      \hline
+      \hline
+    col1& col2& col3    \\
+    \hline
+   \end{tabular}
+   \caption{TEXT}
+   \label{LABEL}
+  }
+  \end{table}
+  More Text for Tab. \ref{LABEL} follows here.
+
+
+
+ %     -+*|[ IMAGES ]|*+-
+
+ \section{Images} \label{Images}
+
+  \emph{TODO}
+
+
+
+
+ %     -+*|[ "BIBLIOGRAPHY" ]|*+-
+
+ \section{``Bibliography''} \label{Bibliography}
+
+  \emph{TODO}
+
+
+
+ %     -+*|[ SOURCE FILE OF THIS DOCUMENT ]|*+-
+
+ \section{Source file of this document} \label{Source file of this document}
+
+  A damn url \texttt{http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375\&ViewPropertyHomePage=\&formName=ViewPropertyHomePageForm}
+
+  Underlines in Latex citations text \cite{xaz_123} text
+
+  There was a bug where an
+  \texttt{apostroph} caused the start of a new paragraph.
 
 \newpage
 \bibliographystyle{plain}

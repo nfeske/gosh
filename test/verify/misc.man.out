@@ -1,14 +1,126 @@
 .TH "misc.txt" 7 "" "TU Dresden" "DROPS Manual"
 .SH NAME
-misc.txt \- Document Title
-A paragraph without a chapter.
-.SH "ABSTRACT"
-Ohh.. .wie abstrakt....
-.SH "CHAPTER ONE"
-Some 
-.I accentuations with spaces in-between
+misc.txt \- TITLE TEXT can _be_ multi-line
+.SH "INTRO"
+Howto build this file:
+.PP
+.ll +1i
+# cat gosh.txt > out.txt
+.br
+# sed s/^/\!/ gosh.txt >> out.txt
+.br
+# gosh out.txt > gosh.tex
+.br
+# rm out.txt
+.br
+.ll
+.PP
+.SH "1ST ORDER HEADING -- CHAPTER"
+.SS "2nd Order Haeding -- Section"
+.PP
+.BI "3rd Order Heading -- SubSection"
+.br
+.PP
+.BI "4th Order Heading -- Paragraph."
+.SH "TEXT STYLES"
+Plain text looks like this.
+Paragraph 1 is here.
+Paragraph 2 should be here.
+Use 'apostrophes for monospaced text', but #hash# works too for compatibility.
+Trigger bug in newline handling:
+BUG appears if a new line starts with non-words.
+BUG this should be a new paragraph, but it is'nt.
+(because of the bracket)
 
-A paragraph with an
-\(cqapostroph' at the beginning of the line.
+.I Just emphasize this point
+but only this point.
+Trigger bug in emph: (
+.I BUG
+) - 
+.B GOTCHA
+This bug is no more.
+.IP "  *"
+itemize is nice.
+.IP "  *"
+what do you think?
+.IP "  *"
+Yes?
+.IP "  *"
+No?
+.IP "  *"
+Maybe!
+.RS
+.TP
+.B 1.
+Let's enumerate some points.
+.TP
+.B 2.
+Test point
+.RE
+
+.RS 0.0
+.TP
+.BI "Description"
+Use this "for descriptions."
+The "description" continues here...
+and here.
+.TP
+.BI "Advice"
+Watch the step!
+.RE
+Trigger bug in itemize newline handling:
+BUG paragraph one
+BUG paragraph two
+BUG paragraph three
+.IP "  *"
+item 1
+.IP "  *"
+item 2
+BUG paragraph four
+.PP
+.ll +1i
+Whole line is verbatim. Maybe used for sources ...
+.br
+/** MAIN */
+.br
+void main(void) {
+.br
+    exit(0);
+.br
+}
+.br
+.ll
+.PP
+.SH ""ABSTRACT""
+
+.I TODO
+
+.SH "REFERENCES"
+.SS "Ref section A"
+Forward refer to section [Ref section B].
+.SS "Ref section B"
+Refer to section [Ref section A] and trigger 
+.I linebreak bug
+[Ref
+section A].
+
+.I TODO:
+bibs, figures, ...
+.SH "TABLES"
+Some Text could be here. Maybe more ...
+More Text for Tab. [LABEL] follows here.
+.SH "IMAGES"
+
+.I TODO
+
+.SH ""BIBLIOGRAPHY""
+
+.I TODO
+
+.SH "SOURCE FILE OF THIS DOCUMENT"
+A damn url [http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375&ViewPropertyHomePage=&formName=ViewPropertyHomePageForm - Hilton]
+Underlines in Latex citations text [xaz_123] text
+There was a bug where an
+\(cqapostroph' caused the start of a new paragraph.
 .SH AUTHOR
-Norman Feske
+Authors

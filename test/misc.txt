@@ -1,22 +1,181 @@
-              Document Title
 
-               Norman Feske
+ TITLE TEXT
+ can _be_ multi-line
+
+ Authors
+
+; $Id$
+
+; This document demonstrates GOSH (Gold Out of SHit) and all its implemented
+; features. It will be enhanced when GOSH is enhanced <--- no advice - simple
+; rule!
+; BTW: Comments start with ';'.
+
+; FIXMEs / Questions
+;
+; * Do NOT strip all newlines - there could be intention to use 'em.
+; * What is 'EMPTY'?
+; * Will "LaTeX" be factored out of GOSH like HTML?
 
 
-A paragraph without a chapter.
+Intro
+#####
 
-Abstract
-########
+Howto build this file:
 
-Ohh.. .wie abstrakt....
 
-Chapter One
+!# cat gosh.txt > out.txt
+!# sed s/^/\!/ gosh.txt >> out.txt
+!# gosh out.txt > gosh.tex
+!# rm out.txt
+
+
+1st Order Heading -- Chapter
+############################
+
+2nd Order Haeding -- Section
+============================
+
+3rd Order Heading -- SubSection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4th Order Heading -- Paragraph
+------------------------------
+
+
+Text styles
 ###########
 
-Some _accentuations with spaces in-between_
+Plain text looks like this.
 
-A paragraph with an
-'apostroph' at the beginning of the line.
+Paragraph 1 is here.
+
+; comments between paragraphs are not a problem 
+
+Paragraph 2 should be here.
+
+Use 'apostrophes for monospaced text', but #hash# works too for compatibility.
+
+Trigger bug in newline handling:
+
+BUG appears if a new line starts with non-words.
+
+BUG this should be a new paragraph, but it is'nt.
+(because of the bracket)
+
+_Just_emphasize_this_point_ but only this point.
+
+Trigger bug in emph: (_BUG_) - *GOTCHA* This bug is no more.
 
 
+* itemize is nice.
+* what do you think?
+  * Yes?
+  * No?
+  * Maybe!
+
+# Let's enumerate some points.
+# Test point
+
+
+:Description: Use this "for descriptions."
+  The "description" continues here...
+
+  and here.
+
+:Advice: Watch the step!
+
+
+Trigger bug in itemize newline handling:
+
+BUG paragraph one
+
+BUG paragraph two
+
+BUG paragraph three
+* item 1
+* item 2
+BUG paragraph four
+
+
+!Whole line is verbatim. Maybe used for sources ...
+!/** MAIN */
+!void main(void) {
+!    exit(0);
+!}
+
+
+"Abstract"
+##########
+
+_TODO_
+
+
+References
+##########
+
+Ref section A
+=============
+
+Forward refer to section [Ref section B].
+
+
+Ref section B
+=============
+
+Refer to section [Ref section A] and trigger _linebreak_bug_ [Ref
+section A].
+
+_TODO:_ bibs, figures, ...
+
+
+Tables
+######
+
+Some Text could be here. Maybe more ...
+
+
+ col1 | col2 | col3
+ ------------------
+ col1 | col2 | col3
+ col1 | col2 | col3
+ col1 | col2 | col3
+ col1 | col2 | col3
+ ------------------
+ ------------------
+ col1 | col2 | col3
+[table LABEL] TEXT
+
+
+More Text for Tab. [LABEL] follows here.
+
+
+Images
+######
+
+_TODO_
+
+;; usage as follows
+;; <image_file_without_extension> will be label with some things
+;; stripped of (e.g. '_')
+;[image <image_file_without_extension> <scale>% <angle>°]
+;caption
+;more caption
+
+
+"Bibliography"
+##############
+
+_TODO_
+
+
+Source file of this document
+############################
+
+A damn url [http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375&ViewPropertyHomePage=&formName=ViewPropertyHomePageForm - Hilton]
+
+Underlines in Latex citations text [xaz_123] text
+
+There was a bug where an
+'apostroph' caused the start of a new paragraph.
 
