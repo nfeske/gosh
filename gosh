@@ -169,9 +169,9 @@ proc process_annotation_latex {txtblock} {
 		regsub {^\| ?} $txtline "" txtline
 		lappend new_txtblock $txtline
 	}
-	printline "\\footnotesize{ \\it {"
+	printline "{ \\footnotesize \\it"
 	handle_txtblock annotation $new_txtblock
-	printline "} }"
+	printline "}"
 }
 
 ### VERBATIM  ###
