@@ -73,6 +73,9 @@ proc out_latex {string} {
 	regsub -all { *$} $string "" string
 	regsub -all {µ} $string "\$\\mu\$" string
 
+	regsub -all {<} $string "\\mbox{\$<\$}" string
+	regsub -all {>} $string "\\mbox{\$>\$}" string
+
 	regsub -all {e\.g\.} $string "e.\\,g." string
 	regsub -all {i\.e\.} $string "i.\\,e." string
 
