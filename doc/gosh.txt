@@ -75,6 +75,18 @@ Trigger bug in emph: (_BUG_)
 :Advice: Watch the step!
 
 
+Trigger bug in itemize newline handling:
+
+BUG paragraph one
+
+BUG paragraph two
+
+BUG paragraph three
+* item 1
+* item 2
+BUG paragraph four
+
+
 !Whole line is verbatim. Maybe used for sources ...
 !/** MAIN */
 !void main(void) {
