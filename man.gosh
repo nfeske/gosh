@@ -74,10 +74,17 @@ proc label_man {string} {
 
 ### WRITE HEADER ###
 proc produce_head_man {} {
-	global title authors
-        regsub {^([^-(]+).*$} $title {\1} name
-	regsub {^.*\(([0-9]+)\).*$} $title {\1} section
-	regsub {^[^-]*-* *(.*)$} $title {\1} desc
+	global title authors txtfilename
+	if {[regexp {^([^(]+)\(([0-9]+)\) *-+ *(.*)$} \
+                   $title dummy name section desc]} {
+	    string trim name
+	    string trim desc
+	} else {
+	    set section 7
+	    set desc $title
+	    set name $txtfilename
+	}
+		   
 	puts ".TH \"$name\" $section \"[exec date]\" \"TU Dresden\" \"DROPS Manual\""
 	puts ".SH NAME"
 	puts "$name \\- $desc"
@@ -203,21 +210,21 @@ proc process_chapter_man {txtblock} {
 ### SECTION ###
 proc process_section_man {txtblock} {
 	set title [lindex $txtblock 0]
-	puts ".SH \"[out_man [string toupper $title]]\""
+	puts ".SS \"[out_man $title]\""
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_man {txtblock} {
 	set title [lindex $txtblock 0]
-	puts ".SH \"[out_man [string toupper $title]]\""
+	puts ".SS \"[out_man $title]\""
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
 ### PARAGRAPH ###
 proc process_paragraph_man {txtblock} {
 	set title [lindex $txtblock 0]
-	puts ".SH \"[out_man [string toupper $title]]\""
+	puts "[man_mbbold [out_man $title]]\""
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
