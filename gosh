@@ -175,7 +175,7 @@ proc process_itemize_latex {txtblock} {
 proc process_item_latex {itemtxtblock} {
 	puts "[indent]\\item"
 	set txtline [lindex $itemtxtblock 0]
-	regsub {^\*\ } $txtline "" txtline
+	regsub {^[^\ ]\ } $txtline "" txtline
 	regsub {^\#\ } $txtline "" txtline
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
