@@ -490,9 +490,9 @@ proc process_table {txtblock} {
 
 proc process_undefined {txtblock} {
 	puts stderr "Error: can not figure out what you mean with"
-#	foreach txtline $txtblock {
-#		puts stderr "[indent] $txtline"
-#	}
+	foreach txtline $txtblock {
+		puts stderr "       $txtline"
+	}
 }
 
 
