@@ -113,6 +113,8 @@ proc process_verbatim_man {txtblock} {
 	puts ".ll +1i"
 	foreach txtline $txtblock {
 		regsub {^!} $txtline "" txtline
+	        regsub {\\} $txtline {\\\\} txtline
+	        regsub {^([.'])} $txtline {\\\&\1} txtline
 		puts "$txtline\n.br"
 	}
 	puts ".ll"
