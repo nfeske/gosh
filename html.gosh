@@ -49,7 +49,7 @@ proc out_html {string} {
 				regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
 			}
 		} else {
-			regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
+			regsub {\[([^\]]+)\]} $string "<a href=\"$ref_text\">$ref_text</a>" string
 		}
 	}
 	
@@ -64,7 +64,7 @@ proc label_html {string} {
 
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_html {} {
-	global title authors
+	global title authors references toc_refs
 	puts "<html><head><title>$title</title></head>"
 	puts "<body>"
 	if {$title != ""} {
@@ -74,6 +74,23 @@ proc produce_head_html {} {
 		puts "<b><center>$authors</center></b>"
 	}
 	puts "<center>[exec date --iso-8601]</center>"
+	puts "[indent]<hr/>"
+	
+	# table of contents #
+	puts "[indent]<table align=\"center\" cellpadding=\"5\"><tr><td>"
+	puts "<h3>Table of contents</h3>"
+	foreach ref_name $toc_refs {
+		if {$references($ref_name,type) == "chapter"} {
+			puts "[indent]<b><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a></b><br/>"
+		}
+		if {$references($ref_name,type) == "section"} {
+			puts "[indent]<code>&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
+		}
+		if {$references($ref_name,type) == "subsection"} {
+			puts "[indent]<code>&nbsp;&nbsp;&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
+		}
+	}
+	puts "[indent]</td></tr></table>"
 	puts "[indent]<hr/><br/>"
 }
 
@@ -161,6 +178,7 @@ proc process_enum_html {itemtxtblock} {
 proc process_plain_html {plaintxtblock} {
 	global curr_section_type text_color
 	puts "[indent]<font color=\"$text_color($curr_section_type)\">"
+	#puts "<p align=\"justify\">"
 	while {[lindex $plaintxtblock end] == ""} {
 		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
 	}
@@ -172,7 +190,9 @@ proc process_plain_html {plaintxtblock} {
 		}
 		puts [out_html $txtline]
 	}
-	puts "[indent]</font><p></p>"
+	#puts "</p>"
+	puts "[indent]<p></p>"
+	puts "[indent]</font>"
 }
 
 ### ABSTRACT ###
@@ -191,6 +211,7 @@ proc process_chapter_html {txtblock} {
 	set curr_section_type chapter
 	set title [lindex $txtblock 0]
 	set curr_chapter $references($title,index)
+	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
 	puts "\n[indent]<h1><font color=\"$text_color(chapter)\">$curr_chapter [out_html $title]</font></h1>"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
@@ -294,9 +315,9 @@ proc output_table_html {head rows caption} {
 
 set text_color(default)    "#000000"
 set text_color(chapter)    "#000014"
-set text_color(section)    "#101028"
-set text_color(subsection) "#202040"
-set text_color(paragraph)  "#303060"
+set text_color(section)    "#202040"
+set text_color(subsection) "#404060"
+set text_color(paragraph)  "#505090"
 
 set curr_section_type default
 set outmode html
