@@ -1,8 +1,8 @@
 
 
-                        GOSH Documentstion \\
+                        GOSH Documentation
 
-    Norman Feske (authors are separated from title by an empty line)
+                           Norman Feske
 
 
 Introduction
@@ -14,24 +14,21 @@ Introduction
 ; BTW: Comments start with ';' and are ignored by GOSH
 
 GOSH is a tool for converting plain ASCII text to Latex and other document
-formats.
-
-Originally, GOSH was meant as an alternative to writing Latex files by hand.
-Its main design criteria was to use a syntax that is perfectly readable as
-plain ASCII text and the support of different target formats.
-
+formats. Its main design criteria was to use a syntax that is perfectly
+readable as plain ASCII text and the support of different target formats.
 The source files of GOSH have a very simple syntax that is similar to the
 usenet style. Everyone, who ever wrote a mail using an plain ASCII editor
 will able to write GOSH texts.
-
 ; Actually, the file you are reading right now is a GOSH text file.
-
 GOSH supports multiple target formats by different backends, which are
 available as separate files. By now, there exists the built-in Latex backend,
 a simple HTML backend and a man-page backend.
 
-This is an early version of GOSH. Its features and arguments may change
-in the future.
+Originally, GOSH was meant as an alternative to writing Latex files by hand.
+In the meanwhile I do all kind of textual work, papers, documentation,
+websites and slides using GOSH. As it is a big help for myself, it might be
+useful for other people, too. Anyhow, this is an early version of GOSH.
+Its features and usage may change in the future.
 
 
 How to get GOSH?
@@ -71,7 +68,7 @@ A HTML-version of the text can be created by using the HTML-backend:
 
 ! > gosh --style html.gosh gosh.txt > gosh.html
 
-The used backend to use is specified via the '--style' argument. The 'html.gosh'
+The backend to use is specified via the '--style' argument. The 'html.gosh'
 file contains the rules of how to produce the HTML output.
 
 
@@ -128,7 +125,7 @@ Accentuations
 GOSH support accentuations for marking *bold* and _italic_ text. It uses
 not the slash ('/') character to mark italic text because slashes are used
 in pathnames, which are very likely to appear in GOSH texts. Additionally,
-Underlined text is rarely used. If you want to _mark multiple words_ you do
+underlined text is rarely used. If you want to _mark multiple words_ you do
 not need to (_but_you_can_) place '_' in-between the words.
 All words 'that are written apostrophes' will be considered as monospaced
 text. This is useful for 'filenames' and the like. The beginning and the
@@ -145,14 +142,16 @@ monospaced font automatically.
 Text structure
 ##############
 
-The document title is always the first text in the document. It is meant
-to be written centered in the GOSH text. There must be at least one space
-at the beginning the a title line. Otherwise, GOSH will consider the line as
-the first paragraph of the document. The title can span multiple lines.
+Head of a GOSH text
+===================
 
-The title is followed by one or more empty lines and the author's names.
-As for the title, the author's names should be written in a centered way
-as well.
+The document title is the first text in the document. It is meant to be written
+centered in the GOSH text. There must be at least one space at the beginning of
+a title line. Otherwise, GOSH will consider the line as the first paragraph of
+the document. The title can span multiple lines.
+
+The title is followed by one or more empty lines and the author's names.  As
+for the title, the author's names should be written in a centered way as well.
 
 Example of a header of a GOSH text:
 
@@ -161,11 +160,16 @@ Example of a header of a GOSH text:
 !             document
 !
 !          Bernd Ullrich
-				   
+!          Uli Berndrich
+
 
 You do not need to specify the author but it is recommended. You can also
 specify neither the title nor the author. In this case the document is
 just untitled.
+
+
+Sections
+========
 
 The chapter's names are underlined with the '#' character:
 
@@ -199,8 +203,8 @@ Images
 Images can be inserted into the document this way:
 
 ! [image filename] This is the caption of the image.
-    The caption can span multiple lines. Each line
-    must be indented by two spaces.
+!   The caption can span multiple lines. Each line
+!   must be indented by two spaces.
 
 You can control the width of the image in relation to the page width via:
 
@@ -221,18 +225,18 @@ Tables
 The table feature of GOSH is very preliminary, but it is still usable for a
 lot of cases. Tables are drawn by '-' and '|' characters. Each line of a
 table must be led by at least one space. The caption of a table can be
-written similar to the caption of an image:
+written similar to the caption of an image.
 
-!  directory | filename  | size
-! --------------------------------
-!  /etc      | crontab   | 651
-!            | csh.login | 65
-!            | exports   | 114
-! --------------------------------
-!  /sbin     | route     | 46680
-!            | portmap   | 12016
-!
-! [table ] This is the caption of the table.
+  directory | filename  | size
+ --------------------------------
+  /etc      | crontab   | 651
+            | csh.login | 65
+            | exports   | 114
+ --------------------------------
+  /sbin     | route     | 46680
+            | portmap   | 12016
+
+[table example_table] This is the caption of the table.
 
 :Note: Two sequent tables without any text in-between cause problems with the
   current version of GOSH.
@@ -241,26 +245,26 @@ written similar to the caption of an image:
 References
 ==========
 
-Chapters, sections and subsections can be referenced within the the
-document by enclosing the corresponding name by '[' and ']'. For example,
-read section [Licence] carefully. This makes it very easy to insert
-references but has the drawback, that all referenced section names need
-to be different to avoid ambiguous references.
+Chapters, sections and subsections can be referenced within the document by
+enclosing the corresponding name with brackets. For example, read section
+[Licence] carefully. This makes it very easy to insert references but has the
+drawback, that all referenced section names need to be different to avoid
+ambiguous references.
 
-Images can be referenced by their filenames (without the extension).
-I use to store all images of the document in a separate 'img/' folder.
-This avoids naming conflicts of image filenames and section names.
-Tables can be referenced by their identifiers.
+Images can be referenced by their filenames (without the extension).  I use to
+store all images of the document in a separate 'img/' folder.  This avoids
+naming conflicts of image filenames and section names.  Tables can be
+referenced by their identifiers.
 
-If there is no matching identifier within the document, GOSH assumes
-the text within '[' and ']' is an external reference (citation). So
-you can insert citations just the same way as references. This is very
-practical if you use Latex and Bibtex.
+If there is no matching identifier within the document, GOSH assumes the text
+within the brackets is an external reference (citation). So you can insert
+citations just the same way as references. This is very practical if you use
+Latex and Bibtex.
 
-GOSH detects HTML-links by a heading 'http://'. For example, take a look
-at Atari.org [http://www.atari.org]. The HTML-backend supports the link text
-and a title to be optionally specified. The link text is delimited from the
-the _URL_ by a '-', enclosed with spaces:
+GOSH detects HTML-links by a heading 'http://'. For example, take a look at
+Atari.org [http://www.atari.org]. The HTML-backend supports the link text and a
+title to be optionally specified. The link text is delimited from the _URL_ by
+a '-', enclosed with spaces:
 
 ! [http://www.atari.org - The Atari Headquarter]
 
@@ -306,7 +310,7 @@ your target format directly into your GOSH text file by marking such lines
 by a colon, followed by a space at the beginning of line:
 
 ! : This text will not be touched by
-! : GOSH. It will be directly printed
+! : GOSH. It will be directly written
 ! : out in its original form.
 
 When using this method, you loose the feature of GOSH to create different
@@ -343,7 +347,7 @@ grow as soon as people will report problems to me.
 When GOSH is unable to parse its input file correctly, it outputs an error
 message "Error: cannot figure out what you mean with", followed by the
 trouble-making text. You should revisit this text passage. Mostly, this
-message is cause by wrong indentation. You should make sure that you
+message is caused by wrong indentation. You should make sure that you
 indented items, enumerations, descriptions and captions with two spaces
 and no TABS. Do not use TABS. GOSH does not recognize TABS.
 
@@ -355,7 +359,7 @@ Known bugs and limitations
 * The line where an error occured is not printed in the error message.
   This sounds simple to fix but it is not.
 * All references must be written completely on one line, including the
-  '[' brackets ']'.
+  brackets.
 
 
 Contact
@@ -367,5 +371,7 @@ hesitate to contact me via
 :Email: nf2@inf.tu-dresden.de
 
 For new versions of GOSH and information about its development, you might
-visit [http://os.inf.tu-dresden.de/~nf2 - my website].
+visit
+
+:My Website: [http://os.inf.tu-dresden.de/~nf2].
 
