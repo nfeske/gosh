@@ -2,295 +2,240 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2004-07-30</center>
-<hr/>
-<table align="center" cellpadding="5"><tr><td>
-<h3>Table of contents</h3>
-<b><a href="#Intro">1. Intro</a></b><br/>
-<b><a href="#1st Order Heading -- Chapter">2. 1st Order Heading -- Chapter</a></b><br/>
-<code>&nbsp;&nbsp;</code><a href="#2nd Order Haeding -- Section">1. 2nd Order Haeding -- Section</a><br/>
-<code>&nbsp;&nbsp;&nbsp;&nbsp;</code><a href="#3rd Order Heading -- SubSection">1. 3rd Order Heading -- SubSection</a><br/>
-<b><a href="#Text styles">3. Text styles</a></b><br/>
-<b><a href="#Abstract">4. "Abstract"</a></b><br/>
-<b><a href="#References">5. References</a></b><br/>
-<code>&nbsp;&nbsp;</code><a href="#Ref section A">1. Ref section A</a><br/>
-<code>&nbsp;&nbsp;</code><a href="#Ref section B">2. Ref section B</a><br/>
-<b><a href="#Tables">6. Tables</a></b><br/>
-<b><a href="#Images">7. Images</a></b><br/>
-<b><a href="#Bibliography">8. "Bibliography"</a></b><br/>
-<b><a href="#Source file of this document">9. Source file of this document</a></b><br/>
-</td></tr></table>
+<center>2004-08-02</center>
 <hr/><br/>
-
  <a name="Intro"></a>
-
- <h1><font color="#000014">1  Intro</font></h1>
-  <font color="#000014">
+ <h1>Intro</h1>
+  <p>
    Howto build this file:
-  <p></p>
-  </font>
-  <pre>
+  </p>
+<pre>
 # cat gosh.txt > out.txt
 # sed s/^/\!/ gosh.txt >> out.txt
 # gosh out.txt > gosh.tex
 # rm out.txt
-  </pre>
-
+</pre>
  <a name="1st Order Heading -- Chapter"></a>
-
- <h1><font color="#000014">2  1st Order Heading -- Chapter</font></h1>
-
+ <h1>1st Order Heading &ndash; Chapter</h1>
   <a name="2nd Order Haeding -- Section"></a>
-  <h2><font color="#202040">2.1  2nd Order Haeding -- Section</font></h2>
-
+  <h2>2nd Order Haeding &ndash; Section</h2>
    <a name="3rd Order Heading -- SubSection"></a>
-   <h3><font color="#404060">2.1.1  3rd Order Heading -- SubSection</font></h3>
-
+   <h3>3rd Order Heading &ndash; SubSection</h3>
     <a name="4th Order Heading -- Paragraph"></a>
-    <h4><font color="#505090"> 4th Order Heading -- Paragraph</font></h4>
-
+    <h4>4th Order Heading &ndash; Paragraph</h4>
  <a name="Text styles"></a>
-
- <h1><font color="#000014">3  Text styles</font></h1>
-  <font color="#000014">
+ <h1>Text styles</h1>
+  <p>
    Plain text looks like this.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    Paragraph 1 is here.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    Paragraph 2 should be here.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    Use <code>apostrophes for monospaced text</code>, but  <code>hash</code>  works too for compatibility.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    Trigger bug in newline handling:
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    BUG appears if a new line starts with non-words.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    BUG this should be a new paragraph, but it is'nt.
    (because of the bracket)
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    <i>Just emphasize this point</i> but only this point.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    Trigger bug in emph: (<i>BUG</i>) - <b>GOTCHA</b> This bug is no more.
-  <p></p>
-  </font>
+  </p>
   <ul>
    <li>
-    <font color="#000014">
+    <p>
      itemize is nice.
-    <p></p>
-    </font>
+    </p>
    </li>
    <li>
-    <font color="#000014">
+    <p>
      what do you think?
-    <p></p>
-    </font>
+    </p>
     <ul>
      <li>
-      <font color="#000014">
+      <p>
        Yes?
-      <p></p>
-      </font>
+      </p>
      </li>
      <li>
-      <font color="#000014">
+      <p>
        No?
-      <p></p>
-      </font>
+      </p>
      </li>
      <li>
-      <font color="#000014">
+      <p>
        Maybe!
-      <p></p>
-      </font>
+      </p>
      </li>
     </ul>
    </li>
   </ul>
   <ol>
    <li>
-    <font color="#000014">
+    <p>
      Let's enumerate some points.
-    <p></p>
-    </font>
+    </p>
    </li>
    <li>
-    <font color="#000014">
+    <p>
      Test point
-    <p></p>
-    </font>
+    </p>
    </li>
   </ol>
-   <b><i> Description</i></b>
-    <font color="#000014">
+  <dl>
+   <dt>Description</dt>
+   <dd>
+    <p>
      Use this "for descriptions."
      The "description" continues here...
-    <p></p>
-    </font>
-    <font color="#000014">
+    </p>
+    <p>
      and here.
-    <p></p>
-    </font>
-   <b><i> Advice</i></b>
-    <font color="#000014">
+    </p>
+   </dd>
+   <dt>Advice</dt>
+   <dd>
+    <p>
      Watch the step!
-    <p></p>
-    </font>
-  <br/>
-  <font color="#000014">
+    </p>
+   </dd>
+  </dl>
+  <p>
    Trigger bug in itemize newline handling:
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    BUG paragraph one
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    BUG paragraph two
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    BUG paragraph three
-  <p></p>
-  </font>
+  </p>
   <ul>
    <li>
-    <font color="#000014">
+    <p>
      item 1
-    <p></p>
-    </font>
+    </p>
    </li>
    <li>
-    <font color="#000014">
+    <p>
      item 2
-    <p></p>
-    </font>
+    </p>
    </li>
   </ul>
-  <font color="#000014">
+  <p>
    BUG paragraph four
-  <p></p>
-  </font>
-  <pre>
+  </p>
+<pre>
 Whole line is verbatim. Maybe used for sources ...
 /** MAIN */
 void main(void) {
     exit(0);
 }
-  </pre>
-
+</pre>
  <a name="Abstract"></a>
-
- <h1><font color="#000014">4  "Abstract"</font></h1>
-  <font color="#000014">
+ <h1>"Abstract"</h1>
+  <p>
    <i>TODO</i>
-  <p></p>
-  </font>
-
+  </p>
  <a name="References"></a>
-
- <h1><font color="#000014">5  References</font></h1>
-
+ <h1>References</h1>
   <a name="Ref section A"></a>
-  <h2><font color="#202040">5.1  Ref section A</font></h2>
-   <font color="#202040">
+  <h2>Ref section A</h2>
+   <p>
     Forward refer to section <a href="#Ref section B">Ref section B</a>.
-   <p></p>
-   </font>
-
+   </p>
   <a name="Ref section B"></a>
-  <h2><font color="#202040">5.2  Ref section B</font></h2>
-   <font color="#202040">
+  <h2>Ref section B</h2>
+   <p>
     Refer to section <a href="#Ref section A">Ref section A</a> and trigger <i>linebreak bug</i> [Ref
     section A].
-   <p></p>
-   </font>
-   <font color="#202040">
+   </p>
+   <p>
     <i>TODO:</i> bibs, figures, ...
-   <p></p>
-   </font>
-
+   </p>
  <a name="Tables"></a>
-
- <h1><font color="#000014">6  Tables</font></h1>
-  <font color="#000014">
+ <h1>Tables</h1>
+  <p>
    Some Text could be here. Maybe more ...
-  <p></p>
-  </font>
+  </p>
   <a name="LABEL"></a>
   <br/><center><table cellspacing="0" cellpadding="3" border="1">
   <tr>  <th bgcolor=#f0f7ff> col1 <br/></th>  <th bgcolor=#f0f7ff> col2 <br/></th>  <th bgcolor=#f0f7ff> col3<br/></th>  </tr>
-<tr>
-  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
-<tr>
-  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
-<tr>
-  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
-<tr>
-  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
-<tr>
-  <td>  col1</td>  <td>  col2</td>  <td>  col3</td></tr>
+  <tr>
+  <td> col1</td>
+  <td> col2</td>
+  <td> col3</td>
+  </tr>
+  <tr>
+  <td> col1</td>
+  <td> col2</td>
+  <td> col3</td>
+  </tr>
+  <tr>
+  <td> col1</td>
+  <td> col2</td>
+  <td> col3</td>
+  </tr>
+  <tr>
+  <td> col1</td>
+  <td> col2</td>
+  <td> col3</td>
+  </tr>
+  <tr>
+  <td> col1</td>
+  <td> col2</td>
+  <td> col3</td>
+  </tr>
   </table>
-  Table 1:  TEXT
-</center><br/>
-  <font color="#000014">
+  Table 1: TEXT
+  </center><br/>
+  <p>
    More Text for Tab. <a href="#LABEL">1</a> follows here.
-  <p></p>
-  </font>
-
+  </p>
  <a name="Images"></a>
-
- <h1><font color="#000014">7  Images</font></h1>
-  <font color="#000014">
+ <h1>Images</h1>
+  <p>
    <i>TODO</i>
-  <p></p>
-  </font>
-
+  </p>
  <a name="Bibliography"></a>
-
- <h1><font color="#000014">8  "Bibliography"</font></h1>
-  <font color="#000014">
+ <h1>"Bibliography"</h1>
+  <p>
    <i>TODO</i>
-  <p></p>
-  </font>
-
+  </p>
  <a name="Source file of this document"></a>
-
- <h1><font color="#000014">9  Source file of this document</font></h1>
-  <font color="#000014">
+ <h1>Source file of this document</h1>
+  <p>
    A damn url <a href="http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375&ViewPropertyHomePage=&formName=ViewPropertyHomePageForm" alt="Hilton">Hilton</a>
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    Underlines in Latex citations text <a href="xaz_123" alt="xaz_123">xaz_123</a> text
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    There was a bug where an
    <code>apostroph</code> caused the start of a new paragraph.
-  <p></p>
-  </font>
-  <font color="#000014">
+  </p>
+  <p>
    There was also a bug where a
    <a href="reference" alt="reference">reference</a> caused the start of a new paragraph.
-  <p></p>
-  </font>
+  </p>
+  <p>
+   Just to test, how &ndash; and &mdash; are handled by the backend.
+   BTW, what happens when they appear inside <a href="refer --- ences" alt="refer --- ences">refer &mdash; ences</a>?
+  </p>
 <hr/><br/>
 <i>Authors</i>
 </body>

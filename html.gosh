@@ -103,10 +103,18 @@ proc out_html {string} {
 			}
 			regsub { +$} $linktext "" linktext
 			regsub -all {&} $url "_§%and%§_" url
-			regsub {\[([^\]]+)\]} $string "<a href=\"$url\" alt=\"$linktext\"$tooltiptext>$linktext</a>" string
+			regsub -all -- {---} $url      "_§%3xminus%§_" url
+			regsub -all -- {--}  $url      "_§%2xminus%§_" url
+			regsub -all -- {---} $linktext "_§%3xminus%§_" alttext
+			regsub -all -- {--}  $linktext "_§%2xminus%§_" alttext
+			regsub {\[([^\]]+)\]} $string "<a href=\"$url\" alt=\"$alttext\"$tooltiptext>$linktext</a>" string
 		}
 	}
 	regsub -all {_§%and%§_} $string {\&} string
+	regsub -all -- {\-\-\-} $string {\&mdash;} string
+	regsub -all -- {\-\-} $string {\&ndash;} string
+	regsub -all {_§%3xminus%§_} $string {---} string
+	regsub -all {_§%2xminus%§_} $string {--} string
 
 	# clear spaces at the end of a line #
 	regsub { +$} $string "" string
