@@ -267,11 +267,13 @@ proc process_image_html {txtblock} {
 	}
 	regsub { *$} $img_cap "" img_cap
 	
-#	puts "[indent]\n[indent]\\begin{figure}\[tbp\]\n[indent] \\begin{center}"
-#	puts "[indent]  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\columnwidth}"
-#	puts "[indent]  \\caption{[out_html $img_cap]}"
-#	puts "[indent]  \\label{[label_html $img_name]}"
-#	puts "[indent] \\end{center}\n[indent]\\end{figure}\n"
+	puts "[indent]<table cellspacing=\"10\"><tr><td>"
+	puts "[indent]  <img src=\"$img_name.jpg\" border=\"0\">"
+	if {$img_cap != ""} {
+		puts "[indent]</td><td valign=\"center\">"
+		puts "[indent]  $img_cap"
+	}
+	puts "[indent]</td></tr></table>"
 }
 
 
