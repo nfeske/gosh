@@ -730,7 +730,7 @@ set style_substyles(paragraph) {image table annotation raw itemize enumeration d
 
 ### IMAGE ###
 set style_begin(image)     {^\[image .+\]}
-set style_continue(image)  {^.+\n}
+set style_continue(image)  {(^  .+)|(^$)}
 
 ### TABLE ###
 set style_begin(table)     {\|}

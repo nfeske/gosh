@@ -260,6 +260,22 @@
 
   here comes ``\textbf{some quoted bold text}'' followed by some normal text.
 
+
+ %     -+*|[ TEXT AFTER IMAGE WITHOUT EMPTY LINE ]|*+-
+
+ \section{Text after image without empty line} \label{Text after image without empty line}
+
+
+  \begin{figure}[tbp]
+   \begin{center}
+    \epsfig{file=bla.png,angle=0,width=0.8\columnwidth}
+    \caption{}
+    \label{blapng}
+   \end{center}
+  \end{figure}
+
+  This is some plain text that was wrongly assigned to the
+  caption of the image.
 \newpage
 \bibliographystyle{plain}
 \bibliography{custom,master}

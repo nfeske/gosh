@@ -203,3 +203,9 @@ here comes "_some_quoted italic text_"
 
 here comes "*some quoted bold text*" followed by some normal text.
 
+Text after image without empty line
+###################################
+
+[image bla.png]
+This is some plain text that was wrongly assigned to the
+caption of the image.

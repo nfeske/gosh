@@ -138,5 +138,8 @@ here comes "
 here comes "
 .B some quoted bold text
 " followed by some normal text.
+.SH "TEXT AFTER IMAGE WITHOUT EMPTY LINE"
+This is some plain text that was wrongly assigned to the
+caption of the image.
 .SH AUTHOR
 Authors

@@ -2,7 +2,7 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2004-10-05</center>
+<center>2004-10-19</center>
 <hr/><br/>
  <a name="Intro"></a>
  <h1>Intro</h1>
@@ -255,6 +255,15 @@ void main(void) {
   </p>
   <p>
    here comes "<b>some quoted bold text</b>" followed by some normal text.
+  </p>
+ <a name="Text after image without empty line"></a>
+ <h1>Text after image without empty line</h1>
+  <table cellspacing="10"><tr><td>
+    <img src="bla.png.jpg" border="0">
+  </td></tr></table>
+  <p>
+   This is some plain text that was wrongly assigned to the
+   caption of the image.
   </p>
 <hr/><br/>
 <i>Authors</i>
