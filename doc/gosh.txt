@@ -351,6 +351,10 @@ When using this method, you loose the feature of GOSH to create different
 target formats of your document because the raw content will certainly
 conflict with the syntax of other formats (such as HTML).
 
+For example the LaTeX sequence "#: $e=mc^2$#" produces:
+
+: $e=mc^2$
+
 
 Annotations
 ===========
