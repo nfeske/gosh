@@ -62,6 +62,7 @@ proc out_latex {string} {
 			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
 				regsub {\[([^\]]+)\]} $string "_citation_gap_" string
 			} else {
+				regsub -all {_} $ref_text {adamndunderlineshite!} ref_text
 				regsub {\[([^\]]+)\]} $string "\\cite{$ref_text}" string
 			}
 		}
@@ -91,6 +92,7 @@ proc out_latex {string} {
 
 	regsub -all {e\.g\.} $string "e.\\,g." string
 	regsub -all {i\.e\.} $string "i.\\,e." string
+	regsub -all {adamndunderlineshite!} $string "_" string
 
 	set priv_function out_latex_private
 	if {[info procs $priv_function] == $priv_function} {
@@ -929,7 +931,7 @@ while {[regexp {\--style ([^ ]+)} $argv dummy style_file]} {
 		source $style_file
 	} else {
 		puts stderr "Error: style file $style_file does not exist"
-	iegsub {^ *$} $string "" string
+		regsub {^ *$} $string "" string
 	}
 	regsub {\--style [^ ]+} $argv "" argv
 }
