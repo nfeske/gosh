@@ -50,7 +50,7 @@ proc out_latex {string} {
 		if {[info exists references($ref_text,type)]} {
 			regsub {\[([^\]]+)\]} $string "\\ref{[label_latex $ref_text]}" string
 		} else {
-			regsub {\[([^\]]+)\]} $string "\\cite{[label_latex $ref_text]}" string
+			regsub {\[([^\]]+)\]} $string "\\cite{$ref_text}" string
 		}
 	}
 	
