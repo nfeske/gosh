@@ -8,6 +8,7 @@
 
 ### FILTER TEXTUAL OUTPUT ###
 proc out_html {string} {
+	global references
 
 	set string " $string "
 	
@@ -28,6 +29,13 @@ proc out_html {string} {
 		regsub {([ \(])\'(.+?)\'([ \)\.,!?])} $string "$head_char<code>$code_text</code>$tail_char" string
 	}
 	
+	# FIXME: kick out monospace style via hashes #
+	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
+		regsub -all {\#} $code_text " " code_text
+		regsub {\#([^#]+)\#} $string " <code>$code_text</code> " string
+		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
+		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
+	}
 	
 	# hexadecimal numbers #
 	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "<code>&</code>" string
@@ -35,7 +43,11 @@ proc out_html {string} {
 	# insert references and citations #
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
-			regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
+			if {$references($ref_text,type) == "tabcap"} {
+				regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$references($ref_text,index)</a>" string
+			} else {
+				regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
+			}
 		} else {
 			regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
 		}
@@ -59,8 +71,9 @@ proc produce_head_html {} {
 		puts "<h1><center>$title</center></h1>"
 	}
 	if {$authors != ""} {
-		puts "<center>$authors</center>"
+		puts "<b><center>$authors</center></b>"
 	}
+	puts "<center>[exec date --iso-8601]</center>"
 	puts "[indent]<hr/><br/>"
 }
 
@@ -146,6 +159,8 @@ proc process_enum_html {itemtxtblock} {
 
 ### PLAIN ###
 proc process_plain_html {plaintxtblock} {
+	global curr_section_type text_color
+	puts "[indent]<font color=\"$text_color($curr_section_type)\">"
 	while {[lindex $plaintxtblock end] == ""} {
 		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
 	}
@@ -157,7 +172,7 @@ proc process_plain_html {plaintxtblock} {
 		}
 		puts [out_html $txtline]
 	}
-	puts "[indent]<p></p>"
+	puts "[indent]</font><p></p>"
 }
 
 ### ABSTRACT ###
@@ -172,38 +187,43 @@ proc process_abstract_html {txtblock} {
 
 ### CHAPTER ###
 proc process_chapter_html {txtblock} {
-	global references curr_chapter
+	global references curr_chapter curr_section_type text_color
+	set curr_section_type chapter
 	set title [lindex $txtblock 0]
 	set curr_chapter $references($title,index)
-	puts "\n[indent]<h1>$curr_chapter [out_html $title]</h1>"
+	puts "\n[indent]<h1><font color=\"$text_color(chapter)\">$curr_chapter [out_html $title]</font></h1>"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_html {txtblock} {
-	global references curr_chapter curr_section
+	global references curr_chapter curr_section curr_section_type text_color
+	set curr_section_type section
 	set title [lindex $txtblock 0]
 	set curr_section $references($title,index)
 	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h2>$curr_chapter.$curr_section [out_html $title]</h2>"
+	puts "[indent]<h2><font color=\"$text_color(section)\">$curr_chapter.$curr_section [out_html $title]</font></h2>"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_html {txtblock} {
-	global references curr_chapter curr_section curr_subsection
+	global references curr_chapter curr_section curr_subsection curr_section_type text_color
+	set curr_section_type subsection
 	set title [lindex $txtblock 0]
 	set curr_subsection $references($title,index)
 	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h3>$curr_chapter.$curr_section.$curr_subsection [out_html $title]</h3>"
+	puts "[indent]<h3><font color=\"$text_color(subsection)\">$curr_chapter.$curr_section.$curr_subsection [out_html $title]</font></h3>"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
 ### PARAGRAPH ###
 proc process_paragraph_html {txtblock} {
+	global curr_section_type text_color
+	set curr_section_type paragraph
 	set title [lindex $txtblock 0]
 	puts "\n[indent]<a name=\"[label_html $title]\"></a>"
-	puts "[indent]<h4>[out_html $title]</h4>"
+	puts "[indent]<h4><font color=\"$text_color(paragraph)\">[out_html $title]</font></h4>"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
@@ -233,8 +253,18 @@ proc process_image_html {txtblock} {
 #	puts "[indent] \\end{center}\n[indent]\\end{figure}\n"
 }
 
+
 ### TABLE ###
 proc output_table_html {head rows caption} {
+	global references
+	set cap ""
+	foreach capline $caption {
+		regsub  {^ +} $capline " "  capline
+		append cap $capline
+	}
+	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
+		puts "[indent]<a name=\"[label_html \"$caplab\"]\"></a>"
+	}
 	puts "[indent]<br/><center><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\">"
 	
 	puts -nonewline "[indent]<tr>"
@@ -255,16 +285,18 @@ proc output_table_html {head rows caption} {
 	}
 	puts "[indent]</table>"
 
-	set cap ""
-	foreach capline $caption {
-		regsub  {^ +} $capline " "  capline
-		append cap $capline
-	}
 	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
 		regsub  {^ +} $captxt ""  captxt
-		puts "[indent]Table: [out_html $captxt]"
+		puts "[indent]Table $references($caplab,index): [out_html $captxt]"
 	}
 	puts "</center><br/>"
 }
 
+set text_color(default)    "#000000"
+set text_color(chapter)    "#000014"
+set text_color(section)    "#101028"
+set text_color(subsection) "#202040"
+set text_color(paragraph)  "#303060"
+
+set curr_section_type default
 set outmode html
