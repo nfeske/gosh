@@ -75,7 +75,7 @@ proc label_man {string} {
 
 ### WRITE HEADER ###
 proc produce_head_man {} {
-	global title authors txtfilename
+	global title authors txtfilename config_man_no_date
 	if {[regexp {^([^(]+)\(([0-9]+)\) *-+ *(.*)$} \
                    $title dummy name section desc]} {
 	    string trim name
@@ -85,8 +85,12 @@ proc produce_head_man {} {
 	    set desc $title
 	    set name $txtfilename
 	}
-		   
-	puts ".TH \"$name\" $section \"[exec date]\" \"TU Dresden\" \"DROPS Manual\""
+	
+	set date_string ""
+	if {$config_man_no_date == 0} {
+		set date_string [exec date]
+	}
+	puts ".TH \"$name\" $section \"$date_string\" \"TU Dresden\" \"DROPS Manual\""
 	puts ".SH NAME"
 	puts "$name \\- $desc"
 }
@@ -231,5 +235,7 @@ proc process_paragraph_man {txtblock} {
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
+
+set config_man_no_date [regexp {\--man-no-date} $argv dummy]
 
 set outmode man
