@@ -23,10 +23,10 @@ Intro
 Howto build this file:
 
 
-* cat gosh.txt > out.txt
-* sed s/^/\!/ gosh.txt >> out.txt
-* gosh out.txt > gosh.tex
-* rm out.txt
+!# cat gosh.txt > out.txt
+!# sed s/^/\!/ gosh.txt >> out.txt
+!# gosh out.txt > gosh.tex
+!# rm out.txt
 
 
 1st Order Heading -- Chapter
