@@ -669,7 +669,7 @@ set style_substyles(enum) {annotation raw itemize enumeration description verbat
 
 ### PLAIN ###
 set style_begin(plain)    {^[^\ \n;].*}
-set style_continue(plain) {^[\w\(]}
+set style_continue(plain) {^[\w\(']}
 #set style_contnext(plain) {^[^-=~#]}
 
 ### ABSTRACT ###
