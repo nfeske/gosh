@@ -286,6 +286,11 @@ void main(void) {
    <code>apostroph</code> caused the start of a new paragraph.
   <p></p>
   </font>
+  <font color="#000014">
+   There was also a bug where a
+   <a href="reference" alt="reference">reference</a> caused the start of a new paragraph.
+  <p></p>
+  </font>
 <hr/><br/>
 <i>Authors</i>
 </body>

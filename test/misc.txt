@@ -179,3 +179,5 @@ Underlines in Latex citations text [xaz_123] text
 There was a bug where an
 'apostroph' caused the start of a new paragraph.
 
+There was also a bug where a
+[reference] caused the start of a new paragraph.

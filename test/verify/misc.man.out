@@ -122,5 +122,7 @@ A damn url [http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375&
 Underlines in Latex citations text [xaz_123] text
 There was a bug where an
 \(cqapostroph' caused the start of a new paragraph.
+There was also a bug where a
+[reference] caused the start of a new paragraph.
 .SH AUTHOR
 Authors

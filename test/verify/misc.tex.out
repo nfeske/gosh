@@ -232,6 +232,8 @@
   There was a bug where an
   \texttt{apostroph} caused the start of a new paragraph.
 
+  There was also a bug where a
+  \cite{reference} caused the start of a new paragraph.
 \newpage
 \bibliographystyle{plain}
 \bibliography{custom,master}
