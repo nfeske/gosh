@@ -138,7 +138,7 @@ proc label_latex {string} {
 proc produce_head_latex {} {
 	global title authors
 	
-	printline {\documentclass[10pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
+	printline {\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
 	printline {\usepackage{times}}
 	printline {\usepackage[T1]{fontenc}}
 	printline {\usepackage[latin1]{inputenc}}
@@ -166,7 +166,7 @@ proc produce_head_latex {} {
 proc produce_tail_latex {} {
 	printline "\\newpage"
 	printline "\\bibliographystyle{plain}"
-	printline "\\bibliography{own}"
+	printline "\\bibliography{custom,master}"
 	printline "\\end{document}"
 }
 
