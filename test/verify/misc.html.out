@@ -1,0 +1,43 @@
+<html><head><title>Document Title</title></head>
+<body>
+<h1><center>Document Title</center></h1>
+<b><center>Norman Feske</center></b>
+<center>2004-07-30</center>
+<hr/>
+<table align="center" cellpadding="5"><tr><td>
+<h3>Table of contents</h3>
+<b><a href="#Abstract">1. Abstract</a></b><br/>
+<b><a href="#Chapter One">2. Chapter One</a></b><br/>
+</td></tr></table>
+<hr/><br/>
+ <font color="#000000">
+  A paragraph without a chapter. 
+ <p></p>
+ </font>
+
+ %     -+*|[ ABSTRACT ]|*+-
+
+ <h1>Abstract</h1>
+ <i>
+  <font color="#000000">
+   Ohh.. .wie abstrakt.... 
+  <p></p>
+  </font>
+ </i><hr/><br/>
+
+ <a name="Chapter One"></a>
+
+ <h1><font color="#000014">2  Chapter One </font></h1>
+  <font color="#000014">
+   Some <i>accentuations with spaces in-between</i> 
+  <p></p>
+  </font>
+  <font color="#000014">
+   A paragraph with an 
+   <code>apostroph</code> at the beginning of the line. 
+  <p></p>
+  </font>
+<hr/><br/>
+<i>Norman Feske</i>
+</body>
+</html>

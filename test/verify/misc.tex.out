@@ -1,0 +1,43 @@
+\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage[small,bf,hang]{caption2}
+\usepackage[ngerman]{babel}
+\usepackage{epsfig}
+\emergencystretch = 10pt
+\clubpenalty = 10000
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+\usepackage{amsmath}
+\usepackage{amssymb}
+\begin{document}
+\title{Document Title}
+\author{Norman Feske}
+\maketitle
+ A paragraph without a chapter.
+
+
+ %     -+*|[ ABSTRACT ]|*+-
+
+ \begin{abstract} \label{Abstract}
+
+  Ohh.. .wie abstrakt....
+
+ \end{abstract}
+
+ %     -+*|[ CHAPTER ONE ]|*+-
+
+ \section{Chapter One} \label{Chapter One}
+
+  Some \emph{accentuations with spaces in-between}
+
+  A paragraph with an
+  \texttt{apostroph} at the beginning of the line.
+
+
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{custom,master}
+\end{document}
