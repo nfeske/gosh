@@ -13,7 +13,7 @@ Introduction
 ;
 ; BTW: Comments start with ';' and are ignored by GOSH
 
-GOSH is a tool for converting plain ASCII text to Latex and other document
+GOSH is a tool for converting plain ASCII text to LaTeX and other document
 formats. Its main design criteria was to use a syntax that is perfectly
 readable as plain ASCII text and the support of different target formats.
 The source files of GOSH have a very simple syntax that is similar to the
@@ -21,10 +21,10 @@ usenet style. Everyone, who ever wrote a mail using an plain ASCII editor
 will able to write GOSH texts.
 ; Actually, the file you are reading right now is a GOSH text file.
 GOSH supports multiple target formats by different backends, which are
-available as separate files. By now, there exists the built-in Latex backend,
+available as separate files. By now, there exists the built-in LaTeX backend,
 a simple HTML backend and a man-page backend.
 
-Originally, GOSH was meant as an alternative to writing Latex files by hand.
+Originally, GOSH was meant as an alternative to writing LaTeX files by hand.
 In the meanwhile I do all kind of textual work, papers, documentation,
 websites and slides using GOSH. As it is a big help for myself, it might be
 useful for other people, too. Anyhow, this is an early version of GOSH.
@@ -61,7 +61,7 @@ can be created via:
 ! > gosh gosh.txt > gosh.tex
 ! > pdflatex gosh.tex
 
-In this example, GOSH generates Latex output that is stored in the file
+In this example, GOSH generates LaTeX output that is stored in the file
 'gosh.tex'. This file is then used as input file for 'pdflatex'.
 
 A HTML-version of the text can be created by using the HTML-backend:
@@ -210,7 +210,7 @@ You can control the width of the image in relation to the page width via:
 
 ! [image filename 50%] This image will appear with the
 !   size of a half page-width.This works only with the
-!   Latex-backend of GOSH.
+!   LaTeX-backend of GOSH.
 
 The image can be rotated via:
 
@@ -259,7 +259,7 @@ referenced by their identifiers.
 If there is no matching identifier within the document, GOSH assumes the text
 within the brackets is an external reference (citation). So you can insert
 citations just the same way as references. This is very practical if you use
-Latex and Bibtex.
+LaTeX and Bibtex.
 
 GOSH detects HTML-links by a heading 'http://'. For example, take a look at
 Atari.org [http://www.atari.org]. The HTML-backend supports the link text and a
@@ -271,6 +271,16 @@ a '-', enclosed with spaces:
 A title can be optionally specified with parenthesis:
 
 ! [http://www.dhs.nu - Dead Hackers Society (click here)]
+
+
+The LaTeX backend
+#################
+
+The integrated LaTeX backend of GOSH can be tweaked via the following command
+line arguments:
+
+:'--tex-table-floating': This argument makes GOSH to create floating tables.
+  By default, tables are inserted at the position of their definition.
 
 
 The HTML backend
@@ -321,7 +331,7 @@ functions for outputting the head and tail:
 ! }
 
 The 'slides.gosh' backend is another example of this technique. It slightly
-modifies the Latex output of GOSH to create Foiltex output. This way, you
+modifies the LaTeX output of GOSH to create Foiltex output. This way, you
 can use GOSH to create 'slides' very easily.
 
 
@@ -329,7 +339,7 @@ Raw text
 ========
 
 There are things like formulars, which are not supported by GOSH but by
-the target format (such as Latex). You can insert source code fragments of
+the target format (such as LaTeX). You can insert source code fragments of
 your target format directly into your GOSH text file by marking such lines
 by a colon, followed by a space at the beginning of line:
 

@@ -352,8 +352,14 @@ proc process_image_latex {txtblock} {
 
 ### TABLE ###
 proc output_table_latex {head rows caption} {
-	printline "\\begin\{table\}\[h\]"
-	printline "\\center \{"
+	global config_tex_table_floating
+
+	if {$config_tex_table_floating} {
+		printline "\\begin\{table\}\[ht\]"
+	} else {
+		printline "\\begin\{table\}\[ht!]"
+	}
+	printline "\{\\center"
 	print "[indent] \\begin\{tabular\}\{|"
 	foreach headcell $head {
 		if {[lindex $headcell 0] == "left"} {
@@ -401,6 +407,11 @@ proc output_table_latex {head rows caption} {
 	printline "\}"
 	printline "\\end\{table\}"
 }
+
+#
+# Process command line arguments for the Latex backend
+#
+set config_tex_table_floating [regexp {\--tex-table-floating} $argv dummy]
 
 
 ##############################
@@ -947,6 +958,18 @@ handle_txtblock documenthead $txtcontent
 
 # find out about internal references #
 collect_references $txtcontent
+
+proc chapter_has_section {chapter} {
+	global toc_refs references
+	foreach ref $toc_refs {
+		if {[info exists references($ref,chapter)]} {
+			if {"$references($ref,chapter)" == "$chapter"} {
+				return 1
+			}
+		}
+	}
+	return 0
+}
 
 # generate output head #
 set produce_function "produce_head_$outmode"
