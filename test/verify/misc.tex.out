@@ -276,6 +276,14 @@
 
   This is some plain text that was wrongly assigned to the
   caption of the image.
+
+
+ %     -+*|[ ACCENTUATIONS ]|*+-
+
+ \section{Accentuations} \label{Accentuations}
+
+  Monospaced and \texttt{non}-monospaced connected by a hyphen.
+
 \newpage
 \bibliographystyle{plain}
 \bibliography{custom,master}

@@ -7,7 +7,7 @@ Howto build this file:
 .ll +1i
 # cat gosh.txt > out.txt
 .br
-# sed s/^/\!/ gosh.txt >> out.txt
+# sed s/^/\\!/ gosh.txt >> out.txt
 .br
 # gosh out.txt > gosh.tex
 .br
@@ -141,5 +141,7 @@ here comes "
 .SH "TEXT AFTER IMAGE WITHOUT EMPTY LINE"
 This is some plain text that was wrongly assigned to the
 caption of the image.
+.SH "ACCENTUATIONS"
+Monospaced and 'non'-monospaced connected by a hyphen.
 .SH AUTHOR
 Authors

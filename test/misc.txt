@@ -209,3 +209,9 @@ Text after image without empty line
 [image bla.png]
 This is some plain text that was wrongly assigned to the
 caption of the image.
+
+Accentuations
+#############
+
+Monospaced and 'non'-monospaced connected by a hyphen.
+
