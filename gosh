@@ -162,6 +162,17 @@ proc produce_tail_latex {} {
 	printline "\\end{document}"
 }
 
+### ANNOTATION ###
+proc process_annotation_latex {txtblock} {
+	set new_txtblock {}
+	foreach txtline $txtblock {
+		regsub {^\| ?} $txtline "" txtline
+		lappend new_txtblock $txtline
+	}
+	printline "\\footnotesize{ \\it {"
+	handle_txtblock annotation $new_txtblock
+	printline "} }"
+}
 
 ### VERBATIM  ###
 proc process_verbatim_latex {txtblock} {
@@ -551,9 +562,9 @@ proc process_table {txtblock} {
 }
 
 proc process_undefined {txtblock} {
-	printline stderr "Error: can not figure out what you mean with"
+	puts stderr "Error: cannot figure out what you mean with"
 	foreach txtline $txtblock {
-		printline stderr "       $txtline"
+		puts stderr "       $txtline"
 	}
 	exit 1
 }
@@ -600,6 +611,11 @@ set style_continue(afterheader) {()}
 set style_begin(verbatim)    {^\!}
 set style_continue(verbatim) {^\!}
 
+### ANNOTATION ###
+set style_begin(annotation)     {^\|}
+set style_continue(annotation)  {^\|}
+set style_substyles(annotation) {itemize enumeration description verbatim plain}
+
 ### ITEMIZE ###
 set style_begin(itemize)     {^\*\ .+}
 set style_continue(itemize)  {(^\ \ +[^\ ])|(^\n)|(^\*\ .+)}
@@ -609,7 +625,7 @@ set style_substyles(itemize) {item}
 ### ITEM ###
 set style_begin(item)     {^\*\ .+}
 set style_continue(item)  {(^\ \ .+)|(^\n)}
-set style_substyles(item) {itemize enumeration description verbatim plain}
+set style_substyles(item) {annotation itemize enumeration description verbatim plain}
 
 ### DESCRIPTION ###
 set style_begin(description)     {^\:[^\:]+\:}
@@ -620,7 +636,7 @@ set style_substyles(description) {descitem}
 ### DESCRIPTION ITEM ###
 set style_begin(descitem)     {^\:[^\:]+\:}
 set style_continue(descitem)  {(^\ \ .+)|(^\n)}
-set style_substyles(descitem) {itemize enumeration description verbatim plain}
+set style_substyles(descitem) {annotation itemize enumeration description verbatim plain}
 
 ### ENUMERATION ###
 set style_begin(enumeration)     {^\#\ .+}
@@ -631,7 +647,7 @@ set style_substyles(enumeration) {enum}
 ### ENUM ITEM ###
 set style_begin(enum)     {^\#\ .+}
 set style_continue(enum)  {(^\ \ .+)|(^\n)}
-set style_substyles(enum) {itemize enumeration description verbatim plain}
+set style_substyles(enum) {annotation itemize enumeration description verbatim plain}
 
 ### PLAIN ###
 set style_begin(plain)    {^[^\ \n;].*}
@@ -661,28 +677,28 @@ set style_begin(chapter)     {^.+}
 set style_next(chapter)      {^\#{3}}
 set style_continue(chapter)  {.*}
 set style_contnext(chapter)  {^#{0,2}[^#]}
-set style_substyles(chapter) {section paragraph image table itemize enumeration description verbatim plain}
+set style_substyles(chapter) {section paragraph image table annotation itemize enumeration description verbatim plain}
 
 ### SECTION ###
 set style_begin(section)     {^.+}
 set style_next(section)      {^\={3}}
 set style_continue(section)  {.*}
 set style_contnext(section)  {^\={0,2}[^\=]}
-set style_substyles(section) {subsection paragraph image table itemize enumeration description verbatim plain}
+set style_substyles(section) {subsection paragraph image table annotation itemize enumeration description verbatim plain}
 
 ### SUBSECTION ###
 set style_begin(subsection)     {^.+}
 set style_next(subsection)      {^\~{3}}
 set style_continue(subsection)  {.*}
 set style_contnext(subsection)  {^\~{0,2}[^\~]}
-set style_substyles(subsection) {paragraph image table itemize enumeration description verbatim plain}
+set style_substyles(subsection) {paragraph image table annotation itemize enumeration description verbatim plain}
 
 ### PARAGRAPH ###
 set style_begin(paragraph)     {^.+}
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
 set style_contnext(paragraph)  {^\-{0,2}[^\-]}
-set style_substyles(paragraph) {image table itemize enumeration description verbatim plain}
+set style_substyles(paragraph) {image table annotation itemize enumeration description verbatim plain}
 
 ### IMAGE ###
 set style_begin(image)     {^\[image .+\]}
@@ -718,7 +734,7 @@ set style_continue(undefined) {\\{100}}
 set style_substyles(documenthead) {header afterheader}
 
 ### DOCUMENT MAIN ###
-set style_substyles(documentmain) {header abstract bibliography chapter paragraph image table itemize enumeration description verbatim plain}
+set style_substyles(documentmain) {header abstract bibliography chapter paragraph image table annotation itemize enumeration description verbatim plain}
 
 ####################
 #                  #
