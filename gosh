@@ -58,7 +58,12 @@ proc out_latex {string} {
 			regsub {\[([^\]]+)\]} $string "\\ref{[label_latex $ref_text]}" string
 		} else {
 			if {[regexp {^http://} $ref_text dummy]} {
-				regsub {\[([^\]]+)\]} $string "\\texttt{$ref_text}" string
+				set url ""
+				set linktext ""
+				set tooltip ""
+				regexp {^(\w+:[^ ]+)} $ref_text url
+				regsub -all {&} $url "_§%and%§_" url
+				regsub {\[([^\]]+)\]} $string "\\texttt{$url}" string
 			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
 				regsub {\[([^\]]+)\]} $string "_citation_gap_" string
 			} else {
@@ -67,7 +72,8 @@ proc out_latex {string} {
 			}
 		}
 	}
-	
+
+	regsub -all {_§%and%§_} $string {\&} string
 	regsub -all {_citation_gap_} $string "\[\\ldots\{\}\]" string
 	regsub -all {"(\w)} $string "``\\1" string
 	regsub -all {([\.\?\!\w])"} $string "\\1''" string
