@@ -1,0 +1,106 @@
+
+### WRITE HEADER OF TEX FILE ###
+proc produce_head_latex {} {
+	global title authors
+	
+	puts {\documentclass[17pt,a4paper,landscape,headrule]{foils}}
+	puts {\usepackage[latin1]{inputenc}}
+	puts {\usepackage{graphicx}}
+	puts {\usepackage{epsfig}}
+	
+	if {$title != ""} {
+		puts "\\title{[out_latex $title]}"
+		if {$authors != ""} {
+			puts "\\author{[out_latex $authors]}"
+		}
+	}
+#	puts {\MyLogo{\epsfig{file=img/logo,width=0.1\columnwidth}}}
+	puts {\MyLogo{}}
+	puts {\rightfooter{}}
+
+	puts "\\leftheader{$title}"
+	puts {\rightheader{\quad\textsf{\tiny[\thepage]}}}
+	puts {\begin{document}}
+	puts {\maketitle}
+}
+
+### ABSTRACT ###
+proc process_abstract_latex {txtblock} {
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\center{"
+	handle_txtblock abstract [lrange $txtblock 2 end]
+	puts "[indent]}"
+}
+
+### CHAPTER ###
+proc process_chapter_latex {txtblock} {
+	global curr_chapter
+	set title [lindex $txtblock 0]
+	set curr_chapter $title
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\foilhead{[out_latex $title]}"
+	puts "[indent]\\vspace{-2cm}"
+	handle_txtblock chapter [lrange $txtblock 2 end]
+}
+
+### SECTION ###
+proc process_section_latex {txtblock} {
+	global curr_chapter curr_section
+	set title [lindex $txtblock 0]
+	set curr_section $title
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\foilhead{[out_latex $curr_chapter]\\\\\\textit{\\normalsize{[out_latex $title]}}}"
+	puts "[indent]\\vspace{-1.5cm}"
+	handle_txtblock section [lrange $txtblock 2 end]
+}
+
+### SUBSECTION ###
+proc process_subsection_latex {txtblock} {
+	global curr_chapter curr_section
+	set title [lindex $txtblock 0]
+	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	puts "[indent]\\foilhead{[out_latex $curr_chapter]\\\\\\normalsize{[out_latex $curr_section]}\\\\\\textit{\\small{[out_latex $title]}}}"
+	puts "[indent]\\vspace{-1.5cm}"
+	handle_txtblock subsection [lrange $txtblock 2 end]
+}
+
+### ITEMIZE ###
+proc process_itemize_latex {txtblock} {
+	puts "[indent]\\begin{itemize}\\setlength{\\itemsep}{0pt}"
+	handle_txtblock itemize $txtblock
+	puts "[indent]\\end{itemize}"
+}
+
+### ENUMERATION ###
+proc process_enumeration_latex {txtblock} {
+	puts "[indent]\\begin{enumerate}\\setlength{\\itemsep}{0pt}"
+	handle_txtblock enumeration $txtblock
+	puts "[indent]\\end{enumerate}"
+}
+
+### IMAGE ###
+proc process_image_latex {txtblock} {
+	set img_info ""
+	set img_size 80
+	set img_angle "0"
+	regexp {\[(image \w+.*)\]} [lindex $txtblock 0] dummy img_info
+	if {$img_info == ""} return
+	set img_name [lindex $img_info 1]
+	regexp { (\d+)%} $img_info dummy img_size
+	regexp { (\d+)°} $img_info dummy img_angle
+	
+	set img_cap ""
+	foreach img_capline $txtblock {
+		regsub {^\[.*\]} $img_capline "" img_capline
+		regsub {^ *} $img_capline "" img_capline
+		append img_cap $img_capline " "
+	}
+	regsub { *$} $img_cap "" img_cap
+	
+	puts "[indent]\n[indent]\\begin{figure}\[h\]\n[indent] \\begin{center}"
+	puts "[indent]  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\columnwidth}"
+#	puts "[indent]  \\caption{[out_latex $img_cap]}"
+#	puts "[indent]  \\label{[label_latex $img_name]}"
+	puts "[indent] \\end{center}\n[indent]\\end{figure}\n"
+}
