@@ -539,7 +539,7 @@ set style_continue(verbatim) {^\!}
 ### ITEMIZE ###
 set style_begin(itemize)     {^\*\ .+}
 set style_continue(itemize)  {(^\ \ +[^\ ])|(^\n)|(^\*\ .+)}
-set style_contnext(itemize)  {^[^|]*$}
+set style_contnext(itemize)  {^.*$}
 set style_substyles(itemize) {item}
 
 ### ITEM ###
