@@ -27,7 +27,7 @@ cleanall: clean
 	epstopdf --outfile $@ $<
 
 %.tex: %.txt
-	$(TXT2TEX) $(TXT2TEX_OPT) $< > $(@:.pdf=.tex) 2> /dev/null
+	$(TXT2TEX) $(TXT2TEX_OPT) $< > $(@:.pdf=.tex)
 
 %.pdf: %.tex $(INFILES) $(IMGFILES)
 	pdflatex $<
