@@ -85,7 +85,7 @@ proc label_latex {string} {
 proc produce_head_latex {} {
 	global title authors
 	
-	puts {\documentclass[10pt,german,a4paper,normalheadings,DIV14]{scrartcl}}
+	puts {\documentclass[10pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
 	puts {\usepackage{times}}
 	puts {\usepackage[T1]{fontenc}}
 	puts {\usepackage[latin1]{inputenc}}
