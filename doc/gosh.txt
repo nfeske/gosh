@@ -18,7 +18,7 @@ formats. Its main design criteria was to use a syntax that is perfectly
 readable as plain ASCII text and the support of different target formats.
 The source files of GOSH have a very simple syntax that is similar to the
 usenet style. Everyone, who ever wrote a mail using an plain ASCII editor
-will able to write GOSH texts.
+will be able to write GOSH texts.
 ; Actually, the file you are reading right now is a GOSH text file.
 GOSH supports multiple target formats by different backends, which are
 available as separate files. By now, there exists the built-in LaTeX backend,
@@ -122,12 +122,12 @@ Descriptions, Items and Enumerations can be mixed and nested as you like.
 Accentuations
 =============
 
-GOSH support accentuations for marking *bold* and _italic_ text. It uses
+GOSH supports accentuations for marking *bold* and _italic_ text. It uses
 not the slash ('/') character to mark italic text because slashes are used
 in pathnames, which are very likely to appear in GOSH texts. Additionally,
 underlined text is rarely used. If you want to _mark multiple words_ you do
 not need to (_but_you_can_) place '_' in-between the words.
-All words 'that are written apostrophes' will be considered as monospaced
+All words 'that are written in apostrophes' will be considered as monospaced
 text. This is useful for 'filenames' and the like. The beginning and the
 end of the accentuated text fragment must be on the same line.
 
@@ -176,7 +176,7 @@ The chapter's names are underlined with the '#' character:
 ! This is the name of a chapter
 ! #############################
 
-Sections are underlined with by '=' characters:
+Sections are underlined by '=' characters:
 
 ! Section
 ! =======
@@ -209,7 +209,7 @@ Images can be inserted into the document this way:
 You can control the width of the image in relation to the page width via:
 
 ! [image filename 50%] This image will appear with the
-!   size of a half page-width.This works only with the
+!   size of a half page-width. This works only with the
 !   LaTeX-backend of GOSH.
 
 The image can be rotated via:
@@ -313,7 +313,7 @@ Advanced features
 Tweaking the GOSH output
 ========================
 
-The output of GOSH can be easily tweaked by supplying multiple '--style'
+The output of GOSH can easily be tweaked by supplying multiple '--style'
 arguments. The style-files will be processed in the specified order.
 For example if you want to tweak the HTML ouput to not contain a
 header and tail, you can tweak the 'html.gosh' style by another
