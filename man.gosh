@@ -5,9 +5,38 @@
 #                     #
 #######################
 
+proc man_mkboldline {string} {
+	# Collapse multiple style changes in one line
+
+	# First, delete all boldness.
+	regsub -all -lineanchor -linestop \
+	       {^\.B (.*)$} $string {\1} string
+
+	# Collapse non-italic lines.
+	regsub -all -lineanchor -linestop \
+	       {^([^.].*)\n([^.].*)$} $string {\1 \2} string
+
+	# Now, we should have only roman and italic lines left.
+	# Trim whitespace
+	regsub -all \
+	       { *\n *} $string "\n" string
+
+	# Collapse.
+	regsub -all  \
+	       {\n(\.I )?} [string trimright $string] \
+	       {" " } string
+	
+	regsub {^\.I } $string {.IB "} string
+	regsub {^([^.])} $string {.BI "\1} string
+	append string {"}
+
+        return $string
+}
 
 ### FILTER TEXTUAL OUTPUT ###
 proc out_man {string} {
+
+	regsub {^\.} $string {\.} string
 
 	set string " $string "
 	
@@ -30,7 +59,7 @@ proc out_man {string} {
 #		regsub {([ \(])\'(.+?)\'([ \)\.,!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
 #	}
 	
-	regsub -all {"} $string "" string
+	regsub -all {"} $string "\"" string
 	regsub {^ } $string "" string
 	regsub { $} $string "" string
 
@@ -46,9 +75,12 @@ proc label_man {string} {
 ### WRITE HEADER ###
 proc produce_head_man {} {
 	global title authors
-	puts ".TH \"$title\" 7 \"[exec date]\" GNU \"$title\""
+        regsub {^([^-(]+).*$} $title {\1} name
+	regsub {^.*\(([0-9]+)\).*$} $title {\1} section
+	regsub {^[^-]*-* *(.*)$} $title {\1} desc
+	puts ".TH \"$name\" $section \"[exec date]\" \"TU Dresden\" \"DROPS Manual\""
 	puts ".SH NAME"
-	puts "$title"
+	puts "$name \\- $desc"
 }
 
 ### WRITE TAIL OF TEX FILE ###
@@ -73,15 +105,13 @@ proc process_verbatim_man {txtblock} {
 
 ### ITEMIZE ###
 proc process_itemize_man {txtblock} {
-	puts ".RS"
 	handle_txtblock itemize $txtblock
-	puts ".RE"
-	puts ""
 }
 
 ### ITEM ###
 proc process_item_man {itemtxtblock} {
-	puts ".IP \"   *\""
+	puts ".IP \"  *\""
+#	puts ".IP \"\\(bu\""
 	set txtline [lindex $itemtxtblock 0]
 	regsub {^\*\ } $txtline "" txtline
 	lappend txtblock $txtline
@@ -97,7 +127,7 @@ proc process_description_man {txtblock} {
 	puts ".RS 0.0"
 	handle_txtblock description $txtblock
 	puts ".RE"
-	puts ""
+#	puts ""
 }
 
 ### DESCRIPTION ITEM ###
@@ -106,7 +136,7 @@ proc process_descitem_man {itemtxtblock} {
 	set desc_name ""
 	regexp {^\:(.+)\:} $txtline dummy desc_name
 	regsub {^\:(.+)\: *} $txtline "" txtline
-	puts ".TP\n.B [out_man $desc_name]"
+	puts ".TP\n[man_mkboldline [out_man $desc_name]]"
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
 		regsub {^\ \ } $txtline "" txtline
