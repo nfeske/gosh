@@ -67,6 +67,11 @@ proc out_latex {string} {
 
 	regsub -all {e\.g\.} $string "e.\\,g.\\" string
 	regsub -all {i\.e\.} $string "i.\\,e.\\" string
+
+	set priv_function out_latex_private
+	if {[info procs $priv_function] == $priv_function} {
+		set string [eval "$priv_function [list $string]"]
+	}
 	return $string
 }
 
