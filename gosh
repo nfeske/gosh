@@ -644,7 +644,7 @@ set style_begin(paragraph)     {^.+}
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
 set style_contnext(paragraph)  {^\-{0,2}[^\-]}
-set style_substyles(paragraph) {table itemize enumeration description verbatim plain}
+set style_substyles(paragraph) {image table itemize enumeration description verbatim plain}
 
 ### IMAGE ###
 set style_begin(image)     {^\[image .+\]}
