@@ -101,7 +101,7 @@ proc out_latex {string} {
 
 
 proc print {string} {
-	puts $string
+	puts -nonewline $string
 }
 
 
@@ -346,7 +346,8 @@ proc output_table_latex {head rows caption} {
 			print "r|"
 		}
 	}
-	printline "\}"
+	print "\}"
+	printline ""
 	printline " \\hline"
 	print "[indent][out_latex [lindex [lindex $head 0] 1]]"
 	foreach headcell [lrange $head 1 end] {
