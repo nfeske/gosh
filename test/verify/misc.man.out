@@ -132,7 +132,11 @@ BTW, what happens when they appear inside [refer --- ences]?
 .SH "TEST FOR MONOSPACED TEXT WITHIN QUOTES"
 here comes "'some quoted monospaced text'" does it work?
 here comes "#some quoted monospaced text#" with a hash?
-here comes "_some_quoted italic text_"
-here comes "*some quoted bold text*" followed by some normal text.
+here comes "
+.I some quoted italic text
+"
+here comes "
+.B some quoted bold text
+" followed by some normal text.
 .SH AUTHOR
 Authors
