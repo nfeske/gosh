@@ -57,7 +57,11 @@ proc out_latex {string} {
 		if {[info exists references($ref_text,type)]} {
 			regsub {\[([^\]]+)\]} $string "\\ref{[label_latex $ref_text]}" string
 		} else {
-			regsub {\[([^\]]+)\]} $string "\\cite{$ref_text}" string
+			if {[regexp {^http://} $ref_text dummy]} {
+				regsub {\[([^\]]+)\]} $string "\\texttt{$ref_text}" string
+			} else {
+				regsub {\[([^\]]+)\]} $string "\\cite{$ref_text}" string
+			}
 		}
 	}
 	
@@ -71,6 +75,7 @@ proc out_latex {string} {
 	regsub -all {&} $string {\\&} string
 	regsub -all {^ *} $string "" string
 	regsub -all { *$} $string "" string
+	regsub -all {~} $string {\\textasciitilde{}} string
 	regsub -all {µ} $string "\$\\mu\$" string
 
 	regsub -all {<} $string "\\mbox{\$<\$}" string
@@ -213,14 +218,21 @@ proc process_enum_latex {itemtxtblock} {
 
 ### PLAIN ###
 proc process_plain_latex {plaintxtblock} {
-	while {[lindex $plaintxtblock end] == ""} {
-		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
-	}
+#	while {[lindex $plaintxtblock end] == ""} {
+#		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
+#	}
 	foreach txtline $plaintxtblock {
 		if {$txtline != ""} {
 			puts -nonewline [indent]
 		}
 		puts [out_latex $txtline]
+	}
+}
+
+### EMPTY ###
+proc process_empty_latex {emptytxtblock} {
+	foreach txtline $emptytxtblock {
+		puts "[indent]$txtline"
 	}
 }
 
@@ -518,6 +530,7 @@ proc process_undefined {txtblock} {
 	foreach txtline $txtblock {
 		puts stderr "       $txtline"
 	}
+	exit 1
 }
 
 
@@ -597,8 +610,8 @@ set style_substyles(enum) {itemize enumeration description verbatim plain}
 
 ### PLAIN ###
 set style_begin(plain)    {^[^\ \n;].*}
-set style_continue(plain) {(^\w)|(^\n)}
-set style_contnext(plain) {(^\w)|(^\n)}
+set style_continue(plain) {^[\w\(]}
+#set style_contnext(plain) {^[^-=~#]}
 
 ### ABSTRACT ###
 set style_begin(abstract)     {^Abstract.*}
@@ -783,7 +796,7 @@ proc indent {} {
 
 ### FIND OUT ABOUT REFERENCES PROVIDED BY THE DOCUMENT ###
 proc collect_references {txtblock} {
-	global references
+	global references toc_refs
 	foreach var {chapter_cnt section_cnt subsection_cnt image_cnt table_cnt} {set $var 0}
 	set curr_chapter ""
 	set curr_section ""
@@ -792,6 +805,7 @@ proc collect_references {txtblock} {
 		set style [get_style [list chapter section subsection image tabcap] $curr_line $next_line]
 		if {(($style == "chapter") || ($style == "section") || ($style == "subsection"))} {
 			set references($curr_line,type) $style
+			lappend toc_refs $curr_line
 			if {$style == "chapter"} {
 				incr chapter_cnt
 				set curr_chapter $curr_line
@@ -856,6 +870,7 @@ set outmode latex
 set depth 0
 set title ""
 set authors ""
+set toc_refs {}
 
 # process arguments #
 while {[regexp {\--style ([^ ]+)} $argv dummy style_file]} {
