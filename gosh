@@ -25,21 +25,28 @@ proc out_latex {string} {
 	set string " $string "
 	
 	# italic style #
-	while {[regexp {( )_([^ ]+)_([ \.,!?])} $string dummy head_char emph_text tail_char]} {
+	while {[regexp {([ \(])_(.+)_([ \)\.,!?])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
-		regsub { _([^ ]+)_.} $string "$head_char\\emph{$emph_text}$tail_char" string
+		regsub {._(.+)_.} $string "$head_char\\emph{$emph_text}$tail_char" string
 	}
 
 	# bold style #
-	while {[regexp {\*([^ ]+)\*} $string dummy bf_text]} {
+	while {[regexp {([ \(])\*(.+)\*([ \)\.,!?])} $string dummy head_char bf_text tail_char]} {
 		regsub -all {\*} $bf_text " " bf_text
-		regsub {\*([^ ]+)\*} $string " \\textbf{$bf_text} " string
+		regsub {.\*(.+)\*.} $string "$head_char\\textbf{$bf_text}$tail_char" string
 	}
 	
 	# monospace style #
+	while {[regexp {([ \(])\'(.+)\'([ \)\.,!?])} $string dummy head_char code_text tail_char]} {
+		regsub {.\'(.+)\'.} $string "$head_char\\texttt{$code_text}$tail_char" string
+	}
+	
+	# FIXME: kick out monospace style via hashes #
 	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
 		regsub -all {\#} $code_text " " code_text
 		regsub {\#([^#]+)\#} $string " \\texttt{$code_text} " string
+		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
+		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
 	}
 	
 	# hexadecimal numbers #
@@ -58,6 +65,7 @@ proc out_latex {string} {
 	regsub -all {([\.\?\!\w])"} $string "\\1''" string
 	regsub -all {\^} $string "\\^" string
 	regsub -all {_} $string "\\_" string
+	regsub -all {#} $string "\\#" string
 	regsub -all {%} $string "\\%" string
 	regsub -all {\$} $string "\\$" string
 	regsub -all {&} $string {\\&} string
