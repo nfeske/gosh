@@ -78,6 +78,11 @@ proc out_latex {string} {
 	regsub -all {~} $string {\\textasciitilde{}} string
 	regsub -all {µ} $string "\$\\mu\$" string
 
+	regsub -all -- {->} $string "\$\\rightarrow\$" string
+	regsub -all {<-} $string "\$\\leftarrow\$" string
+	regsub -all {=>} $string "\$\\Rightarrow\$" string
+	regsub -all {<=} $string "\$\\Leftarrow\$" string
+	
 	regsub -all {<} $string "\\mbox{\$<\$}" string
 	regsub -all {>} $string "\\mbox{\$>\$}" string
 
