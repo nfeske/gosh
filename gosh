@@ -816,6 +816,22 @@ proc collect_references {txtblock} {
 #              #
 ################
 
+proc print_help {} {
+	puts "Convert ASCII to Latex"
+	puts "  usage: gosh <document.txt> > <document.tex>"
+	puts "         gosh --style <backend.gosh> <document.txt> > <document.tex>"
+}
+
+if {[llength $argv] == 0} {
+	print_help
+	exit
+} else {
+	if {[regexp {\--help} $argv]} {
+		print_help
+		exit
+	}
+}
+
 set outmode latex
 set txtfilename [lindex $argv end]
 set txtcontent [split [exec cat $txtfilename] "\n"]
