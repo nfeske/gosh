@@ -67,7 +67,9 @@ _Just_emphasize_this_point_
 # Test point
 
 
-:Description: Use this for descriptions.
+:Description: Use this "for descriptions."
+  The "description" continues here.
+
 :Advice: Watch the step!
 
 
