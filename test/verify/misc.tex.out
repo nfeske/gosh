@@ -66,7 +66,7 @@
 
   Paragraph 2 should be here.
 
-  Use \texttt{apostrophes for monospaced text}, but  \texttt{hash}  works too for compatibility.
+  Use \texttt{apostrophes for monospaced text}, but \texttt{hash} works too for compatibility.
 
   Trigger bug in newline handling:
 
@@ -180,8 +180,8 @@
   Some Text could be here. Maybe more ...
 
 
-  \begin{table}[h]
-  \center {
+  \begin{table}[ht!]
+  {\center
    \begin{tabular}{|l|l|l|}
    \hline
   col1& col2& col3    \\
@@ -240,6 +240,25 @@
 
   Just to test, how -- and --- are handled by the backend.
   BTW, what happens when they appear inside \cite{refer --- ences}?
+
+
+
+  %     -+*|[ [HTTP://A.LINK.AS.SECTION.TITLE] ]|*+-
+
+  \subsection{\texttt{http://a.link.as.section.title}} \label{httpalinkassectiontitle}
+
+
+ %     -+*|[ TEST FOR MONOSPACED TEXT WITHIN QUOTES ]|*+-
+
+ \section{Test for monospaced text within quotes} \label{Test for monospaced text within quotes}
+
+  here comes ``\texttt{some quoted monospaced text}'' does it work?
+
+  here comes ``\texttt{some quoted monospaced text}'' with a hash?
+
+  here comes ``\emph{some quoted italic text}''
+
+  here comes ``\textbf{some quoted bold text}'' followed by some normal text.
 
 \newpage
 \bibliographystyle{plain}

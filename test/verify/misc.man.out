@@ -128,5 +128,11 @@ There was even a bug where a
 "quotes" caused the start of a new paragraph.
 Just to test, how -- and --- are handled by the backend.
 BTW, what happens when they appear inside [refer --- ences]?
+.SS "[http://a.link.as.section.title]"
+.SH "TEST FOR MONOSPACED TEXT WITHIN QUOTES"
+here comes "'some quoted monospaced text'" does it work?
+here comes "#some quoted monospaced text#" with a hash?
+here comes "_some_quoted italic text_"
+here comes "*some quoted bold text*" followed by some normal text.
 .SH AUTHOR
 Authors

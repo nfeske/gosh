@@ -2,7 +2,7 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2004-08-02</center>
+<center>2004-10-05</center>
 <hr/><br/>
  <a name="Intro"></a>
  <h1>Intro</h1>
@@ -239,6 +239,22 @@ void main(void) {
   <p>
    Just to test, how &ndash; and &mdash; are handled by the backend.
    BTW, what happens when they appear inside <a href="refer --- ences" alt="refer --- ences">refer &mdash; ences</a>?
+  </p>
+  <a name="[http://a.link.as.section.title]"></a>
+  <h2><a href="http://a.link.as.section.title" alt="http://a.link.as.section.title">http://a.link.as.section.title</a></h2>
+ <a name="Test for monospaced text within quotes"></a>
+ <h1>Test for monospaced text within quotes</h1>
+  <p>
+   here comes "'some quoted monospaced text'" does it work?
+  </p>
+  <p>
+   here comes " <code>some quoted monospaced text</code> " with a hash?
+  </p>
+  <p>
+   here comes "_some_quoted italic text_"
+  </p>
+  <p>
+   here comes "*some quoted bold text*" followed by some normal text.
   </p>
 <hr/><br/>
 <i>Authors</i>
