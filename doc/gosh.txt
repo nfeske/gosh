@@ -86,6 +86,24 @@ _Just_emphasize_this_point_
 _TODO_
 
 
+References
+##########
+
+Ref section A
+=============
+
+Forward refer to section [Ref section B].
+
+
+Ref section B
+=============
+
+Refer to section [Ref section A] and trigger _linebreak_bug_ [Ref
+section A].
+
+_TODO:_ bibs, figures, ...
+
+
 Tables
 ######
 
@@ -104,7 +122,7 @@ Some Text could be here. Maybe more ...
 [table LABEL] TEXT
 
 
-More Text follows here.
+More Text for Tab. [LABEL] follows here.
 
 
 Images
