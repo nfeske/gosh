@@ -166,7 +166,9 @@ proc process_descitem_latex {itemtxtblock} {
 	regexp {^\:([^\:]+)\:} $txtline dummy desc_name
 	regsub {^\:([^\:]+)\: *} $txtline "" txtline
 	puts "[indent]\\item\[[out_latex $desc_name]\]"
-	lappend txtblock $txtline
+	if {$txtline == ""} {
+		lappend txtblock "\\mbox{}$txtline"
+	}
 	foreach txtline [lrange $itemtxtblock 1 end] {
 		regsub {^\ \ } $txtline "" txtline
 		lappend txtblock $txtline
