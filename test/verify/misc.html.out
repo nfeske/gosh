@@ -35,7 +35,7 @@
    Paragraph 2 should be here.
   </p>
   <p>
-   Use <code>apostrophes for monospaced text</code>, but  <code>hash</code>  works too for compatibility.
+   Use <code>apostrophes for monospaced text</code>, but <code>hash</code> works too for compatibility.
   </p>
   <p>
    Trigger bug in newline handling:
@@ -245,16 +245,16 @@ void main(void) {
  <a name="Test for monospaced text within quotes"></a>
  <h1>Test for monospaced text within quotes</h1>
   <p>
-   here comes "'some quoted monospaced text'" does it work?
+   here comes "<code>some quoted monospaced text</code>" does it work?
   </p>
   <p>
-   here comes " <code>some quoted monospaced text</code> " with a hash?
+   here comes "<code>some quoted monospaced text</code>" with a hash?
   </p>
   <p>
-   here comes "_some_quoted italic text_"
+   here comes "<i>some quoted italic text</i>"
   </p>
   <p>
-   here comes "*some quoted bold text*" followed by some normal text.
+   here comes "<b>some quoted bold text</b>" followed by some normal text.
   </p>
 <hr/><br/>
 <i>Authors</i>
