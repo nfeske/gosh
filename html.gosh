@@ -49,7 +49,20 @@ proc out_html {string} {
 				regsub {\[([^\]]+)\]} $string "<a href=\"#[label_html $ref_text]\">$ref_text</a>" string
 			}
 		} else {
-			regsub {\[([^\]]+)\]} $string "<a href=\"$ref_text\">$ref_text</a>" string
+			set url ""
+			set linktext ""
+			set tooltip " "
+			regexp {^(\w+:[^ ]+)} $ref_text url
+			regexp {^(\w+:[^ ]+) - ([^\(]+)} $ref_text dummy dummy linktext
+			regexp {\((.*)\)} $ref_text dummy tooltip
+			if {$url == ""} {
+				set url $ref_text
+			}
+			if {$linktext == ""} {
+				set linktext $url
+			}
+			regsub { +$} $linktext "" linktext
+			regsub {\[([^\]]+)\]} $string "<a href=\"$url\" alt=\"$linktext\" title=\"$tooltip\">$linktext</a>" string
 		}
 	}
 	
