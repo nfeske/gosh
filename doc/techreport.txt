@@ -1,0 +1,20 @@
+
+        Description of the GOSH backend for Technical Reports
+
+                            Norman Feske
+
+The 'techreport.gosh' backend creates a document that is compliant with the
+layout of the Technical Reports of the TU Dresden. It prepends a front page
+with the usual graphics of the skyline of Dresden and the TUD-Logo. If you
+want to create a Technical Report, just copy the files 'dresden.pdf',
+'siggraph.cls' and 'tu11.pdf' to the directory where your paper resides and
+call gosh via:
+
+! gosh --style /where/gosh/lives/techreport.gosh \
+!      --trnum "TUD-FIXX-XX-März 2024" \
+!      your_paper.txt > your_paper.tex
+
+Now simply run pdflatex with the resulting tex file.
+
+Thanks to Michael Hohmuth and Hendrik Tews for supplying the Latex layout
+stuff.
