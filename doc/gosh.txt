@@ -53,6 +53,12 @@ Paragraph 1 is here.
 
 Paragraph 2 should be here.
 
+Trigger bug in newline handling:
+
+BUG appears if a new line starts with non-words.
+
+BUG this should be a new paragraph, but it is'nt.
+(because of the bracket)
 
 _Just_emphasize_this_point_
 
@@ -150,6 +156,7 @@ _TODO_
 ;[image <image_file_without_extension> <scale>% <angle>°]
 ;caption
 ;more caption
+
 
 "Bibliography"
 ##############
