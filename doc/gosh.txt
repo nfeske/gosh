@@ -1,0 +1,122 @@
+ TITLE TEXT
+ can _be_ multi-line
+
+ Authors
+
+; $Id$
+
+; This document demonstrates GOSH (Gold Out of SHit) and all its implemented
+; features. It will be enhanced when GOSH is enhanced <--- no advice - simple
+; rule!
+; BTW: Comments start with ';'.
+
+; FIXMEs / Questions
+;
+; * Do NOT strip all newlines - there could be intention to use 'em.
+; * What is 'EMPTY'?
+; * Will "LaTeX" be factored out of GOSH like HTML?
+
+
+Intro
+#####
+
+Howto build this file:
+
+
+* cat gosh.txt > out.txt
+* sed s/^/\!/ gosh.txt >> out.txt
+* gosh out.txt > gosh.tex
+* rm out.txt
+
+
+1st Order Heading -- Chapter
+############################
+
+2nd Order Haeding -- Section
+============================
+
+3rd Order Heading -- SubSection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4th Order Heading -- Paragraph
+------------------------------
+
+
+Text styles
+###########
+
+Plain text looks like this.
+
+Paragraph 1 is here.
+
+; FIXME: comments eat newlines
+
+Paragraph 2 should be here.
+
+
+_Just_emphasize_this_point_
+
+
+* itemize is nice.
+* what do you think?
+  * Yes?
+  * No?
+  * Maybe!
+
+# Let's enumerate some points.
+# Test point
+
+
+:Description: Use this for descriptions.
+:Advice: Watch the step!
+
+
+!Whole line is verbatim. Maybe used for sources ...
+!/** MAIN */
+!void main(void) {
+!    exit(0);
+!}
+
+
+"Abstract"
+##########
+
+_TODO_
+
+
+Tables
+######
+
+Some Text could be here. Maybe more ...
+
+
+ col1 | col2 | col3
+ ------------------
+ col1 | col2 | col3
+ col1 | col2 | col3
+ col1 | col2 | col3
+ col1 | col2 | col3
+ ------------------
+ ------------------
+ col1 | col2 | col3
+[table LABEL] TEXT
+
+
+More Text follows here.
+
+
+Images
+######
+
+_TODO_
+
+
+"Bibliography"
+##############
+
+_TODO_
+
+
+Source file of this document
+############################
+
