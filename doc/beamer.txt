@@ -1,0 +1,72 @@
+
+        Description of the GOSH backend for the Latex Beamer Package
+
+                            Ronald Aigner
+
+The style 'beamer.gosh' and 'beamer-split.gosh' allow to generate slides from
+a GOSH file using the latex-beamer style.  There are some restriction on how
+to format the text:
+* The Beamer style displays short names of the current part of the
+  presentation.  For these parts we use the chapter. Therefore use short
+  descriptive names with chapters.
+* One chapter title is reserved: 'Outline'. Writing a single outline chapter
+  will generate the outline slide in the presentation. Leave this chapter
+  empty. Using a dedicated chapter allows you to palce the outline wherever
+  you like.
+* To assign the title of a slide, use the section heading.
+* You may also use the subsection heading to generate a slide. The main
+  difference to a section is the placement in the outline.
+* You may use pictures just as you would with the main latex style.
+* To generate listings with grayed items where the items are displayed with
+  the next click, insert '\pause' after an item.
+
+Example:
+
+!    This is an example presentation
+!
+!           Ronald Aigner
+!
+! Outline
+! #######
+!
+! First Part
+! ##########
+!
+! First Slide
+! ===========
+!
+! * Item
+!   * Subitem \pause
+!   * Subitem 2
+!   * Subitem 3 \pause
+!   * Subitem 4
+!
+! Second Slide
+! ============
+!
+! * foo
+!
+! Second Part
+! ###########
+!
+! Third Slide
+! ===========
+!
+! * bla
+!
+! Forth Slide
+! ===========
+!
+! * blubb
+
+To generate the respective latex file use:
+
+! gosh --style /where/gosh/lives/techreport.gosh \
+!      your_paper.txt > your_paper.tex
+
+Now simply run pdflatex with the resulting tex file. Don't forget to install
+the latex-beamer package!
+
+TODO:
+* set used style using command line parameter
+* generate bibliography (if command line parameter)
