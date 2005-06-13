@@ -18,9 +18,12 @@ to format the text:
   difference to a section is the placement in the outline.
 * You may use pictures just as you would with the main latex style.
 * To generate listings with grayed items where the items are displayed with
-  the next click, insert '\pause' after an item.
+  the next click, insert the 'pause' command after an item (Don't forget to
+  write the backslash before 'pause'.)
+
 
 Example:
+########
 
 !    This is an example presentation
 !
@@ -65,8 +68,10 @@ To generate the respective latex file use:
 !      your_paper.txt > your_paper.tex
 
 Now simply run pdflatex with the resulting tex file. Don't forget to install
-the latex-beamer package!
+the 'latex-beamer' package!
+
 
 TODO:
+#####
 * set used style using command line parameter
 * generate bibliography (if command line parameter)
