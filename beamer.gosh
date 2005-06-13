@@ -88,7 +88,10 @@ proc process_section_latex {txtblock} {
 proc process_subsection_latex {txtblock} {
 	global curr_chapter curr_section depth
 	set title [lindex $txtblock 0]
-	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
+	incr depth -1
+	puts "[indent]\}"
+	incr depth 
+	puts "[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
 	puts "[indent]\\subsection{[out_latex $title]}\n"
 	puts "[indent]\\frame"
 	puts "[indent]{"
@@ -97,6 +100,9 @@ proc process_subsection_latex {txtblock} {
 	handle_txtblock subsection [lrange $txtblock 2 end]
 	incr depth -1
 	puts "[indent]}"
+	incr depth -1
+	puts "[indent]\{"
+	incr depth
 }
 
 ### ITEMIZE ###
@@ -154,3 +160,4 @@ set idx [lsearch $argv "--theme-split"]
 if {$idx != -1} {
 	set beamersplit "on"
 }
+
