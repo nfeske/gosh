@@ -3,9 +3,8 @@
 
                             Ronald Aigner
 
-The style 'beamer.gosh' and 'beamer-split.gosh' allow to generate slides from
-a GOSH file using the latex-beamer style.  There are some restriction on how
-to format the text:
+The style 'beamer.gosh' allows to generate slides from a GOSH file using the
+latex-beamer style.  There are some restriction on how to format the text:
 * The Beamer style displays short names of the current part of the
   presentation.  For these parts we use the chapter. Therefore use short
   descriptive names with chapters.
@@ -21,6 +20,15 @@ to format the text:
   the next click, insert the 'pause' command after an item (Don't forget to
   write the backslash before 'pause'.)
 
+Options:
+########
+
+You can specify a beamer theme using the '--theme' command line argument.
+Default is 'Darmstadt'
+
+You can also split a them using the '--theme-split' command line argument.
+This gives you the possibility to define single elemts of the layout.
+*Untested!*
 
 Example:
 ########
@@ -65,6 +73,7 @@ Example:
 To generate the respective latex file use:
 
 ! gosh --style /where/gosh/lives/techreport.gosh \
+!      --theme Frankfurt
 !      your_paper.txt > your_paper.tex
 
 Now simply run pdflatex with the resulting tex file. Don't forget to install

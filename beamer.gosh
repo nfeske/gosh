@@ -9,14 +9,21 @@
 
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_latex {} {
-	global title authors
+	global title authors beamertheme beamersplit
 	
 	puts {\documentclass{beamer}}
-	puts {\usetheme{Darmstadt}}
+	if {$beamertheme != ""} {
+		puts "\\usetheme{$beamertheme}"
+	} else {
+		puts {\usetheme{Darmstadt}}
+	}
 	puts {\setbeamercovered{transparent}}
 	puts {\usepackage[latin1]{inputenc}}
 	puts {\usepackage{graphicx}}
 	puts {\usepackage{epsfig}}
+	if {$beamersplit != ""} {
+		puts {\usepackage{beamerthemesplit}}
+	}
 	
 	if {$title != ""} {
 		puts "\\title{[out_latex $title]}"
@@ -61,7 +68,7 @@ proc process_chapter_latex {txtblock} {
 
 ### SECTION ###
 proc process_section_latex {txtblock} {
-	global curr_chapter curr_section depth
+	global curr_chapter curr_section depth beamersplit
 	set title [lindex $txtblock 0]
 	set curr_section $title
 	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
@@ -69,6 +76,9 @@ proc process_section_latex {txtblock} {
 	puts "[indent]\\frame"
 	puts "[indent]{"
 	incr depth
+	if {$beamersplit != ""} {
+		puts "[indent]\\frametitle{\\textit{\\normalsize{[out_latex $title]}}}"
+	}
 	handle_txtblock section [lrange $txtblock 2 end]
 	incr depth -1
 	puts "[indent]}"
@@ -127,4 +137,20 @@ proc process_image_latex {txtblock} {
 #	puts "[indent]  \\caption{[out_latex $img_cap]}"
 #	puts "[indent]  \\label{[label_latex $img_name]}"
 	puts "[indent] \\end{center}\n[indent]\\end{figure}\n"
+}
+
+# catch style for beamer from command line #
+set beamertheme ""
+set beamersplit ""
+
+set idx [lsearch $argv "--theme"]
+if {$idx != -1} {
+	if {[llength $argv] > $idx} {
+		set beamertheme [lindex $argv [expr $idx+1]]
+	}
+}
+
+set idx [lsearch $argv "--theme-split"]
+if {$idx != -1} {
+	set beamersplit "on"
 }
