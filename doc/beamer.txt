@@ -19,16 +19,31 @@ latex-beamer style.  There are some restriction on how to format the text:
 * To generate listings with grayed items where the items are displayed with
   the next click, insert the 'pause' command after an item (Don't forget to
   write the backslash before 'pause'.)
+* Per default a biblioraphy is generated.
 
 Options:
 ########
 
 You can specify a beamer theme using the '--theme' command line argument.
-Default is 'Darmstadt'
+Default is 'Darmstadt'. For a list of valid theme refer to the latex-beamer
+documentation.
+
+To manipulate the look of a theme you may use the command line arguments
+'--colortheme', '--fonttheme', '--innertheme, and '--outertheme'. For a list
+of valid themes refer to the latex-beamer documentation.
 
 You can also split a them using the '--theme-split' command line argument.
 This gives you the possibility to define single elemts of the layout.
 *Untested!*
+
+If you specify the '--slidenum' command line argument to let gosh generate a
+specific footline with your name, the title of the talk, and your name.
+
+Animated items (see 'pause' command) are per default grayed if not displayed.
+You can hide the gayed items if you specify the '--cover-notransparent'
+command line argument. Another option is to use '--cover-auto', which will
+only display two grayed items.
+
 
 Example:
 ########
@@ -82,5 +97,4 @@ the 'latex-beamer' package!
 
 TODO:
 #####
-* set used style using command line parameter
-* generate bibliography (if command line parameter)
+* generate question mark slide

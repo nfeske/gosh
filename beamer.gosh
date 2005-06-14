@@ -9,7 +9,7 @@
 
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_latex {} {
-	global title authors beamertheme beamersplit
+	global title authors beamertheme beamersplit beamerslidenum beamercovertransp beamercoverauto beamercolortheme beamerfonttheme beamerinnertheme beameroutertheme
 	
 	puts {\documentclass{beamer}}
 	if {$beamertheme != ""} {
@@ -17,7 +17,26 @@ proc produce_head_latex {} {
 	} else {
 		puts {\usetheme{Darmstadt}}
 	}
-	puts {\setbeamercovered{transparent}}
+	if {$beamercovertransp != ""} {
+		puts {\setbeamercovered{transparent}}
+	} 
+	if {$beamercoverauto != ""} {
+		puts {\setbeamercovered{dynamic}}
+	}
+
+	if {$beamercolortheme != ""} {
+		puts "\\usecolortheme{$beamercolortheme}"
+	}
+	if {$beamerfonttheme != ""} {
+		puts "\\usefonttheme{$beamerfonttheme}"
+	}
+	if {$beamerinnertheme != ""} {
+		puts "\\useinnertheme{$beamerinnertheme}"
+	}
+	if {$beameroutertheme != ""} {
+		puts "\\useoutertheme{$beameroutertheme}"
+	}
+
 	puts {\usepackage[latin1]{inputenc}}
 	puts {\usepackage{graphicx}}
 	puts {\usepackage{epsfig}}
@@ -33,13 +52,27 @@ proc produce_head_latex {} {
 		puts {\date{\today}}
 	}
 
+	if {$beamerslidenum != ""} {
+		puts "\\setbeamertemplate{footline}"
+		puts "\{"
+	  	puts "\\leavevmode%"
+		puts "\\hbox\{%"
+		puts "\\begin{beamercolorbox}\[wd=.175\\paperwidth,ht=2.25ex,dp=1ex,center\]{author in head/foot}%"
+		puts "  \\usebeamerfont{author in head/foot}\\insertshortauthor"
+		puts "\\end{beamercolorbox}%"
+		puts "\\begin{beamercolorbox}\[wd=.725\\paperwidth,ht=2.25ex,dp=1ex,center\]{title in head/foot}%"
+		puts "  \\usebeamerfont{title in head/foot}\\insertshorttitle"
+		puts "\\end{beamercolorbox}%"
+		puts "\\begin{beamercolorbox}\[wd=.1\\paperwidth,ht=2.25ex,dp=1ex,right\]{date in head/foot}%"
+		puts "  \\insertframenumber{} / \\inserttotalframenumber\\hspace*{2ex}"
+		puts "\\end{beamercolorbox}\}%"
+		puts "\\vskip0pt%"
+		puts "\}"
+	}
+
 	puts {\begin{document}}
 	puts {\frame{\maketitle}}
-}
-
-### END OF DOCUMENT ###
-proc produce_tail_latex {} {
-	puts {\end{document}}
+	
 }
 
 ### ABSTRACT ###
@@ -91,8 +124,8 @@ proc process_subsection_latex {txtblock} {
 	incr depth -1
 	puts "[indent]\}"
 	incr depth 
-	puts "[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-	puts "[indent]\\subsection{[out_latex $title]}\n"
+	puts "[indent]%     -+*|\[ [string toupper $title] \]|*+-"
+	puts "[indent]\\subsection{[out_latex $title]}"
 	puts "[indent]\\frame"
 	puts "[indent]{"
 	incr depth
@@ -147,7 +180,14 @@ proc process_image_latex {txtblock} {
 
 # catch style for beamer from command line #
 set beamertheme ""
+set beamercolortheme ""
+set beamerfonttheme ""
+set beamerinnertheme ""
+set beameroutertheme ""
 set beamersplit ""
+set beamerslidenum ""
+set beamercovertransp "on"
+set beamercoverauto ""
 
 set idx [lsearch $argv "--theme"]
 if {$idx != -1} {
@@ -156,8 +196,51 @@ if {$idx != -1} {
 	}
 }
 
+set idx [lsearch $argv "--colortheme"]
+if {$idx != -1} {
+	if {[llength $argv] > $idx} {
+		set beamercolortheme [lindex $argv [expr $idx+1]]
+	}
+}
+
+set idx [lsearch $argv "--fonttheme"]
+if {$idx != -1} {
+	if {[llength $argv] > $idx} {
+		set beamerfonttheme [lindex $argv [expr $idx+1]]
+	}
+}
+
+set idx [lsearch $argv "--innertheme"]
+if {$idx != -1} {
+	if {[llength $argv] > $idx} {
+		set beamerinnertheme [lindex $argv [expr $idx+1]]
+	}
+}
+
+set idx [lsearch $argv "--outertheme"]
+if {$idx != -1} {
+	if {[llength $argv] > $idx} {
+		set beameroutertheme [lindex $argv [expr $idx+1]]
+	}
+}
+
 set idx [lsearch $argv "--theme-split"]
 if {$idx != -1} {
 	set beamersplit "on"
 }
 
+set idx [lsearch $argv "--slidenum"]
+if {$idx != -1} {
+	set beamerslidenum "on"
+}
+
+set idx [lsearch $argv "--cover-auto"]
+if {$idx != -1} {
+	set beamercoverauto "on"
+	set beamercovertransp ""
+}
+
+set idx [lsearch $argv "--cover-notransparent"]
+if {$idx != -1} {
+	set beamercovertransp ""
+}
