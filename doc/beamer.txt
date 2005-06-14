@@ -8,10 +8,15 @@ latex-beamer style.  There are some restriction on how to format the text:
 * The Beamer style displays short names of the current part of the
   presentation.  For these parts we use the chapter. Therefore use short
   descriptive names with chapters.
-* One chapter title is reserved: 'Outline'. Writing a single outline chapter
-  will generate the outline slide in the presentation. Leave this chapter
-  empty. Using a dedicated chapter allows you to palce the outline wherever
-  you like.
+* Two chapter titles are reserved: 'Outline' and 'Question'. 
+  * Writing a single outline chapter will generate the outline slide in the
+    presentation. Leave this chapter empty. Using a dedicated chapter allows
+    you to palce the outline wherever you like.
+  * Writing a single question chapter will generate a slide with the caption
+    "Question" and a centered graphic showing question marks. Per default the
+    provided graphic 'question1.pdf' is included. To be able to use this file
+    use 'TEXINPUTS=.:$(GOSHDIR)/beamer: pdflatex' instead of 'pdflatex'. You
+    can specify an alternative graphic using the '--question' argument.
 * To assign the title of a slide, use the section heading.
 * You may also use the subsection heading to generate a slide. The main
   difference to a section is the placement in the outline.
@@ -43,6 +48,9 @@ Animated items (see 'pause' command) are per default grayed if not displayed.
 You can hide the gayed items if you specify the '--cover-notransparent'
 command line argument. Another option is to use '--cover-auto', which will
 only display two grayed items.
+
+Use the command line option '--question' to specify an alternative file
+containing the question mark graphic.
 
 
 Example:

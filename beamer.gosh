@@ -86,17 +86,27 @@ proc process_abstract_latex {txtblock} {
 
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
-	global curr_chapter
+	global curr_chapter depth beamerquestion
 	set title [lindex $txtblock 0]
 	set curr_chapter $title
 	if {$title == "Outline"} {
-		puts "\\section\[Outline\]{}\n"
+		puts "\\section\[Outline\]{}"
 		puts "\\frame{\\tableofcontents}\n"
 	} else {
-		puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
-		puts "[indent]\\section{[out_latex $title]}\n"
+	if {$title == "Questions"} {
+		puts "[indent]\\section\[\]{}"
+		puts "[indent]\\frame"
+		puts "[indent]\{"
+		incr depth
+		puts "[indent]\\frametitle{[out_latex $title]}"
+		puts "[indent]\\hspace{0.29\\paperwidth}\\includegraphics\[scale=0.4\]{$beamerquestion}"
+		incr depth -1
+		puts "[indent]\}"
+	} else {
+		puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-"
+		puts "[indent]\\section{[out_latex $title]}"
 		handle_txtblock chapter [lrange $txtblock 2 end]
-	}
+	}}
 }
 
 ### SECTION ###
@@ -188,6 +198,7 @@ set beamersplit ""
 set beamerslidenum ""
 set beamercovertransp "on"
 set beamercoverauto ""
+set beamerquestion "question1"
 
 set idx [lsearch $argv "--theme"]
 if {$idx != -1} {
@@ -221,6 +232,13 @@ set idx [lsearch $argv "--outertheme"]
 if {$idx != -1} {
 	if {[llength $argv] > $idx} {
 		set beameroutertheme [lindex $argv [expr $idx+1]]
+	}
+}
+
+set idx [lsearch $argv "--question"]
+if {$idx != -1} {
+	if {[llength $argv] > $idx} {
+		set beamerquestion [lindex $argv [expr $idx+1]]
 	}
 }
 
