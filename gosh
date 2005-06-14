@@ -51,9 +51,6 @@ proc out_latex {string} {
 	# hexadecimal numbers #
 	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
 
-	# pause command for animated beamer slides
-	regsub -all {\\pause} $string " \\pause"
-	
 	# insert references and citations #
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
