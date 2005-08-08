@@ -124,7 +124,8 @@ proc out_html {string} {
 
 ### FILTER LABEL ###
 proc label_html {string} {
-	regsub -all {"} $string "" string
+	regsub -all {"} $string ""  string
+	regsub -all { } $string "_" string
 	return $string
 }
 
