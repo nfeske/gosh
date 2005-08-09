@@ -2,7 +2,7 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2005-02-18</center>
+<center>2005-08-09</center>
 <hr/><br/>
  <a name="Intro"></a>
  <h1>Intro</h1>
@@ -15,15 +15,15 @@
 # gosh out.txt > gosh.tex
 # rm out.txt
 </pre>
- <a name="1st Order Heading -- Chapter"></a>
+ <a name="1st_Order_Heading_--_Chapter"></a>
  <h1>1st Order Heading &ndash; Chapter</h1>
-  <a name="2nd Order Haeding -- Section"></a>
+  <a name="2nd_Order_Haeding_--_Section"></a>
   <h2>2nd Order Haeding &ndash; Section</h2>
-   <a name="3rd Order Heading -- SubSection"></a>
+   <a name="3rd_Order_Heading_--_SubSection"></a>
    <h3>3rd Order Heading &ndash; SubSection</h3>
-    <a name="4th Order Heading -- Paragraph"></a>
+    <a name="4th_Order_Heading_--_Paragraph"></a>
     <h4>4th Order Heading &ndash; Paragraph</h4>
- <a name="Text styles"></a>
+ <a name="Text_styles"></a>
  <h1>Text styles</h1>
   <p>
    Plain text looks like this.
@@ -153,15 +153,15 @@ void main(void) {
   </p>
  <a name="References"></a>
  <h1>References</h1>
-  <a name="Ref section A"></a>
+  <a name="Ref_section_A"></a>
   <h2>Ref section A</h2>
    <p>
-    Forward refer to section <a href="#Ref section B">Ref section B</a>.
+    Forward refer to section <a href="#Ref_section_B">Ref section B</a>.
    </p>
-  <a name="Ref section B"></a>
+  <a name="Ref_section_B"></a>
   <h2>Ref section B</h2>
    <p>
-    Refer to section <a href="#Ref section A">Ref section A</a> and trigger <i>linebreak bug</i> [Ref
+    Refer to section <a href="#Ref_section_A">Ref section A</a> and trigger <i>linebreak bug</i> [Ref
     section A].
    </p>
    <p>
@@ -216,7 +216,7 @@ void main(void) {
   <p>
    <i>TODO</i>
   </p>
- <a name="Source file of this document"></a>
+ <a name="Source_file_of_this_document"></a>
  <h1>Source file of this document</h1>
   <p>
    A damn url <a href="http://www.hilton.de/dispatch/ViewPropertyHomePageForm?hid=11036375&ViewPropertyHomePage=&formName=ViewPropertyHomePageForm" alt="Hilton">Hilton</a>
@@ -242,7 +242,7 @@ void main(void) {
   </p>
   <a name="[http://a.link.as.section.title]"></a>
   <h2><a href="http://a.link.as.section.title" alt="http://a.link.as.section.title">http://a.link.as.section.title</a></h2>
- <a name="Test for monospaced text within quotes"></a>
+ <a name="Test_for_monospaced_text_within_quotes"></a>
  <h1>Test for monospaced text within quotes</h1>
   <p>
    here comes "<code>some quoted monospaced text</code>" does it work?
@@ -256,7 +256,7 @@ void main(void) {
   <p>
    here comes "<b>some quoted bold text</b>" followed by some normal text.
   </p>
- <a name="Text after image without empty line"></a>
+ <a name="Text_after_image_without_empty_line"></a>
  <h1>Text after image without empty line</h1>
   <table cellspacing="10"><tr><td>
     <img src="bla.png.jpg" border="0">
