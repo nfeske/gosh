@@ -394,8 +394,6 @@ Known bugs and limitations
 ##########################
 
 * Sequent tables without any text in-between cause trouble.
-* The line where an error occured is not printed in the error message.
-  This sounds simple to fix but it is not.
 * All references must be written completely on one line, including the
   brackets.
 
