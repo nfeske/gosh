@@ -79,13 +79,13 @@ proc label_man {string} {
 proc produce_head_man {} {
 	global title authors txtfilename config_man_no_date
 	if {[regexp {^([^(]+)\(([0-9]+)\) *-+ *(.*)$} \
-                   $title dummy name section desc]} {
-	    string trim name
-	    string trim desc
+	    $title dummy name section desc]} {
+		string trim name
+		string trim desc
 	} else {
-	    set section 7
-	    set desc $title
-	    set name $txtfilename
+		set section 7
+		set desc $title
+		set name $txtfilename
 	}
 	
 	set date_string ""
@@ -112,10 +112,11 @@ proc process_verbatim_man {txtblock} {
 	puts ".PP"
 	puts ".ll +1i"
 	foreach txtline $txtblock {
-		regsub {^!} $txtline "" txtline
-	        regsub {\\} $txtline {\\\\} txtline
-	        regsub {^([.'])} $txtline {\\\&\1} txtline
-		puts "$txtline\n.br"
+		set txt [linetxt $txtline]
+		regsub {^!} $txt "" txt
+	        regsub {\\} $txt {\\\\} txt
+	        regsub {^([.'])} $txt {\\\&\1} txt
+		puts "$txt\n.br"
 	}
 	puts ".ll"
 	puts ".PP"
@@ -131,10 +132,10 @@ proc process_item_man {itemtxtblock} {
 	puts ".IP \"  *\""
 #	puts ".IP \"\\(bu\""
 	set txtline [lindex $itemtxtblock 0]
-	regsub {^\*\ } $txtline "" txtline
+	set txtline [lineregsub {^\*\ } $txtline ""]
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
+		set txtline [lineregsub {^\ \ } $txtline ""]
 		lappend txtblock $txtline
 	}
 	handle_txtblock item $txtblock
@@ -152,12 +153,12 @@ proc process_description_man {txtblock} {
 proc process_descitem_man {itemtxtblock} {
 	set txtline [lindex $itemtxtblock 0]
 	set desc_name ""
-	regexp {^\:(.+)\:} $txtline dummy desc_name
-	regsub {^\:(.+)\: *} $txtline "" txtline
+	regexp {^\:(.+)\:} [linetxt $txtline] dummy desc_name
+	set txtline [lineregsub {^\:(.+)\: *} $txtline ""]
 	puts ".TP\n[man_mkboldline [out_man $desc_name]]"
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
+		set txtline [lineregsub {^\ \ } $txtline ""]
 		lappend txtblock $txtline
 	}
 	handle_txtblock descitem $txtblock
@@ -185,10 +186,10 @@ proc process_enum_man {itemtxtblock} {
 	incr enum_cnt($enum_level)
 	puts ".B $enum_cnt($enum_level)."
 	set txtline [lindex $itemtxtblock 0]
-	regsub {^\#\ } $txtline "" txtline
+	set txtline [lineregsub {^\#\ } $txtline ""]
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
+		set txtline [lineregsub {^\ \ } $txtline ""]
 		lappend txtblock $txtline
 	}
 	handle_txtblock item $txtblock
@@ -200,41 +201,41 @@ proc process_plain_man {plaintxtblock} {
 		set plaintxtblock [lrange $plaintxtblock 0 [expr [llength $plaintxtblock]-2]]
 	}
 	foreach txtline $plaintxtblock {
-		puts [out_man $txtline]
+		puts [out_man [linetxt $txtline]]
 	}
 }
 
 ### ABSTRACT ###
 proc process_abstract_man {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	puts ".SH \"[out_man [string toupper $title]]\""
 	handle_txtblock abstract [lrange $txtblock 2 end]
 }
 
 ### CHAPTER ###
 proc process_chapter_man {txtblock} {
-	set title [lindex $txtblock 0]
+	set title  [linetxt [lindex $txtblock 0]]
 	puts ".SH \"[out_man [string toupper $title]]\""
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_man {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	puts ".SS \"[out_man $title]\""
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_man {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	puts ".PP\n[man_mkboldline [out_man $title]]\n.br"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 
 ### PARAGRAPH ###
 proc process_paragraph_man {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	puts ".PP\n[man_mkboldline [out_man $title.]]"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }

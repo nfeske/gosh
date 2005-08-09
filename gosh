@@ -175,7 +175,7 @@ proc produce_tail_latex {} {
 proc process_annotation_latex {txtblock} {
 	set new_txtblock {}
 	foreach txtline $txtblock {
-		regsub {^\| ?} $txtline "" txtline
+		set txtline [lineregsub {^\| ?} $txtline ""]
 		lappend new_txtblock $txtline
 	}
 	printline "{ \\footnotesize \\it"
@@ -190,9 +190,10 @@ proc process_verbatim_latex {txtblock} {
 	}
 	printline "\\begin{verbatim}"
 	foreach txtline $txtblock {
-		regsub {^\!} $txtline "" txtline
-		regsub -all {\t} $txtline "  " txtline
-		printline "$txtline"
+		set txt [linetxt $txtline]
+		regsub     {^\!} $txt ""   txt
+		regsub -all {\t} $txt "  " txt
+		printline "$txt"
 	}
 	printline "\\end{verbatim}"
 }
@@ -208,12 +209,11 @@ proc process_itemize_latex {txtblock} {
 proc process_item_latex {itemtxtblock} {
 	printline "\\item"
 	set txtline [lindex $itemtxtblock 0]
-	regsub {^[^\ ]\ } $txtline "" txtline
-	regsub {^\#\ } $txtline "" txtline
+	set txtline [lineregsub {^[^\ ]\ } $txtline ""]
+	set txtline [lineregsub {^\#\ }    $txtline ""]
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
-		lappend txtblock $txtline
+		lappend txtblock [lineregsub {^\ \ } $txtline ""]
 	}
 	handle_txtblock item $txtblock
 }
@@ -229,18 +229,17 @@ proc process_description_latex {txtblock} {
 proc process_descitem_latex {itemtxtblock} {
 	set txtline [lindex $itemtxtblock 0]
 	set desc_name ""
-	regexp {^\:([^\:]+)\:} $txtline dummy desc_name
-	regsub {^\:([^\:]+)\: *} $txtline "" txtline
+	regexp {^\:([^\:]+)\:} [linetxt $txtline] dummy desc_name
+	set txtline [lineregsub {^\:([^\:]+)\: *} $txtline ""]
 	printline "\\item\[[out_latex $desc_name]\]"
-	if {$txtline == ""} {
-		lappend txtblock "\\mbox{}$txtline"
-	} else {
-		lappend txtblock "$txtline"
+
+	if {[linetxt $txtline] == ""} {
+		set txtline [lineset $txtline "\\mbox{}[linetxt $txtline]"]
 	}
+	lappend txtblock $txtline
 
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
-		lappend txtblock $txtline
+		lappend txtblock [lineregsub {^\ \ } $txtline ""]
 	}
 	handle_txtblock descitem $txtblock
 }
@@ -260,20 +259,20 @@ proc process_enum_latex {itemtxtblock} {
 ### PLAIN ###
 proc process_plain_latex {plaintxtblock} {
 	foreach txtline $plaintxtblock {
-		printline [out_latex $txtline]
+		printline [out_latex [linetxt $txtline]]
 	}
 }
 
 ### EMPTY ###
 proc process_empty_latex {emptytxtblock} {
 	foreach txtline $emptytxtblock {
-		printline "$txtline"
+		printline "[linetxt $txtline]"
 	}
 }
 
 ### ABSTRACT ###
 proc process_abstract_latex {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
 	printline "\\begin{abstract} \\label{$title}"
@@ -283,7 +282,7 @@ proc process_abstract_latex {txtblock} {
 
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
 	printline "\\section{[out_latex $title]} \\label{[label_latex $title]}"
@@ -292,7 +291,7 @@ proc process_chapter_latex {txtblock} {
 
 ### SECTION ###
 proc process_section_latex {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
 	printline "\\subsection{[out_latex $title]} \\label{[label_latex $title]}"
@@ -301,7 +300,7 @@ proc process_section_latex {txtblock} {
 
 ### SUBSECTION ###
 proc process_subsection_latex {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
 	printline "\\subsubsection{[out_latex $title]} \\label{[label_latex $title]}"
@@ -310,7 +309,7 @@ proc process_subsection_latex {txtblock} {
 
 ### PARAGRAPH ###
 proc process_paragraph_latex {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
 	printline "\\paragraph{[out_latex $title]}"
@@ -336,9 +335,10 @@ proc process_image_latex {txtblock} {
 	
 	set img_cap ""
 	foreach img_capline $txtblock {
-		regsub {^\[.*\]} $img_capline "" img_capline
-		regsub {^ *} $img_capline "" img_capline
-		append img_cap $img_capline " "
+		set txt [linetxt $img_capline]
+		regsub {^\[.*\]} $txt "" txt
+		regsub {^ *}     $txt "" txt
+		append img_cap $txt " "
 	}
 	regsub { *$} $img_cap "" img_cap
 	
@@ -397,8 +397,9 @@ proc output_table_latex {head rows caption} {
 
 	set cap ""
 	foreach capline $caption {
-		regsub  {^ +} $capline " "  capline
-		append cap $capline
+		set txt [linetxt $capline]
+		regsub  {^ +} $txt " "  txt
+		append cap $txt
 	}
 	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
 		regsub  {^ +} $captxt ""  captxt
@@ -548,10 +549,10 @@ proc process_table {txtblock} {
 		}
 	}
 	
-	set tabhead [lindex $tabmain 0];
+	set tabhead [linetxt [lindex $tabmain 0]]
 	set headcells [split $tabhead "|"]
 	
-	set head {};
+	set head {}
 	foreach headcell $headcells {
 		set align "left"
 		if {[regexp {[^ ] $} $headcell]} { set align "right" }
@@ -561,6 +562,7 @@ proc process_table {txtblock} {
 	set tabmain [lrange $tabmain 2 end]
 	set cells {}
 	foreach row $tabmain {
+		set row [linetxt $row]
 		if {[regexp {\-\-\-\-} $row]} {
 			lappend cells "hline"
 		} elseif {[regexp {^[\| ]*$} $row]} {
@@ -579,9 +581,9 @@ proc process_table {txtblock} {
 }
 
 proc process_undefined {txtblock} {
-	puts stderr "Error: cannot figure out what you mean with"
+	puts stderr "Error at line [linenum [lindex $txtblock 0]]: cannot figure out what you mean with"
 	foreach txtline $txtblock {
-		puts stderr "       $txtline"
+		puts stderr "  \"[linetxt $txtline]\""
 	}
 	exit 1
 }
@@ -593,9 +595,10 @@ proc process_header {txtblock} {
 	
 	set block ""
 	foreach txtline $txtblock {
-		regsub {^\ +} $txtline "" txtline
-		if {$txtline != ""} {
-			set block [append block " " $txtline]
+		set txtline [lineregsub {^\ +} $txtline ""]
+#		regsub {^\ +} $txtline "" txtline
+		if {[linetxt $txtline] != ""} {
+			set block [append block " " [linetxt $txtline]]
 		} else {
 			regsub {^\ +} $block "" block
 			if {$block != ""} {
@@ -614,8 +617,8 @@ proc process_header {txtblock} {
 proc process_raw {txtblock} {
 	set new_txtblock {}
 	foreach txtline $txtblock {
-		regsub {^\: ?} $txtline "" txtline
-		puts $txtline
+		set txt [linetxt $txtline]
+		puts [lineregsub {^\: ?} $txt ""]
 	}
 }
 
@@ -776,11 +779,11 @@ set style_substyles(documentmain) {header abstract bibliography chapter paragrap
 proc get_style {styles txtline next_txtline} {
 	global style_begin style_next
 	foreach style $styles {
-		if {[regexp $style_begin($style) $txtline]} {
+		if {[regexp $style_begin($style) [linetxt $txtline]]} {
 			if {![info exists style_next($style)]} {
 				return $style
 			}
-			if {[regexp $style_next($style) $next_txtline]} {
+			if {[regexp $style_next($style) [linetxt $next_txtline]]} {
 				return $style
 			}
 		}
@@ -791,11 +794,11 @@ proc get_style {styles txtline next_txtline} {
 ### DETERMINE IF THE GIVEN STYLE IS STILL VALID ###
 proc style_continues {style txtline next_txtline} {
 	global style_continue style_contnext
-	if {[regexp $style_continue($style) $txtline]} {
+	if {[regexp $style_continue($style) "[linetxt $txtline]\n"]} {
 		if {![info exists style_contnext($style)]} {
 			return 1
 		}
-		if {[regexp $style_contnext($style) $next_txtline]} {
+		if {[regexp $style_contnext($style) "[linetxt $next_txtline]\n"]} {
 			return 1
 		}
 	}
@@ -818,7 +821,7 @@ proc style_split {styles txtblock} {
 		incr i
 		set curr_txtline [lindex $txtblock $i]
 		set next_txtline [lindex $txtblock [expr $i+1]]
-		while {(([style_continues $style "$curr_txtline\n" "$next_txtline\n"]) & ($i < $txtlen))} {
+		while {(([style_continues $style $curr_txtline $next_txtline]) & ($i < $txtlen))} {
 			lappend style_block $curr_txtline
 			incr i
 			set curr_txtline [lindex $txtblock $i]
@@ -855,6 +858,28 @@ proc handle_txtblock {txtstyle txtcontent} {
 	}
 }
 
+### RETURN LINE NUMBER OF SPECIFIED LINE ###
+proc linenum {line} {
+	return [lindex $line 0]
+}
+
+### RETURN TEXT STRING OF SPECIFIED LINE ###
+proc linetxt {line} {
+	return [lindex $line 1]
+}
+
+### APPLY REGEXP SUBSTITUTION TO A LINE ###
+proc lineregsub {pattern txtline replacement} {
+	set txt [linetxt $txtline]
+	regsub $pattern $txt $replacement txt
+	return [list [linenum $txtline] $txt]
+}
+
+proc lineset {txtline newtxt} {
+	lset txtline 1 $newtxt
+	return $txtline
+}
+
 ### RETURN A STRING WITH CURRENT NUMBER OF INDENTATION BLANKS ###
 proc indent {} {
 	global depth
@@ -874,35 +899,36 @@ proc collect_references {txtblock} {
 	set curr_line [lindex $txtblock 0]
 	foreach next_line [lrange $txtblock 1 end] {
 		set style [get_style [list chapter section subsection image tabcap] $curr_line $next_line]
+		set txt [linetxt $curr_line]
 		if {(($style == "chapter") || ($style == "section") || ($style == "subsection"))} {
-			set references($curr_line,type) $style
-			lappend toc_refs $curr_line
+			set references($txt,type) $style
+			lappend toc_refs $txt
 			if {$style == "chapter"} {
 				incr chapter_cnt
-				set curr_chapter $curr_line
+				set curr_chapter $txt
 				set section_cnt 0
 				set subsection_cnt 0
-				set references($curr_line,index) $chapter_cnt
+				set references($txt,index) $chapter_cnt
 			} elseif {$style == "section"} {
 				incr section_cnt
-				set curr_section $curr_line
+				set curr_section $txt
 				set subsection_cnt 0
-				set references($curr_line,chapter) $curr_chapter
-				set references($curr_line,index) $section_cnt
+				set references($txt,chapter) $curr_chapter
+				set references($txt,index)   $section_cnt
 			} elseif {$style == "subsection"} {
 				incr subsection_cnt
-				set references($curr_line,section) $curr_section
-				set references($curr_line,index) $subsection_cnt
+				set references($txt,section) $curr_section
+				set references($txt,index)   $subsection_cnt
 			}
 		} elseif {$style == "image"} {
-			if {[regexp {\[(image \w+.*)\]} $curr_line dummy img_info]} {
+			if {[regexp {\[(image \w+.*)\]} $txt dummy img_info]} {
 				incr image_cnt
 				set img_name [lindex $img_info 1]
 				set references($img_name,type) $style
 				set references($img_name,index) $image_cnt
 			}
 		} elseif {$style == "tabcap"} {
-			if {[regexp {\[(table \w+.*)\]} $curr_line dummy tab_info]} {
+			if {[regexp {\[(table \w+.*)\]} $txt dummy tab_info]} {
 				incr table_cnt
 				set tab_name [lindex $tab_info 1]
 				set references($tab_name,type) $style
@@ -920,7 +946,6 @@ proc collect_references {txtblock} {
 #              #
 ################
 
-
 # assist the user a bit #
 if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 	printline "Convert ASCII to Latex"
@@ -933,8 +958,10 @@ if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 set txtfilename [lindex $argv end]
 set txtlines [split [exec cat $txtfilename] "\n"]
 set txtcontent {}
+set cnt 1
 foreach txtline $txtlines {
-	if {![regexp {^;} $txtline]} {lappend txtcontent $txtline}
+	if {![regexp {^;} $txtline]} {lappend txtcontent [list $cnt $txtline]}
+	incr cnt
 }
 
 set outmode latex

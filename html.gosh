@@ -179,9 +179,10 @@ proc process_verbatim_html {txtblock} {
 	}
 	puts "<pre>"
 	foreach txtline $txtblock {
-		regsub {^\!} $txtline "" txtline
-		regsub -all {\t} $txtline "  " txtline
-		puts "$txtline"
+		set txt [linetxt $txtline]
+		regsub {^\!} $txt "" txt
+		regsub -all {\t} $txt "  " txt
+		puts "$txt"
 	}
 	puts "</pre>"
 }
@@ -197,11 +198,11 @@ proc process_itemize_html {txtblock} {
 proc process_item_html {itemtxtblock} {
 	printline "<li>"
 	set txtline [lindex $itemtxtblock 0]
-	regsub {^\*\ } $txtline "" txtline
-	regsub {^\#\ } $txtline "" txtline
+	set txtline [lineregsub {^\*\ } $txtline ""]
+	set txtline [lineregsub {^\#\ } $txtline ""]
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
+		set txtline [lineregsub {^\ \ } $txtline ""]
 		lappend txtblock $txtline
 	}
 	handle_txtblock item $txtblock
@@ -220,13 +221,14 @@ proc process_description_html {txtblock} {
 proc process_descitem_html {itemtxtblock} {
 	set txtline [lindex $itemtxtblock 0]
 	set desc_name ""
-	regexp {^\:(.+)\:} $txtline dummy desc_name
-	regsub {^\:(.+)\: *} $txtline "" txtline
+	set txt [linetxt $txtline]
+	regexp {^\:(.+)\:} $txt dummy desc_name
+	set txtline [lineregsub {^\:(.+)\: *} $txtline ""]
 	printline "<dt>[out_html $desc_name]</dt>"
 	printline "<dd>"
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
-		regsub {^\ \ } $txtline "" txtline
+		set txtline [lineregsub {^\ \ } $txtline ""]
 		lappend txtblock $txtline
 	}
 	handle_txtblock descitem $txtblock
@@ -252,7 +254,7 @@ proc process_plain_html {plaintxtblock} {
 	printline "[p_style_begin][font_style_begin]"
 	incr depth
 	foreach txtline $plaintxtblock {
-		printline "[out_html $txtline]"
+		printline "[out_html [linetxt $txtline]]"
 	}
 	incr depth -1
 	printline "[font_style_end][p_style_end]"
@@ -260,7 +262,6 @@ proc process_plain_html {plaintxtblock} {
 
 ### ABSTRACT ###
 proc process_abstract_html {txtblock} {
-	set title [lindex $txtblock 0]
 	printline "<h1>Abstract</h1>"
 	printline "<i>"
 	handle_txtblock abstract [lrange $txtblock 2 end]
@@ -271,7 +272,7 @@ proc process_abstract_html {txtblock} {
 proc process_chapter_html {txtblock} {
 	global references curr_chapter curr_section_type config_html_sec_enum
 	set curr_section_type chapter
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	set curr_chapter $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter " }
@@ -284,7 +285,7 @@ proc process_chapter_html {txtblock} {
 proc process_section_html {txtblock} {
 	global references curr_chapter curr_section curr_section_type text_color config_html_sec_enum
 	set curr_section_type section
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	set curr_section $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
@@ -297,7 +298,7 @@ proc process_section_html {txtblock} {
 proc process_subsection_html {txtblock} {
 	global references curr_chapter curr_section curr_subsection curr_section_type text_color config_html_sec_enum
 	set curr_section_type subsection
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	set curr_subsection $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
@@ -310,7 +311,7 @@ proc process_subsection_html {txtblock} {
 proc process_paragraph_html {txtblock} {
 	global curr_section_type text_color
 	set curr_section_type paragraph
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	printline "<a name=\"[label_html $title]\"></a>"
 	printline "<h4>[font_style_begin][out_html $title][font_style_end]</h4>"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
@@ -329,9 +330,10 @@ proc process_image_html {txtblock} {
 	
 	set img_cap ""
 	foreach img_capline $txtblock {
-		regsub {^\[.*\]} $img_capline "" img_capline
-		regsub {^ *} $img_capline "" img_capline
-		append img_cap $img_capline " "
+		set txt [linetxt $img_capline]
+		regsub {^\[.*\]} $txt "" txt
+		regsub {^ *} $txt "" txt
+		append img_cap $txt " "
 	}
 	regsub { *$} $img_cap "" img_cap
 	
@@ -350,8 +352,9 @@ proc output_table_html {head rows caption} {
 	global references
 	set cap ""
 	foreach capline $caption {
-		regsub  {^ +} $capline " "  capline
-		append cap $capline
+		set txt [linetxt $capline]
+		regsub  {^ +} $txt " "  txt
+		append cap $txt
 	}
 	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
 		printline "<a name=\"[label_html \"$caplab\"]\"></a>"
