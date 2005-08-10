@@ -875,9 +875,9 @@ proc lineregsub {pattern txtline replacement} {
 	return [list [linenum $txtline] $txt]
 }
 
+### ASSIGN NEW TEST TO THE SPECIFIED LINE ###
 proc lineset {txtline newtxt} {
-	lset txtline 1 $newtxt
-	return $txtline
+	return [list [lindex $txtline 0] $newtxt]
 }
 
 ### RETURN A STRING WITH CURRENT NUMBER OF INDENTATION BLANKS ###
