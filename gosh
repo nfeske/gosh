@@ -970,14 +970,39 @@ set title ""
 set authors ""
 set toc_refs {}
 
-# process arguments #
-while {[regexp {\--style ([^ ]+)} $argv dummy style_file]} {
-	if {[file exists $style_file]} {
-		source $style_file
-	} else {
-		puts stderr "Error: style file $style_file does not exist"
-		regsub {^ *$} $string "" string
+
+### FIND FILE FOR SPECIFIED STYLE NAME ###
+proc get_style_file {style_name} {
+	global argv0
+
+	if {![string match "*.gosh" $style_name]} {
+		append style_name ".gosh"
 	}
+
+	set gosh_path $argv0
+
+	if {[file type $gosh_path] == "link"} {
+		set gosh_path [file readlink $gosh_path]
+	}
+
+	if {![file exists $style_name]} {
+		set try_file "[file dirname $gosh_path]/$style_name"
+		if {[file exists $try_file]} {
+			set style_name $try_file
+		}
+	}
+
+	if {![file exists $style_name]} {
+		puts stderr "Error: style file $style_name does not exist"
+		exit 1
+	}
+
+	return $style_name
+}
+
+# process arguments #
+while {[regexp {\--style ([^ ]+)} $argv dummy style_name]} {
+	catch { source [get_style_file $style_name] }
 	regsub {\--style [^ ]+} $argv "" argv
 }
 
