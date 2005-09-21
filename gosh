@@ -25,9 +25,9 @@ proc out_latex {string} {
 	set string " $string "
 	
 	# italic style #
-	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?])} $string dummy head_char emph_text tail_char]} {
+	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?\-])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
-		regsub {([ \"\(])_(.+?)_([ \)\.\",!?])} $string "$head_char\\emph{$emph_text}$tail_char" string
+		regsub {([ \"\(])_(.+?)_([ \)\.\",!?\-])} $string "$head_char\\emph{$emph_text}$tail_char" string
 	}
 
 	# bold style #
@@ -49,7 +49,7 @@ proc out_latex {string} {
 	}
 	
 	# hexadecimal numbers #
-	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
+#	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
 
 	# insert references and citations #
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
@@ -617,8 +617,7 @@ proc process_header {txtblock} {
 proc process_raw {txtblock} {
 	set new_txtblock {}
 	foreach txtline $txtblock {
-		set txt [linetxt $txtline]
-		puts [lineregsub {^\: ?} $txt ""]
+		puts [linetxt [lineregsub {^\: ?} $txtline ""]]
 	}
 }
 
