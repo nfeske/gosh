@@ -2,10 +2,10 @@
 #
 # Use Chapters (underline with #) to set title in overview
 # Use special Chapter name Outline to create outline slide
-# Use Section (underline with ) to set current slide caption
-# Use subsection (underline with ) to set current slide caption
+# Use Section (underline with =) to set current slide caption
+# Use subsection (underline with -) to set current slide caption
 # to animate insert a "\pause" after an item (it will be printed as is into
-#   the generated tex source
+# the generated tex source
 
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_latex {} {
@@ -77,7 +77,7 @@ proc produce_head_latex {} {
 
 ### ABSTRACT ###
 proc process_abstract_latex {txtblock} {
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
 	puts "[indent]\\center{"
 	handle_txtblock abstract [lrange $txtblock 2 end]
@@ -87,7 +87,7 @@ proc process_abstract_latex {txtblock} {
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
 	global curr_chapter depth beamerquestion
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	set curr_chapter $title
 	if {$title == "Outline"} {
 		puts "\\section\[Outline\]{}"
@@ -112,7 +112,7 @@ proc process_chapter_latex {txtblock} {
 ### SECTION ###
 proc process_section_latex {txtblock} {
 	global curr_chapter curr_section depth beamersplit
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	set curr_section $title
 	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
 	puts "[indent]\\subsection{[out_latex $title]}\n"
@@ -130,7 +130,7 @@ proc process_section_latex {txtblock} {
 ### SUBSECTION ###
 proc process_subsection_latex {txtblock} {
 	global curr_chapter curr_section depth
-	set title [lindex $txtblock 0]
+	set title [linetxt [lindex $txtblock 0]]
 	incr depth -1
 	puts "[indent]\}"
 	incr depth 
