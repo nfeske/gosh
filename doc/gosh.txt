@@ -282,6 +282,14 @@ line arguments:
 :'--tex-table-floating': This argument makes GOSH to create floating tables.
   By default, tables are inserted at the position of their definition.
 
+When prefixing the name of a chapter or a section with an asterisk '*', then
+this is translated into the latex syntax
+
+!\section*{<name>}
+
+That way you can define chapters and sections that are not listed in the
+contents listing and they receive no index number.
+
 
 The HTML backend
 ################

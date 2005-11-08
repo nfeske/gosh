@@ -283,18 +283,28 @@ proc process_abstract_latex {txtblock} {
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
 	set title [linetxt [lindex $txtblock 0]]
+	set nonum ""
+	if {[regexp {^\*} $title]} {
+	  regsub {^\*} $title "" title
+	  set nonum "*"
+	}
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
-	printline "\\section{[out_latex $title]} \\label{[label_latex $title]}"
+	printline "\\section$nonum{[out_latex $title]} \\label{[label_latex $title]}"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_latex {txtblock} {
 	set title [linetxt [lindex $txtblock 0]]
+	set nonum ""
+	if {[regexp {^\*} $title]} {
+	  regsub {^\*} $title "" title
+	  set nonum "*"
+	}
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
-	printline "\\subsection{[out_latex $title]} \\label{[label_latex $title]}"
+	printline "\\subsection$nonum{[out_latex $title]} \\label{[label_latex $title]}"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
