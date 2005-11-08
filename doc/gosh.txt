@@ -50,9 +50,9 @@ official GNU website [http://www.gnu.org/licenses].
 Usage
 #####
 
-GOSH is written in the script language 'Tcl/Tk'. Make sure that your installed
-'Tcl/Tk' on your computer before trying out GOSH. Just check, if you have a
-program called 'tclsh' installed.
+GOSH is written in the script language 'Tcl/Tk'. Make sure that you have
+'Tcl/Tk' installed on your computer before trying out GOSH. Just check,
+if you have a program called 'tclsh'.
 
 GOSH must be called with the source text file as argument and uses standard
 output for printing its result. For example. a pdf-file of the this text
