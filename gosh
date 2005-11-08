@@ -115,7 +115,10 @@ proc print {string} {
 
 
 proc printline {string} {
-	set string "[indent]$string"
+	global config_indent
+	if {$config_indent} {
+		set string "[indent]$string"
+	}
 	regsub {^ *$} $string "" string
 	puts $string
 }
@@ -205,17 +208,23 @@ proc process_itemize_latex {txtblock} {
 	printline "\\end{itemize}"
 }
 
+### UTILITY: EXTRACT CONTENT OF AN ITEM ###
+proc extract_item_text {itemtxtblock} {
+	set txtline [lindex $itemtxtblock 0]
+	set txtline [lineregsub {^\*\ } $txtline ""]
+	set txtline [lineregsub {^\#\ } $txtline ""]
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		set txtline [lineregsub {^\ \ } $txtline ""]
+		lappend txtblock $txtline
+	}
+	return $txtblock
+}
+
 ### ITEM ###
 proc process_item_latex {itemtxtblock} {
 	printline "\\item"
-	set txtline [lindex $itemtxtblock 0]
-	set txtline [lineregsub {^[^\ ]\ } $txtline ""]
-	set txtline [lineregsub {^\#\ }    $txtline ""]
-	lappend txtblock $txtline
-	foreach txtline [lrange $itemtxtblock 1 end] {
-		lappend txtblock [lineregsub {^\ \ } $txtline ""]
-	}
-	handle_txtblock item $txtblock
+	handle_txtblock item [extract_item_text $itemtxtblock]
 }
 
 ### DESCRIPTION ###
@@ -978,6 +987,7 @@ set depth 0
 set title ""
 set authors ""
 set toc_refs {}
+set config_indent 1
 
 
 ### FIND FILE FOR SPECIFIED STYLE NAME ###
