@@ -197,15 +197,7 @@ proc process_itemize_html {txtblock} {
 ### ITEM ###
 proc process_item_html {itemtxtblock} {
 	printline "<li>"
-	set txtline [lindex $itemtxtblock 0]
-	set txtline [lineregsub {^\*\ } $txtline ""]
-	set txtline [lineregsub {^\#\ } $txtline ""]
-	lappend txtblock $txtline
-	foreach txtline [lrange $itemtxtblock 1 end] {
-		set txtline [lineregsub {^\ \ } $txtline ""]
-		lappend txtblock $txtline
-	}
-	handle_txtblock item $txtblock
+	handle_txtblock item [extract_item_text $itemtxtblock]
 	printline "</li>"
 }
 
@@ -214,7 +206,6 @@ proc process_description_html {txtblock} {
 	printline "<dl>"
 	handle_txtblock description $txtblock
 	printline "</dl>"
-#	printline "<br/>"
 }
 
 ### DESCRIPTION ITEM ###
