@@ -1,0 +1,35 @@
+
+                   Known Issues of GOSH
+
+                       Norman Feske
+
+
+This document compiles known issues of GOSH that are not yet resolved.
+Please feel free to fix them. I would be happy to receive a patch from you :-)
+
+
+Martin Pohlack 2005-11-23
+#########################
+
+seite ich meine locale auf de_DE.utf8 umgestellt habe, produziert gosh
+manchmal Dokumente, an denen sich Latex verschluckt.
+
+Ich denke das Problem ist, dass TCL seine Ausgabe in Abhängigkeit der
+locale codiert (das will man ja eigentlich).  Dadurch entstehen aber
+latex-Dateien (gilt für andere Backends sicher auch), die intern
+utf8-codiert sind, im Header aber expliziet etwas anderes spezifizieren
+(\usepackage[latin1]{inputenc}).  Wenn das Dokument Umlaute etc. enthält
+kracht es.
+
+Lösungsvorschläge:
+ - Man erzwingt für die Ausgabe eine klassische locale die dem
+   Dokumenttyp des Backends entspricht (keine Ahnung ob das mit TCL
+   geht)
+ - Man prüft die echte locale und passt die Ausgabe der Backends an,
+   z.B. "\usepackage[utf8]{inputenc}" anstelle von
+        "\usepackage[latin1]{inputenc}"
+
+Temporär sollte man das Problem mindestens dokumentieren und als
+Lösungsvorschlag einen locale-wrapper erwähnen:
+ $ gosh abc.txt > abc.tex                   ->
+ $ LC_CTYPE="de_DE" gosh abc.txt > abc.tex
