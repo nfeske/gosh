@@ -66,7 +66,7 @@ BUG this should be a new paragraph, but it is'nt.
 _Just_emphasize_this_point_ but only this point.
 
 Trigger bug in emph: (_BUG_) - *GOTCHA* This bug is no more.
-
+What about this one: (_BUG0_,_BUG1_)?
 
 * itemize is nice.
 * what do you think?
@@ -145,7 +145,15 @@ Some Text could be here. Maybe more ...
  ------------------
  col1 | col2 | col3
 [table LABEL] TEXT
+ 
+ col1 | col2 | col3
+ ------------------
+ col1 | col2 | col3
+[table TABLE2] second table
 
+Please not that you need a _space_ in the line between table [LABEL] and 
+[TABLE2] in the source representation. 
+;Is it correct that this text is indented?
 
 More Text for Tab. [LABEL] follows here.
 
@@ -206,7 +214,8 @@ here comes "*some quoted bold text*" followed by some normal text.
 Text after image without empty line
 ###################################
 
-[image bla.png]
+'bla.png' is missing.
+;[image bla.png]
 This is some plain text that was wrongly assigned to the
 caption of the image.
 
