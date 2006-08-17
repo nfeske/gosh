@@ -181,6 +181,7 @@ proc produce_tail_html {} {
 
 ### VERBATIM  ###
 proc process_verbatim_html {txtblock} {
+	global config_html_keep_tags
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
@@ -189,6 +190,12 @@ proc process_verbatim_html {txtblock} {
 		set txt [linetxt $txtline]
 		regsub {^\!} $txt "" txt
 		regsub -all {\t} $txt "  " txt
+		regsub -all {&} $txt "_§%and%§_" txt
+		if {!$config_html_keep_tags} {
+			regsub -all {<} $txt {_§%and%§_lt;} txt
+			regsub -all {>} $txt {_§%and%§_gt;} txt
+		}
+		regsub -all {_§%and%§_} $txt {\&} txt
 		puts "$txt"
 	}
 	puts "</pre>"
