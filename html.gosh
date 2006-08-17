@@ -43,10 +43,16 @@ proc p_style_end {} {
 
 ### FILTER TEXTUAL OUTPUT ###
 proc out_html {string} {
-	global references
+	global references config_html_keep_tags
 
 	set string " $string "
-	
+
+	# prevent < and > to be interpreted as html tags #
+	if {!$config_html_keep_tags} {
+		regsub -all {<} $string {_§%and%§_lt;} string
+		regsub -all {>} $string {_§%and%§_gt;} string
+	}
+
 	# italic style #
 	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
@@ -393,3 +399,4 @@ set config_html_toc       [regexp {\--html-toc}       $argv dummy]
 set config_html_p_justify [regexp {\--html-p-justify} $argv dummy]
 set config_html_p_colored [regexp {\--html-p-colored} $argv dummy]
 set config_html_sec_enum  [regexp {\--html-sec-enum}  $argv dummy]
+set config_html_keep_tags [regexp {\--html-keep-tags} $argv dummy]

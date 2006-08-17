@@ -183,8 +183,8 @@ Sections are underlined by '=' characters:
 
 Subsections are underlined by '~' characters:
 
-! Section
-! ~~~~~~~
+! Subsection
+! ~~~~~~~~~~
 
 Paragraphs are underlined by '-' characters:
 
@@ -313,6 +313,10 @@ output:
   [Tweaking the GOSH output].
 
 :'--html-p-justify': This option sets the alignment of paragraphs to justified.
+
+:'--html-keep-tags': This option prevents GOSH from replacing '<' and '>'
+  characters by the corresponding HTML sequences and thus, lets you embed
+  HTML tags directly in your GOSH document.
 
 
 Advanced features
