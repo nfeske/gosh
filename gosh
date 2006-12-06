@@ -681,7 +681,7 @@ set style_substyles(item) {annotation raw itemize enumeration description verbat
 ### DESCRIPTION ###
 set style_begin(description)     {^\:[^\:]+\:}
 set style_continue(description)  {(^\ \ +[^\ ])|(^\n)|(^\:[\w ]+\:)}
-set style_contnext(description)  {^[^|]*$}
+#set style_contnext(description)  {^[^|]*$}
 set style_substyles(description) {descitem}
 
 ### DESCRIPTION ITEM ###
@@ -692,7 +692,7 @@ set style_substyles(descitem) {annotation raw itemize enumeration description ve
 ### ENUMERATION ###
 set style_begin(enumeration)     {^\#\ .+}
 set style_continue(enumeration)  {(^\ \ +[^\ ])|(^\n)|(^\#\ .+)}
-set style_contnext(enumeration)  {^[^|]*$}
+#set style_contnext(enumeration)  {^[^|]*$}
 set style_substyles(enumeration) {enum}
 
 ### ENUM ITEM ###

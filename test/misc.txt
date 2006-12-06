@@ -224,3 +224,24 @@ Accentuations
 
 Monospaced and 'non'-monospaced connected by a hyphen.
 
+
+This works
+##########
+
+* _To be written by #Krishna#_
+* _To be written by *Krishna* _
+* _To be written by 'Krishna' _
+
+This don't
+##########
+
+* _To be written by *Krishna*_
+* _To be written by 'Krishna'_
+
+Annotations
+###########
+
+:description:
+  Here is some normal text
+  | followed by an annotation
+  and some more text

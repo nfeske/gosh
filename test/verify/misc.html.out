@@ -2,7 +2,7 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2005-08-09</center>
+<center>2006-12-06</center>
 <hr/><br/>
  <a name="Intro"></a>
  <h1>Intro</h1>
@@ -10,9 +10,9 @@
    Howto build this file:
   </p>
 <pre>
-# cat gosh.txt > out.txt
-# sed s/^/\!/ gosh.txt >> out.txt
-# gosh out.txt > gosh.tex
+# cat gosh.txt &gt; out.txt
+# sed s/^/\!/ gosh.txt &gt;&gt; out.txt
+# gosh out.txt &gt; gosh.tex
 # rm out.txt
 </pre>
  <a name="1st_Order_Heading_--_Chapter"></a>
@@ -52,6 +52,7 @@
   </p>
   <p>
    Trigger bug in emph: (<i>BUG</i>) - <b>GOTCHA</b> This bug is no more.
+   What about this one: (<i>BUG0</i>,_BUG1_)?
   </p>
   <ul>
    <li>
@@ -203,6 +204,21 @@ void main(void) {
   </table>
   Table 1: TEXT
   </center><br/>
+  <a name="TABLE2"></a>
+  <br/><center><table cellspacing="0" cellpadding="3" border="1">
+  <tr>  <th bgcolor=#f0f7ff> col1 <br/></th>  <th bgcolor=#f0f7ff> col2 <br/></th>  <th bgcolor=#f0f7ff> col3<br/></th>  </tr>
+  <tr>
+  <td> col1</td>
+  <td> col2</td>
+  <td> col3</td>
+  </tr>
+  </table>
+  Table 2: second table
+  </center><br/>
+  <p>
+   Please not that you need a <i>space</i> in the line between table <a href="#LABEL">1</a> and
+   <a href="#TABLE2">2</a> in the source representation.
+  </p>
   <p>
    More Text for Tab. <a href="#LABEL">1</a> follows here.
   </p>
@@ -258,18 +274,62 @@ void main(void) {
   </p>
  <a name="Text_after_image_without_empty_line"></a>
  <h1>Text after image without empty line</h1>
-  <table cellspacing="10"><tr><td>
-    <img src="bla.png.jpg" border="0">
-  </td></tr></table>
   <p>
+   <code>bla.png</code> is missing.
    This is some plain text that was wrongly assigned to the
    caption of the image.
   </p>
  <a name="Accentuations"></a>
  <h1>Accentuations</h1>
   <p>
-   Monospaced and 'non'-monospaced connected by a hyphen.
+   Monospaced and <code>non</code>-monospaced connected by a hyphen.
   </p>
+ <a name="This_works"></a>
+ <h1>This works</h1>
+  <ul>
+   <li>
+    <p>
+     <i>To be written by <code>Krishna</code></i>
+    </p>
+   </li>
+   <li>
+    <p>
+     <i>To be written by <b>Krishna</b> </i>
+    </p>
+   </li>
+   <li>
+    <p>
+     <i>To be written by <code>Krishna</code> </i>
+    </p>
+   </li>
+  </ul>
+ <a name="This_don't"></a>
+ <h1>This don't</h1>
+  <ul>
+   <li>
+    <p>
+     <i>To be written by *Krishna*</i>
+    </p>
+   </li>
+   <li>
+    <p>
+     <i>To be written by 'Krishna'</i>
+    </p>
+   </li>
+  </ul>
+ <a name="Annotations"></a>
+ <h1>Annotations</h1>
+  <dl>
+   <dt>description</dt>
+   <dd>
+    <p>
+     Here is some normal text
+    </p>
+    <p>
+     and some more text
+    </p>
+   </dd>
+  </dl>
 <hr/><br/>
 <i>Authors</i>
 </body>

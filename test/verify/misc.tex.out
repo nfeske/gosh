@@ -78,7 +78,7 @@
   \emph{Just emphasize this point} but only this point.
 
   Trigger bug in emph: (\emph{BUG}) - \textbf{GOTCHA} This bug is no more.
-
+  What about this one: (\emph{BUG0},\_BUG1\_)?
 
   \begin{itemize}
    \item
@@ -200,6 +200,24 @@
    \label{LABEL}
   }
   \end{table}
+
+  \begin{table}[ht!]
+  {\center
+   \begin{tabular}{|l|l|l|}
+   \hline
+  col1& col2& col3    \\
+    \hline
+    \hline
+    col1& col2& col3    \\
+    \hline
+   \end{tabular}
+   \caption{second table}
+   \label{TABLE2}
+  }
+  \end{table}
+  Please not that you need a \emph{space} in the line between table \ref{LABEL} and
+  \ref{TABLE2} in the source representation.
+
   More Text for Tab. \ref{LABEL} follows here.
 
 
@@ -265,15 +283,7 @@
 
  \section{Text after image without empty line} \label{Text after image without empty line}
 
-
-  \begin{figure}[tbp]
-   \begin{center}
-    \epsfig{file=bla.png,angle=0,width=0.8\columnwidth}
-    \caption{}
-    \label{blapng}
-   \end{center}
-  \end{figure}
-
+  \texttt{bla.png} is missing.
   This is some plain text that was wrongly assigned to the
   caption of the image.
 
@@ -284,6 +294,47 @@
 
   Monospaced and \texttt{non}-monospaced connected by a hyphen.
 
+
+
+ %     -+*|[ THIS WORKS ]|*+-
+
+ \section{This works} \label{This works}
+
+  \begin{itemize}
+   \item
+    \emph{To be written by \texttt{Krishna}}
+   \item
+    \emph{To be written by \textbf{Krishna} }
+   \item
+    \emph{To be written by \texttt{Krishna} }
+
+  \end{itemize}
+
+ %     -+*|[ THIS DON'T ]|*+-
+
+ \section{This don't} \label{This dont}
+
+  \begin{itemize}
+   \item
+    \emph{To be written by *Krishna*}
+   \item
+    \emph{To be written by 'Krishna'}
+
+  \end{itemize}
+
+ %     -+*|[ ANNOTATIONS ]|*+-
+
+ \section{Annotations} \label{Annotations}
+
+  \begin{description}
+   \item[description]
+    \mbox{}
+    Here is some normal text
+    { \footnotesize \it
+     followed by an annotation
+    }
+    and some more text
+  \end{description}
 \newpage
 \bibliographystyle{plain}
 \bibliography{custom,master}

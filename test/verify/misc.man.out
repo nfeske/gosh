@@ -39,6 +39,9 @@ Trigger bug in emph: (
 ) - 
 .B GOTCHA
 This bug is no more.
+What about this one: (
+.I BUG0
+,_BUG1_)?
 .IP "  *"
 itemize is nice.
 .IP "  *"
@@ -108,6 +111,10 @@ section A].
 bibs, figures, ...
 .SH "TABLES"
 Some Text could be here. Maybe more ...
+Please not that you need a 
+.I space
+in the line between table [LABEL] and 
+[TABLE2] in the source representation. 
 More Text for Tab. [LABEL] follows here.
 .SH "IMAGES"
 
@@ -139,9 +146,41 @@ here comes "
 .B some quoted bold text
 " followed by some normal text.
 .SH "TEXT AFTER IMAGE WITHOUT EMPTY LINE"
+\(cqbla.png' is missing.
 This is some plain text that was wrongly assigned to the
 caption of the image.
 .SH "ACCENTUATIONS"
 Monospaced and 'non'-monospaced connected by a hyphen.
+.SH "THIS WORKS"
+.IP "  *"
+
+.I To be written by #Krishna#
+
+.IP "  *"
+
+.I To be written by 
+.B Krishna
+
+
+.IP "  *"
+
+.I To be written by 'Krishna' 
+
+.SH "THIS DON'T"
+.IP "  *"
+
+.I To be written by *Krishna*
+
+.IP "  *"
+
+.I To be written by 'Krishna'
+
+.SH "ANNOTATIONS"
+.RS 0.0
+.TP
+.BI "description"
+Here is some normal text
+and some more text
+.RE
 .SH AUTHOR
 Authors
