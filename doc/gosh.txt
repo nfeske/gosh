@@ -290,6 +290,12 @@ this is translated into the latex syntax
 That way you can define chapters and sections that are not listed in the
 contents listing and they receive no index number.
 
+By default, GOSH uses plain 'image' and 'table' environments. If you
+prefer to use a 'image*' or 'table*' environment, you can add the attribute
+'full-span' to the image or table tag. For example:
+
+![image img/example 85% 5° full-span]
+
 
 The HTML backend
 ################
