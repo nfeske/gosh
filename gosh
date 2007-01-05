@@ -289,31 +289,37 @@ proc process_abstract_latex {txtblock} {
 	printline "\\end{abstract}"
 }
 
+### GENERATE SECTION ENVIRONMENT ###
+#
+# A section can be excluded from the table of contents
+# by prefixing its title with a '*'. This function
+# returns the proper section environment and a
+# corresponding label for cross-referencing.
+#
+proc section_env_latex {title} {
+	set out ""
+	if {[regexp {^\*(.*)$} $title dummy title]} {
+		append out "*"
+	}
+	append out "{[out_latex $title]} \\label{[label_latex $title]}"
+	return $out
+}
+
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
 	set title [linetxt [lindex $txtblock 0]]
-	set nonum ""
-	if {[regexp {^\*} $title]} {
-	  regsub {^\*} $title "" title
-	  set nonum "*"
-	}
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
-	printline "\\section$nonum{[out_latex $title]} \\label{[label_latex $title]}"
+	printline "\\section[section_env_latex $title]"
 	handle_txtblock chapter [lrange $txtblock 2 end]
 }
 
 ### SECTION ###
 proc process_section_latex {txtblock} {
 	set title [linetxt [lindex $txtblock 0]]
-	set nonum ""
-	if {[regexp {^\*} $title]} {
-	  regsub {^\*} $title "" title
-	  set nonum "*"
-	}
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
-	printline "\\subsection$nonum{[out_latex $title]} \\label{[label_latex $title]}"
+	printline "\\subsection[section_env_latex $title]"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
@@ -322,7 +328,7 @@ proc process_subsection_latex {txtblock} {
 	set title [linetxt [lindex $txtblock 0]]
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
-	printline "\\subsubsection{[out_latex $title]} \\label{[label_latex $title]}"
+	printline "\\subsubsection[section_env_latex $title]"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 }
 

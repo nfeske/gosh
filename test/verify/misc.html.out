@@ -4,6 +4,9 @@
 <b><center>Authors</center></b>
 <center>2007-01-05</center>
 <hr/><br/>
+ <p>
+  \tableofcontents
+ </p>
  <a name="Intro"></a>
  <h1>Intro</h1>
   <p>
@@ -15,6 +18,8 @@
 # gosh out.txt &gt; gosh.tex
 # rm out.txt
 </pre>
+ <a name="*Some_hidden_chapter"></a>
+ <h1>*Some hidden chapter</h1>
  <a name="1st_Order_Heading_--_Chapter"></a>
  <h1>1st Order Heading &ndash; Chapter</h1>
   <a name="2nd_Order_Haeding_--_Section"></a>

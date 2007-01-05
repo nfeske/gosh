@@ -17,6 +17,7 @@
 ; * What is 'EMPTY'?
 ; * Will "LaTeX" be factored out of GOSH like HTML?
 
+\tableofcontents
 
 Intro
 #####
@@ -29,6 +30,9 @@ Howto build this file:
 !# gosh out.txt > gosh.tex
 !# rm out.txt
 
+
+*Some hidden chapter
+####################
 
 1st Order Heading -- Chapter
 ############################

@@ -1,6 +1,7 @@
 .TH "misc.txt" 7 "" "TU Dresden" "DROPS Manual"
 .SH NAME
 misc.txt \- TITLE TEXT can _be_ multi-line
+\tableofcontents
 .SH "INTRO"
 Howto build this file:
 .PP
@@ -15,6 +16,7 @@ Howto build this file:
 .br
 .ll
 .PP
+.SH "*SOME HIDDEN CHAPTER"
 .SH "1ST ORDER HEADING -- CHAPTER"
 .SS "2nd Order Haeding -- Section"
 .PP

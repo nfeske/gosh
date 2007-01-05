@@ -17,6 +17,8 @@
 \author{Authors}
 \maketitle
 
+ \tableofcontents
+
 
  %     -+*|[ INTRO ]|*+-
 
@@ -32,6 +34,11 @@
 # rm out.txt
   \end{verbatim}
 
+
+
+ %     -+*|[ *SOME HIDDEN CHAPTER ]|*+-
+
+ \section*{Some hidden chapter} \label{Some hidden chapter}
 
 
  %     -+*|[ 1ST ORDER HEADING -- CHAPTER ]|*+-
