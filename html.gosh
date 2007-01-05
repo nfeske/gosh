@@ -417,7 +417,7 @@ proc output_table_html {col_attr rows caption} {
 
 				set cell_out " <$cell_tag>"
 				foreach cell_txt_line $cell_txt {
-					append cell_out "$cell_txt_line<br/>"
+					append cell_out "[out_html $cell_txt_line]<br/>"
 				}
 				append cell_out "</$cell_tag>"
 				printline "$cell_out"

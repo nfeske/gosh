@@ -151,6 +151,14 @@ Some Text could be here. Maybe more ...
  col1 | col2 | col3
 [table TABLE2] second table
 
+ accentuation  | test
+----------------------------
+ italic        | _italic_
+ bold          | *bold*
+ monospaced    | 'monospaced'
+
+[table accentuations]
+
 Please not that you need a _space_ in the line between table [LABEL] and 
 [TABLE2] in the source representation. 
 ;Is it correct that this text is indented?

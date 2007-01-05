@@ -378,7 +378,7 @@ proc output_table_latex {colattr rows caption} {
 
 	# determine additional table attributes that are specified after the table lable
 	if {[regexp {\[table +[^ ]+ +([^\]]+)} [linetxt [lindex $caption 0]] dummy attr]} {
-		if {[regexp {wide} $attr]} { set tabenv "table*" }
+		if {[regexp {full-span} $attr]} { set tabenv "table*" }
 	}
 
 	if {$config_tex_table_floating} {
@@ -408,8 +408,18 @@ proc output_table_latex {colattr rows caption} {
 		if {$rowtype == "tabrow"} {
 			foreach rowline $rowlines {
 				set rowlinetxt [linetxt $rowline]
-				regsub -all { *[\|]} $rowlinetxt {\&} rowlinetxt
-				printline " $rowlinetxt    \\\\"
+
+				set rowlinetxt_list [split $rowlinetxt "|"]
+				set out_txt ""
+				set idx 0
+				foreach txt $rowlinetxt_list {
+					append out_txt [out_latex $txt]
+					if {$idx < [expr [llength $rowlinetxt_list] - 1]} {
+						append out_txt " & "
+					}
+					incr idx
+				}
+				printline "  $out_txt    \\\\"
 			}
 		}
 		if {$rowtype == "tabhline"} {
