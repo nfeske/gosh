@@ -176,17 +176,17 @@ void main(void) {
   <a name="LABEL"></a>
   <br/><center><table cellspacing="0" cellpadding="3" border="1">
   <tr>
-   <th> col1 <br/></th>
-   <th> col2 <br/></th>
+   <th> col1<br/></th>
+   <th> col2<br/></th>
    <th> col3<br/></th>
   </tr><tr>
-   <td> col1 <br/> col1 <br/> col1 <br/> col1 <br/></td>
-   <td> col2 <br/> col2 <br/> col2 <br/> col2 <br/></td>
+   <td> col1<br/> col1<br/> col1<br/> col1<br/></td>
+   <td> col2<br/> col2<br/> col2<br/> col2<br/></td>
    <td> col3<br/> col3<br/> col3<br/> col3<br/></td>
   </tr><tr>
   </tr><tr>
-   <td> col1 <br/></td>
-   <td> col2 <br/></td>
+   <td> col1<br/></td>
+   <td> col2<br/></td>
    <td> col3<br/></td>
   </tr>
   </table>
@@ -195,16 +195,28 @@ void main(void) {
   <a name="TABLE2"></a>
   <br/><center><table cellspacing="0" cellpadding="3" border="1">
   <tr>
-   <th> col1 <br/></th>
-   <th> col2 <br/></th>
+   <th> col1<br/></th>
+   <th> col2<br/></th>
    <th> col3<br/></th>
   </tr><tr>
-   <td> col1 <br/></td>
-   <td> col2 <br/></td>
+   <td> col1<br/></td>
+   <td> col2<br/></td>
    <td> col3<br/></td>
   </tr>
   </table>
   Table 2: second table
+  </center><br/>
+  <a name="accentuations"></a>
+  <br/><center><table cellspacing="0" cellpadding="3" border="1">
+  <tr>
+   <th> accentuation<br/></th>
+   <th> test<br/></th>
+  </tr><tr>
+   <td> italic<br/> bold<br/> monospaced<br/></td>
+   <td> <i>italic</i><br/> <b>bold</b><br/> <code>monospaced</code><br/></td>
+  </tr>
+  </table>
+  Table 3: 
   </center><br/>
   <p>
    Please not that you need a <i>space</i> in the line between table <a href="#LABEL">1</a> and

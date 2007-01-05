@@ -184,16 +184,16 @@ void main(void) {
   {\center
    \begin{tabular}{|l|l|l|}
     \hline
-    col1& col2& col3    \\
+    col1 & col2 & col3    \\
     \hline
     \hline
-    col1& col2& col3    \\
-    col1& col2& col3    \\
-    col1& col2& col3    \\
-    col1& col2& col3    \\
+    col1 & col2 & col3    \\
+    col1 & col2 & col3    \\
+    col1 & col2 & col3    \\
+    col1 & col2 & col3    \\
     \hline
     \hline
-    col1& col2& col3    \\
+    col1 & col2 & col3    \\
     \hline
    \end{tabular}
    \caption{TEXT}
@@ -204,14 +204,30 @@ void main(void) {
   {\center
    \begin{tabular}{|l|l|l|}
     \hline
-    col1& col2& col3    \\
+    col1 & col2 & col3    \\
     \hline
     \hline
-    col1& col2& col3    \\
+    col1 & col2 & col3    \\
     \hline
    \end{tabular}
    \caption{second table}
    \label{TABLE2}
+  }
+  \end{table}
+  \begin{table}[ht!]
+  {\center
+   \begin{tabular}{|l|l|}
+    \hline
+    accentuation & test    \\
+    \hline
+    \hline
+    italic & \emph{italic}    \\
+    bold & \textbf{bold}    \\
+    monospaced & \texttt{monospaced}    \\
+    \hline
+   \end{tabular}
+   \caption{}
+   \label{accentuations}
   }
   \end{table}
   Please not that you need a \emph{space} in the line between table \ref{LABEL} and
