@@ -26,10 +26,10 @@
 
 
   \begin{verbatim}
-  # cat gosh.txt > out.txt
-  # sed s/^/\!/ gosh.txt >> out.txt
-  # gosh out.txt > gosh.tex
-  # rm out.txt
+# cat gosh.txt > out.txt
+# sed s/^/\!/ gosh.txt >> out.txt
+# gosh out.txt > gosh.tex
+# rm out.txt
   \end{verbatim}
 
 
@@ -132,11 +132,11 @@
 
 
   \begin{verbatim}
-  Whole line is verbatim. Maybe used for sources ...
-  /** MAIN */
-  void main(void) {
-      exit(0);
-  }
+Whole line is verbatim. Maybe used for sources ...
+/** MAIN */
+void main(void) {
+    exit(0);
+}
   \end{verbatim}
 
 
@@ -183,16 +183,16 @@
   \begin{table}[ht!]
   {\center
    \begin{tabular}{|l|l|l|}
-   \hline
-  col1& col2& col3    \\
+    \hline
+    col1& col2& col3    \\
     \hline
     \hline
     col1& col2& col3    \\
     col1& col2& col3    \\
     col1& col2& col3    \\
     col1& col2& col3    \\
-      \hline
-      \hline
+    \hline
+    \hline
     col1& col2& col3    \\
     \hline
    \end{tabular}
@@ -200,12 +200,11 @@
    \label{LABEL}
   }
   \end{table}
-
   \begin{table}[ht!]
   {\center
    \begin{tabular}{|l|l|l|}
-   \hline
-  col1& col2& col3    \\
+    \hline
+    col1& col2& col3    \\
     \hline
     \hline
     col1& col2& col3    \\

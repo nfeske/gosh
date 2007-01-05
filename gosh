@@ -24,34 +24,34 @@ proc out_latex {string} {
 	
 	set string " $string "
 	
-	# italic style #
+	# italic style
 	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?\-])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
 		regsub {([ \"\(])_(.+?)_([ \)\.\",!?\-])} $string "$head_char\\emph{$emph_text}$tail_char" string
 	}
 
-	# bold style #
+	# bold style
 	while {[regexp {([ \"\(])\*(.+?)\*([ \)\.\",!?])} $string dummy head_char bf_text tail_char]} {
 		regsub -all {\*} $bf_text " " bf_text
 		regsub {([ \"\(])\*(.+?)\*([ \)\.\",!?])} $string "$head_char\\textbf{$bf_text}$tail_char" string
 	}
 	
-	# monospace style #
+	# monospace style
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
 	}
 	
-	# FIXME: kick out monospace style via hashes #
+	# FIXME: kick out monospace style via hashes
 	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
 		regsub {\#([^#]+)\#} $string "\\texttt{$code_text}" string
 		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
 		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
 	}
 	
-	# hexadecimal numbers #
+	# hexadecimal numbers
 #	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
 
-	# insert references and citations #
+	# insert references and citations
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
 			regsub {\[([^\]]+)\]} $string "\\ref{[label_latex $ref_text]}" string
@@ -196,7 +196,7 @@ proc process_verbatim_latex {txtblock} {
 		set txt [linetxt $txtline]
 		regsub     {^\!} $txt ""   txt
 		regsub -all {\t} $txt "  " txt
-		printline "$txt"
+		puts "$txt"
 	}
 	printline "\\end{verbatim}"
 }
@@ -371,18 +371,25 @@ proc process_image_latex {txtblock} {
 }
 
 ### TABLE ###
-proc output_table_latex {head rows caption} {
+proc output_table_latex {colattr rows caption} {
 	global config_tex_table_floating
 
+	set tabenv "table"
+
+	# determine additional table attributes that are specified after the table lable
+	if {[regexp {\[table +[^ ]+ +([^\]]+)} [linetxt [lindex $caption 0]] dummy attr]} {
+		if {[regexp {wide} $attr]} { set tabenv "table*" }
+	}
+
 	if {$config_tex_table_floating} {
-		printline "\\begin\{table\}\[ht\]"
+		printline "\\begin\{$tabenv\}\[ht\]"
 	} else {
-		printline "\\begin\{table\}\[ht!]"
+		printline "\\begin\{$tabenv\}\[ht!]"
 	}
 	printline "\{\\center"
 	print "[indent] \\begin\{tabular\}\{|"
-	foreach headcell $head {
-		if {[lindex $headcell 0] == "left"} {
+	foreach attr $colattr {
+		if {$attr == "left"} {
 			print "l|"
 		} else {
 			print "r|"
@@ -390,27 +397,30 @@ proc output_table_latex {head rows caption} {
 	}
 	print "\}"
 	printline ""
-	printline " \\hline"
-	print "[indent][out_latex [lindex [lindex $head 0] 1]]"
-	foreach headcell [lrange $head 1 end] {
-		print "& [out_latex [lindex $headcell 1]]"
-	}
-	printline "  \\\\"
 	printline "  \\hline"
-	printline "  \\hline"
+
+	set firstrow 1
+
 	foreach row $rows {
-		if {[lindex $row 0] == "hline"} {
-			printline "[indent]  \\hline"
-		}
-		if {[lindex $row 0] == "text"} {
-			set cells [lindex $row 1]
-			print "[indent]  [out_latex [lindex $cells 0]]"
-			foreach cell [lrange $cells 1 end] {
-				print "& [out_latex $cell]"
+		set rowtype  [lindex $row 0]
+		set rowlines [lindex $row 1]
+
+		if {$rowtype == "tabrow"} {
+			foreach rowline $rowlines {
+				set rowlinetxt [linetxt $rowline]
+				regsub -all { *[\|]} $rowlinetxt {\&} rowlinetxt
+				printline " $rowlinetxt    \\\\"
 			}
-			printline "  \\\\"
+		}
+		if {$rowtype == "tabhline"} {
+			if {$firstrow} {
+				printline "  \\hline"
+				set firstrow 0
+			}
+			printline "  \\hline"
 		}
 	}
+
 	printline "  \\hline"
 	printline " \\end\{tabular\}"
 
@@ -420,13 +430,13 @@ proc output_table_latex {head rows caption} {
 		regsub  {^ +} $txt " "  txt
 		append cap $txt
 	}
-	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
+	if {[regexp {^\[table ([^\]]+)\](.*)$} $cap dummy caplab captxt]} {
 		regsub  {^ +} $captxt ""  captxt
 		printline " \\caption\{[out_latex $captxt]\}"
 		printline " \\label\{[label_latex $caplab]\}"
 	}
 	printline "\}"
-	printline "\\end\{table\}"
+	printline "\\end\{$tabenv\}"
 }
 
 #
@@ -554,7 +564,12 @@ proc output_table_struct {head cells caption} {
 }
 
 proc process_table {txtblock} {
-	global outmode
+	global outmode tables
+
+	# read table index from '[tabref..]' tag
+	regexp {\[tabref ([0-9]+)} [linetxt [lindex $txtblock 0]] dummy table_idx
+
+	set txtblock $tables($table_idx)
 
 	set split_tab [style_split {tabmain tabcap empty undefined} $txtblock]
 	set tabmain ""
@@ -567,35 +582,27 @@ proc process_table {txtblock} {
 			append cap [lindex $tabpart 1]
 		}
 	}
-	
-	set tabhead [linetxt [lindex $tabmain 0]]
+
+	set rows [style_split {tabrow tabhline undefined} $txtblock]
+
+	# determine alignment of table colums based on the first
+	# line of the table head
+
+	set tabhead [linetxt [lindex [lindex [lindex $rows 0] 1] 0]]
 	set headcells [split $tabhead "|"]
-	
-	set head {}
+
+	set colattr {}
 	foreach headcell $headcells {
 		set align "left"
 		if {[regexp {[^ ] $} $headcell]} { set align "right" }
 		if {[regexp {^ [^ ]} $headcell]} { set align "left" }
-		lappend head [list $align $headcell]
-	}
-	set tabmain [lrange $tabmain 2 end]
-	set cells {}
-	foreach row $tabmain {
-		set row [linetxt $row]
-		if {[regexp {\-\-\-\-} $row]} {
-			lappend cells "hline"
-		} elseif {[regexp {^[\| ]*$} $row]} {
-			lappend cells "space"
-		} else {
-			set tabcells [split $row "|"]
-			lappend cells [list "text" $tabcells]
-		}
+		lappend colattr $align
 	}
 
 	set tabout_function "output_table_"
 	append tabout_function $outmode
 	if {[info procs $tabout_function] == $tabout_function} {
-		eval "$tabout_function \$head \$cells \$cap"
+		eval "$tabout_function \$colattr \$rows \$cap"
 	}
 }
 
@@ -756,9 +763,12 @@ set style_begin(image)     {^\[image .+\]}
 set style_continue(image)  {(^  .+)|(^$)}
 
 ### TABLE ###
-set style_begin(table)     {\|}
-set style_next(table)      {\-\-\-}
-set style_continue(table)  {(\|)|(\-\-\-)|(^\n)|(^\[table.*\])|(^  .+\n)}
+set style_begin(table)    {\[tabref[^\]]*\]}
+set style_continue(table) {^$}
+#set style_continue(table) {(^\n)|(^\[table[^\]]*\])|(^  .+\n)}
+#set style_begin(table)     {\|}
+#set style_next(table)      {\-\-\-}
+#set style_continue(table)  {(\|)|(\-\-\-)|(^\n)|(^\[table.*\])|(^  .+\n)}
 
 ### TABLE CAPTION ###
 set style_begin(tabcap)     {^\[table .+\]}
@@ -769,9 +779,14 @@ set style_begin(tabmain)    {\|}
 set style_next(tabmain)     {\-\-\-}
 set style_continue(tabmain) {(\|)|(\-\-\-)}
 
-### CAPTION OF TABLE ###
-set style_begin(tabcap)     {^\[table .+\]}
-set style_continue(tabcap)  {^.+\n}
+### TABLE ROW ###
+set style_begin(tabrow)    {\|}
+set style_continue(tabrow) {\|}
+#set style_next(tabrow)     {\|}
+
+### TABLE HLINE ###
+set style_begin(tabhline)    {\-\-\-}
+set style_continue(tabhline) {^$}
 
 ### EMPTY ###
 set style_begin(empty)    {^ *$}
@@ -834,7 +849,7 @@ proc style_split {styles txtblock} {
 		
 		set style [get_style $styles $curr_txtline $next_txtline]
 		
-		# read current style block until its end #
+		# read current style block until its end
 		set style_block [list $curr_txtline]
 		incr i
 		set curr_txtline [lindex $txtblock $i]
@@ -958,13 +973,101 @@ proc collect_references {txtblock} {
 	}
 }
 
+
+### DETECT PRESENCE OF A TABLE AT SPECIFIED LINE INDEX ###
+#
+# Returns number of text lines that make up the table.
+# A number of less than 3 indicates an invalid table.
+#
+proc detect_table {start_idx max_idx} {
+	global txtcontent
+
+	# first line must start with a space and must contain at least one pipe symbol
+	set line [linetxt [lindex $txtcontent $start_idx]]
+	if {![regexp { .*[|]} $line]} {
+		return 0
+	}
+
+	# further lines must contain either '---' or pipes
+	set idx [expr $start_idx + 1]
+	set valid 0
+	while {($idx < $max_idx) && [regexp {(---)|([|])} [linetxt [lindex $txtcontent $idx]]]} {
+
+		# a valid table must feature at least one horizontal separator
+		if {[regexp -- {---} [linetxt [lindex $txtcontent $idx]]]} {
+			set valid 1
+		}
+		incr idx
+	}
+
+	if {$valid == 0} { 
+		return 0
+	}
+
+	# right after the table, we accept empty lines
+	while {($idx < $max_idx) && [regexp {^ *$} [linetxt [lindex $txtcontent $idx]]]} {
+		incr idx
+	}
+
+	# Detect caption of the table.
+	# The caption begins with a '[table' tag and is followed
+	# by any number of lines that are indented by two spaces.
+	if {[regexp {^\[table} [linetxt [lindex $txtcontent $idx]]]} {
+		incr idx
+		while {[regexp {^  [^ ]} [linetxt [lindex $txtcontent $idx]]]} {
+			incr idx
+		}
+	}
+
+	# eat empty lines after caption
+	while {($idx < $max_idx) && [regexp {^ *$} [linetxt [lindex $txtcontent $idx]]]} {
+		incr idx
+	}
+
+	set table_len [expr $idx - $start_idx]
+	return $table_len
+}
+
+
+### EXTRACT TABLES FROM TEXT ###
+#
+# Each table gets inserted into the 'tables' array.
+# The corresponding array index is kept within the
+# text as attribute of the table label.
+#
+proc extract_tables {} {
+	global txtcontent tables num_tables
+
+	set num_tables 0
+
+	set max_idx [llength $txtcontent]
+
+	for {set idx 0} {$idx < $max_idx} {incr idx} {
+		set table_len [detect_table $idx $max_idx]
+
+		# a valid table consumes at least 3 lines of text
+		if {$table_len >= 3} {
+			incr num_tables
+			set table_end [expr $idx + $table_len - 1]
+
+			# store text lines of the table in 'tables' array
+			set tables($num_tables) [lrange $txtcontent $idx $table_end]
+
+			# replace table in text by a reference token pointing to the
+			# corresponding 'tables' index
+			set txtcontent [lreplace $txtcontent $idx $table_end [list "-1" "\[tabref $num_tables\]"]]
+		}
+	}
+}
+
+
 ################
 #              #
 # MAIN PROGRAM #
 #              #
 ################
 
-# assist the user a bit #
+# assist the user a bit
 if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 	printline "Convert ASCII to Latex"
 	printline "  usage: gosh <document.txt> > <document.tex>"
@@ -972,7 +1075,7 @@ if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 	exit
 }
 
-# read text file and kick out any comments #
+# read text file and kick out any comments
 set txtfilename [lindex $argv end]
 set txtlines [split [exec cat $txtfilename] "\n"]
 set txtcontent {}
@@ -1019,17 +1122,20 @@ proc get_style_file {style_name} {
 	return $style_name
 }
 
-# process arguments #
+# process arguments
 while {[regexp {\--style ([^ ]+)} $argv dummy style_name]} {
 	catch { source [get_style_file $style_name] }
 	regsub {\--style [^ ]+} $argv "" argv
 }
 
-# find out about title and authors #
-handle_txtblock documenthead $txtcontent
-
-# find out about internal references #
+# find out about internal references
 collect_references $txtcontent
+
+# parse text for tables
+extract_tables
+
+# find out about title and authors
+handle_txtblock documenthead $txtcontent
 
 proc chapter_has_section {chapter} {
 	global toc_refs references
@@ -1043,13 +1149,13 @@ proc chapter_has_section {chapter} {
 	return 0
 }
 
-# generate output head #
+# generate output head
 set produce_function "produce_head_$outmode"
 if {[info procs $produce_function] == $produce_function} {
 	eval $produce_function
 }
 
-# generate main output #
+# generate main output
 handle_txtblock documentmain $txtcontent
 
 # generate output tail 

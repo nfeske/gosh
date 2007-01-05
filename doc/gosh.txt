@@ -405,7 +405,6 @@ and no TABS. Do not use TABS. GOSH does not recognize TABS.
 Known bugs and limitations
 ##########################
 
-* Sequent tables without any text in-between cause trouble.
 * All references must be written completely on one line, including the
   brackets.
 

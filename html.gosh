@@ -352,41 +352,90 @@ proc process_image_html {txtblock} {
 }
 
 
+### DETERMINE NUMBER OF TABLE COLUMNS
+#
+# 'rows' contains the complete table information as a list of rows.
+# Each row is a two-element list {<rowtype> <rowtextlines>}.
+# Each rowtextline is a two-element list of {<line number> <string>}.
+# A table string is contains pipe symbols as column separators.
+#
+proc table_num_cols {rows} {
+	return [llength [split [lindex [lindex [lindex [lindex $rows 0] 1] 0] 1] "|"]]
+}
+
+
+### REQUEST LIST OF TEXT LINES OF SPECIFIED TABLE CELL ###
+proc table_row_cell_txt {row col_idx} {
+	set row_type  [lindex $row 0]
+	set row_lines [lindex $row 1]
+
+	set cell_txt ""
+
+	if {$row_type == "tabrow"} {
+		foreach row_line $row_lines {
+
+			set col_txt_list [split [linetxt $row_line] "|"]
+
+			if {$col_idx < [llength $col_txt_list]} {
+				set col_txt [lindex $col_txt_list $col_idx]
+				lappend cell_txt $col_txt
+			}
+		}
+	}
+	return $cell_txt
+}
+
+
 ### TABLE ###
-proc output_table_html {head rows caption} {
+proc output_table_html {col_attr rows caption} {
 	global references
 	set cap ""
-	foreach capline $caption {
-		set txt [linetxt $capline]
+	foreach cap_line $caption {
+		set txt [linetxt $cap_line]
 		regsub  {^ +} $txt " "  txt
 		append cap $txt
 	}
-	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
-		printline "<a name=\"[label_html \"$caplab\"]\"></a>"
+	if {[regexp {^\[table ([^ \]]+)\]} $cap dummy cap_lab cap_txt]} {
+		printline "<a name=\"[label_html \"$cap_lab\"]\"></a>"
 	}
+
 	printline "<br/><center><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\">"
-	
-	print "[indent]<tr>"
-	foreach headcell [lrange $head 0 end] {
-		print "[indent]<th bgcolor=#f0f7ff>[lindex $headcell 1]<br/></th>"
+	printline "<tr>"
+
+	set num_cols [table_num_cols $rows]
+	set first_row 1
+	foreach row $rows {
+		set row_type  [lindex $row 0]
+		set row_lines [lindex $row 1]
+
+		if {$row_type == "tabrow"} {
+			for {set col 0} {$col < $num_cols} {incr col} {
+				set cell_txt [table_row_cell_txt $row $col]
+
+				set cell_tag "td"
+				if {$first_row} { set cell_tag "th" }
+
+				set cell_out " <$cell_tag>"
+				foreach cell_txt_line $cell_txt {
+					append cell_out "$cell_txt_line<br/>"
+				}
+				append cell_out "</$cell_tag>"
+				printline "$cell_out"
+			}
+		}
+
+		if {$row_type == "tabhline"} {
+			printline "</tr><tr>"
+		}
+
+		set first_row 0
 	}
 	printline "</tr>"
-	
-	foreach row $rows {
-		if {[lindex $row 0] == "text"} {
-			printline "<tr>"
-			set cells [lindex $row 1]
-			foreach cell [lrange $cells 0 end] {
-				printline "<td>[out_html $cell]</td>"
-			}
-			printline "</tr>"
-		}
-	}
 	printline "</table>"
 
-	if {[regexp {^\[table (.+)\](.*)$} $cap dummy caplab captxt]} {
-		regsub  {^ +} $captxt ""  captxt
-		printline "Table $references($caplab,index): [out_html $captxt]"
+	if {[regexp {^\[table ([^ \]]+)[^\]]*\](.*)$} $cap dummy cap_lab cap_txt]} {
+		regsub  {^ +} $cap_txt ""  cap_txt
+		printline "Table $references($cap_lab,index): [out_html $cap_txt]"
 	}
 	printline "</center><br/>"
 }

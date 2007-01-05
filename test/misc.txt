@@ -145,7 +145,7 @@ Some Text could be here. Maybe more ...
  ------------------
  col1 | col2 | col3
 [table LABEL] TEXT
- 
+
  col1 | col2 | col3
  ------------------
  col1 | col2 | col3
