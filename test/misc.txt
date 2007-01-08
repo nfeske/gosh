@@ -236,6 +236,7 @@ Accentuations
 
 Monospaced and 'non'-monospaced connected by a hyphen.
 
+Accentuation of 'IPCmon''s name.
 
 This works
 ##########

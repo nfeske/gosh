@@ -37,8 +37,8 @@ proc out_latex {string} {
 	}
 	
 	# monospace style
-	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
-		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
+	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',!?])} $string dummy head_char code_text tail_char]} {
+		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
 	}
 	
 	# FIXME: kick out monospace style via hashes

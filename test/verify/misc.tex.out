@@ -316,6 +316,7 @@ void main(void) {
 
   Monospaced and \texttt{non}-monospaced connected by a hyphen.
 
+  Accentuation of \texttt{IPCmon}'s name.
 
 
  %     -+*|[ THIS WORKS ]|*+-

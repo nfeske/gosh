@@ -2,7 +2,7 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2007-01-05</center>
+<center>2007-01-08</center>
 <hr/><br/>
  <p>
   \tableofcontents
@@ -291,6 +291,9 @@ void main(void) {
  <h1>Accentuations</h1>
   <p>
    Monospaced and <code>non</code>-monospaced connected by a hyphen.
+  </p>
+  <p>
+   Accentuation of 'IPCmon''s name.
   </p>
  <a name="This_works"></a>
  <h1>This works</h1>
