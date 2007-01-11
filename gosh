@@ -193,14 +193,14 @@ proc process_verbatim_latex {txtblock} {
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
-	printline "\\begin{verbatim}"
+	puts "\\begin{verbatim}"
 	foreach txtline $txtblock {
 		set txt [linetxt $txtline]
 		regsub     {^\!} $txt ""   txt
 		regsub -all {\t} $txt "  " txt
 		puts "$txt"
 	}
-	printline "\\end{verbatim}"
+	puts "\\end{verbatim}"
 }
 
 ### ITEMIZE ###
