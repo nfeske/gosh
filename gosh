@@ -143,12 +143,14 @@ proc produce_head_latex {} {
 	global title authors
 	
 	printline {\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
-	printline {\usepackage{times}}
 	printline {\usepackage[T1]{fontenc}}
 	printline {\usepackage[latin1]{inputenc}}
 	printline {\usepackage[small,bf,hang]{caption2}}
 	printline {\usepackage[ngerman]{babel}}
 	printline {\usepackage{epsfig}}
+	printline {\usepackage{mathptmx}}
+	printline {\usepackage{helvet}}
+	printline {\usepackage{courier}}
 	printline {\emergencystretch = 10pt}
 	printline {\clubpenalty = 10000}
 	printline {\widowpenalty = 10000}
