@@ -1,0 +1,13 @@
+:2007-01-05:
+
+  * Implemented new table parser with increased robustness.
+    Now, subsequent tables without any text in-between cause
+    no troubles anymore. The new table parser also allows for
+    using multi-line table headers.
+
+  * Fixed bug with references in table captions.
+
+  * Added table attribute 'wide' that can be specified after
+    the table label. This attribute is only interpreted by the
+    Latex backend of GOSH and causes the usage of a 'table*'
+    environment instead of a plain 'table' environment.
