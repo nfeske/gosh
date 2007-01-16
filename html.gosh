@@ -395,7 +395,7 @@ proc output_table_html {col_attr rows caption} {
 		regsub  {^ +} $txt " "  txt
 		append cap $txt
 	}
-	if {[regexp {^\[table ([^ \]]+)\]} $cap dummy cap_lab cap_txt]} {
+	if {[regexp {^\[table ([^ \]]+)} $cap dummy cap_lab cap_txt]} {
 		printline "<a name=\"[label_html \"$cap_lab\"]\"></a>"
 	}
 

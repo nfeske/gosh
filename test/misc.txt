@@ -161,10 +161,11 @@ Some Text could be here. Maybe more ...
  bold          | *bold*
  monospaced    | 'monospaced'
 
-[table accentuations]
+[table accentuations full-span]
 
 Please not that you need a _space_ in the line between table [LABEL] and 
-[TABLE2] in the source representation. 
+[TABLE2] in the source representation. Table [accentuations] shows
+italic, bold, and monospaced styles.
 ;Is it correct that this text is indented?
 
 More Text for Tab. [LABEL] follows here.

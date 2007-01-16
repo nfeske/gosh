@@ -1,11 +1,13 @@
 
 \documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}
-\usepackage{times}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage[small,bf,hang]{caption2}
 \usepackage[ngerman]{babel}
 \usepackage{epsfig}
+\usepackage{mathptmx}
+\usepackage{helvet}
+\usepackage{courier}
 \emergencystretch = 10pt
 \clubpenalty = 10000
 \widowpenalty = 10000
@@ -27,12 +29,12 @@
   Howto build this file:
 
 
-  \begin{verbatim}
+\begin{verbatim}
 # cat gosh.txt > out.txt
 # sed s/^/\!/ gosh.txt >> out.txt
 # gosh out.txt > gosh.tex
 # rm out.txt
-  \end{verbatim}
+\end{verbatim}
 
 
 
@@ -138,13 +140,13 @@
   BUG paragraph four
 
 
-  \begin{verbatim}
+\begin{verbatim}
 Whole line is verbatim. Maybe used for sources ...
 /** MAIN */
 void main(void) {
     exit(0);
 }
-  \end{verbatim}
+\end{verbatim}
 
 
 
@@ -221,7 +223,7 @@ void main(void) {
    \label{TABLE2}
   }
   \end{table}
-  \begin{table}[ht!]
+  \begin{table*}[ht!]
   {\center
    \begin{tabular}{|l|l|}
     \hline
@@ -236,9 +238,10 @@ void main(void) {
    \caption{}
    \label{accentuations}
   }
-  \end{table}
+  \end{table*}
   Please not that you need a \emph{space} in the line between table \ref{LABEL} and
-  \ref{TABLE2} in the source representation.
+  \ref{TABLE2} in the source representation. Table \ref{accentuations} shows
+  italic, bold, and monospaced styles.
 
   More Text for Tab. \ref{LABEL} follows here.
 

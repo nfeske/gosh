@@ -2,7 +2,7 @@
 <body>
 <h1><center>TITLE TEXT can _be_ multi-line</center></h1>
 <b><center>Authors</center></b>
-<center>2007-01-08</center>
+<center>2007-01-16</center>
 <hr/><br/>
  <p>
   \tableofcontents
@@ -225,7 +225,8 @@ void main(void) {
   </center><br/>
   <p>
    Please not that you need a <i>space</i> in the line between table <a href="#LABEL">1</a> and
-   <a href="#TABLE2">2</a> in the source representation.
+   <a href="#TABLE2">2</a> in the source representation. Table <a href="#accentuations">3</a> shows
+   italic, bold, and monospaced styles.
   </p>
   <p>
    More Text for Tab. <a href="#LABEL">1</a> follows here.

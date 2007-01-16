@@ -116,7 +116,8 @@ Some Text could be here. Maybe more ...
 Please not that you need a 
 .I space
 in the line between table [LABEL] and 
-[TABLE2] in the source representation. 
+[TABLE2] in the source representation. Table [accentuations] shows
+italic, bold, and monospaced styles.
 More Text for Tab. [LABEL] follows here.
 .SH "IMAGES"
 

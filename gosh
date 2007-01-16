@@ -450,6 +450,7 @@ proc output_table_latex {colattr rows caption} {
 	}
 	if {[regexp {^\[table ([^\]]+)\](.*)$} $cap dummy caplab captxt]} {
 		regsub  {^ +} $captxt ""  captxt
+		regexp  {^[^ ]+} $caplab caplab
 		printline " \\caption\{[out_latex $captxt]\}"
 		printline " \\label\{[label_latex $caplab]\}"
 	}
