@@ -24,6 +24,9 @@ latex-beamer style.  There are some restriction on how to format the text:
 * To generate listings with grayed items where the items are displayed with
   the next click, insert the 'pause' command after an item (Don't forget to
   write the backslash before 'pause'.)
+* To use the nice box frames of the beamer package, you can write your
+  text in GOSH's paragraph style (by using '-' to underline the title of the
+  paragraph.
 * Per default a biblioraphy is generated.
 
 Options:

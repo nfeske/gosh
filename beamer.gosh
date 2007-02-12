@@ -148,6 +148,15 @@ proc process_subsection_latex {txtblock} {
 	incr depth
 }
 
+### PARAGRAPH ###
+proc process_paragraph_latex {txtblock} {
+	global curr_chapter curr_section depth
+	set title [linetxt [lindex $txtblock 0]]
+	puts "[indent]\\begin{block}{$title}"
+	handle_txtblock paragraph [lrange $txtblock 2 end]
+	puts "[indent]\\end{block}"
+}
+
 ### ITEMIZE ###
 proc process_itemize_latex {txtblock} {
 	puts "[indent]\\begin{itemize}\\setlength{\\itemsep}{0pt}"
