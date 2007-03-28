@@ -25,20 +25,20 @@ proc out_latex {string} {
 	set string " $string "
 	
 	# italic style
-	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?\-])} $string dummy head_char emph_text tail_char]} {
+	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
-		regsub {([ \"\(])_(.+?)_([ \)\.\",!?\-])} $string "$head_char\\emph{$emph_text}$tail_char" string
+		regsub {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string "$head_char\\emph{$emph_text}$tail_char" string
 	}
 
 	# bold style
-	while {[regexp {([ \"\(])\*(.+?)\*([ \)\.\",!?])} $string dummy head_char bf_text tail_char]} {
+	while {[regexp {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string dummy head_char bf_text tail_char]} {
 		regsub -all {\*} $bf_text " " bf_text
-		regsub {([ \"\(])\*(.+?)\*([ \)\.\",!?])} $string "$head_char\\textbf{$bf_text}$tail_char" string
+		regsub {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string "$head_char\\textbf{$bf_text}$tail_char" string
 	}
 	
 	# monospace style
-	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',!?])} $string dummy head_char code_text tail_char]} {
-		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
+	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string dummy head_char code_text tail_char]} {
+		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
 	}
 	
 	# FIXME: kick out monospace style via hashes
