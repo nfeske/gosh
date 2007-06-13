@@ -36,8 +36,8 @@ proc produce_head_latex {} {
 	if {$beameroutertheme != ""} {
 		puts "\\useoutertheme{$beameroutertheme}"
 	}
-
-	puts {\usepackage[latin1]{inputenc}}
+	
+	puts {\usepackage[latin1]{inputenc}}	
 	puts {\usepackage{graphicx}}
 	puts {\usepackage{epsfig}}
 	if {$beamersplit != ""} {
@@ -95,7 +95,7 @@ proc process_chapter_latex {txtblock} {
 	} else {
 	if {$title == "Questions"} {
 		puts "[indent]\\section\[\]{}"
-		puts "[indent]\\frame"
+		puts "[indent]\\frame\[containsverbatim\]"
 		puts "[indent]\{"
 		incr depth
 		puts "[indent]\\frametitle{[out_latex $title]}"
@@ -116,7 +116,7 @@ proc process_section_latex {txtblock} {
 	set curr_section $title
 	puts "\n[indent]%     -+*|\[ [string toupper $title] \]|*+-\n"
 	puts "[indent]\\subsection{[out_latex $title]}\n"
-	puts "[indent]\\frame"
+	puts "[indent]\\frame\[containsverbatim\]"
 	puts "[indent]{"
 	incr depth
 	if {$beamersplit != ""} {
@@ -136,7 +136,7 @@ proc process_subsection_latex {txtblock} {
 	incr depth 
 	puts "[indent]%     -+*|\[ [string toupper $title] \]|*+-"
 	puts "[indent]\\subsection{[out_latex $title]}"
-	puts "[indent]\\frame"
+	puts "[indent]\\frame\[containsverbatim\]"
 	puts "[indent]{"
 	incr depth
 	puts "[indent]\\frametitle{\\textit{\\small{[out_latex $title]}}}"
