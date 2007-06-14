@@ -1,0 +1,31 @@
+
+### WRITE HEADER OF TEX FILE ###
+proc produce_head_latex {} {
+	global title authors
+	
+	printline {\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
+	printline {\usepackage[T1]{fontenc}}
+	printline {\usepackage{textcomp}}
+	printline {\usepackage{ucs}}
+	printline {\usepackage[utf8x]{inputenc}}
+	printline {\usepackage[small,bf,hang]{caption2}}
+	printline {\usepackage[ngerman]{babel}}
+	printline {\usepackage{mathptmx}}
+	printline {\usepackage{helvet}}
+	printline {\usepackage{courier}}
+	printline {\emergencystretch = 10pt}
+	printline {\clubpenalty = 10000}
+	printline {\widowpenalty = 10000}
+	printline {\displaywidowpenalty = 10000}
+	printline {\usepackage{amsmath}}
+	printline {\usepackage{amssymb}}
+	printline {\begin{document}}
+	
+	if {$title != ""} {
+		printline "\\title{[out_latex $title]}"
+		if {$authors != ""} {
+			printline "\\author{[out_latex $authors]}"
+		}
+		printline {\maketitle}
+	}
+}
