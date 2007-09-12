@@ -786,7 +786,7 @@ set style_substyles(subsection) {paragraph image table annotation raw itemize en
 set style_begin(paragraph)     $style_begin(plain)
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
-set style_contnext(paragraph)  {^\-{0,2}[^\-]}
+set style_contnext(paragraph)  {^[\-~=#]{0,2}[^\-~=#]}
 set style_substyles(paragraph) {image table annotation raw itemize enumeration description verbatim plain}
 
 ### IMAGE ###
