@@ -1098,6 +1098,13 @@ proc extract_tables {} {
 #              #
 ################
 
+set outmode latex
+set depth 0
+set title ""
+set authors ""
+set toc_refs {}
+set config_indent 1
+
 # assist the user a bit
 if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 	printline "Convert ASCII to Latex"
@@ -1115,13 +1122,6 @@ foreach txtline $txtlines {
 	if {![regexp {^;} $txtline]} {lappend txtcontent [list $cnt $txtline]}
 	incr cnt
 }
-
-set outmode latex
-set depth 0
-set title ""
-set authors ""
-set toc_refs {}
-set config_indent 1
 
 
 ### FIND FILE FOR SPECIFIED STYLE NAME ###
