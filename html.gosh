@@ -67,6 +67,7 @@ proc out_html {string} {
 	
 	# monospace style #
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
+		regsub -all " " $code_text "\\\&nbsp;" code_text
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string [seal_repl "$head_char<code>$code_text</code>$tail_char"] string
 	}
 	
@@ -152,7 +153,7 @@ proc produce_head_html {} {
 	# table of contents #
 	if {$config_html_toc} {
 		printline "<hr/>"
-		printline "<table align=\"center\" cellpadding=\"5\"><tr><td>"
+		printline "<table class=\"toc\"><tr><td>"
 		printline "<h3>Table of contents</h3>"
 		foreach ref_name $toc_refs {
 			if {$references($ref_name,type) == "chapter"} {
@@ -342,11 +343,11 @@ proc process_image_html {txtblock} {
 	}
 	regsub { *$} $img_cap "" img_cap
 	
-	printline "<table cellspacing=\"10\"><tr><td>"
-	printline "  <img src=\"$img_name.jpg\" border=\"0\">"
+	printline "<table><tr><td>"
+	printline "  <img src=\"$img_name.jpg\">"
 	if {$img_cap != ""} {
-		printline "</td><td valign=\"center\">"
-		printline "  <font size=\"-1\">$img_cap</font>"
+		printline "</td><td>"
+		printline "  <div class=\"caption\">$img_cap</div>"
 	}
 	printline "</td></tr></table>"
 }
@@ -399,7 +400,7 @@ proc output_table_html {col_attr rows caption} {
 		printline "<a name=\"[label_html \"$cap_lab\"]\"></a>"
 	}
 
-	printline "<br/><center><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\">"
+	printline "<table>"
 	printline "<tr>"
 
 	set num_cols [table_num_cols $rows]
@@ -437,7 +438,6 @@ proc output_table_html {col_attr rows caption} {
 		regsub  {^ +} $cap_txt ""  cap_txt
 		printline "Table $references($cap_lab,index): [out_html $cap_txt]"
 	}
-	printline "</center><br/>"
 }
 
 set text_color(default)    "#000000"
