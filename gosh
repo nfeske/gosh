@@ -27,23 +27,23 @@ proc out_latex {string} {
 	# italic style
 	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
-		regsub {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string "$head_char\\emph{$emph_text}$tail_char" string
+		regsub {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string [seal_repl "$head_char\\emph{$emph_text}$tail_char"] string
 	}
 
 	# bold style
 	while {[regexp {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string dummy head_char bf_text tail_char]} {
 		regsub -all {\*} $bf_text " " bf_text
-		regsub {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string "$head_char\\textbf{$bf_text}$tail_char" string
+		regsub {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string [seal_repl "$head_char\\textbf{$bf_text}$tail_char"] string
 	}
 	
 	# monospace style
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string dummy head_char code_text tail_char]} {
-		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string "$head_char\\texttt{$code_text}$tail_char" string
+		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string [seal_repl "$head_char\\texttt{$code_text}$tail_char"] string
 	}
 	
 	# FIXME: kick out monospace style via hashes
 	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
-		regsub {\#([^#]+)\#} $string "\\texttt{$code_text}" string
+		regsub {\#([^#]+)\#} $string [seal_repl "\\texttt{$code_text}"] string
 		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
 		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
 	}
@@ -54,25 +54,23 @@ proc out_latex {string} {
 	# insert references and citations
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
-			regsub {\[([^\]]+)\]} $string "\\ref{[label_latex $ref_text]}" string
+			regsub {\[([^\]]+)\]} $string [seal_repl "\\ref{[label_latex $ref_text]}"] string
 		} else {
 			if {[regexp {^http://} $ref_text dummy]} {
 				set url ""
 				set linktext ""
 				set tooltip ""
 				regexp {^(\w+:[^ ]+)} $ref_text url
-				regsub -all {&} $url "_§%and%§_" url
-				regsub {\[([^\]]+)\]} $string "\\texttt{$url}" string
+				regsub {\[([^\]]+)\]} $string [seal_repl "\\texttt{$url}"] string
 			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
 				regsub {\[([^\]]+)\]} $string "_citation_gap_" string
 			} else {
 				regsub -all {_} $ref_text {adamndunderlineshite!} ref_text
-				regsub {\[([^\]]+)\]} $string "\\cite{$ref_text}" string
+				regsub {\[([^\]]+)\]} $string [seal_repl "\\cite{$ref_text}"] string
 			}
 		}
 	}
 
-	regsub -all {_§%and%§_} $string {\&} string
 	regsub -all {_citation_gap_} $string "\[\\ldots\{\}\]" string
 	regsub -all {"([\w\\])} $string "``\\1" string
 	regsub -all {([\.\?\!\w\}])"} $string "\\1''" string
@@ -114,6 +112,19 @@ proc print {string} {
 }
 
 
+#
+# The '&' character in the replacement expression used for the regsub
+# command is synonymous with '\0'. When generating such an expression
+# from input data, we need to make sure that input data is free from
+# such special characters. By prepending '&' characters with a
+# backslash, 'regsub' ignores the special meaning of '&'.
+#
+proc seal_repl {replace_string} {
+	regsub -all {&} $replace_string {\\&} replace_string
+	return $replace_string
+}
+
+
 proc printline {string} {
 	global config_indent
 	if {$config_indent} {
@@ -126,7 +137,7 @@ proc printline {string} {
 
 ### FILTER LABEL ###
 proc label_latex {string} {
-	
+
 	regsub -all {ä} $string "ae" string
 	regsub -all {ö} $string "oe" string
 	regsub -all {ü} $string "ue" string
@@ -193,6 +204,12 @@ proc process_verbatim_latex {txtblock} {
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
+
+	#
+	# For the output of verbatim text, we use 'puts' rather than
+	# 'printline' because 'printline' would indent the text, which
+	# is not desired within a verbatim environment.
+	#
 	puts "\\begin{verbatim}"
 	foreach txtline $txtblock {
 		set txt [linetxt $txtline]
@@ -718,14 +735,14 @@ set style_substyles(item) {annotation raw itemize enumeration description verbat
 
 ### DESCRIPTION ###
 set style_begin(description)     {^\:[^\:]+\:}
-set style_continue(description)  {(^\ \ +[^\ ])|(^\n)|(^\:[\w ]+\:)}
+set style_continue(description)  {(^\ \ +[^\ ])|(^\n)|(^\:[^\:]+\:)}
 #set style_contnext(description)  {^[^|]*$}
 set style_substyles(description) {descitem}
 
 ### DESCRIPTION ITEM ###
 set style_begin(descitem)     {^\:[^\:]+\:}
 set style_continue(descitem)  {(^\ \ .+)|(^\n)}
-set style_substyles(descitem) {annotation raw itemize enumeration description verbatim plain}
+set style_substyles(descitem) {annotation table raw itemize enumeration description verbatim plain}
 
 ### ENUMERATION ###
 set style_begin(enumeration)     {^\#\ .+}
@@ -935,7 +952,7 @@ proc linetxt {line} {
 ### APPLY REGEXP SUBSTITUTION TO A LINE ###
 proc lineregsub {pattern txtline replacement} {
 	set txt [linetxt $txtline]
-	regsub $pattern $txt $replacement txt
+	regsub $pattern $txt [seal_repl $replacement] txt
 	return [list [linenum $txtline] $txt]
 }
 
