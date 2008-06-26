@@ -1,0 +1,57 @@
+
+### ABSTRACT ###
+proc process_abstract_html {txtblock} {
+	printline "<h2>Abstract</h2>"
+	printline "<i>"
+	handle_txtblock abstract [lrange $txtblock 2 end]
+	printline "</i>"
+}
+
+### CHAPTER ###
+proc process_chapter_html {txtblock} {
+	global references curr_chapter curr_section_type config_html_sec_enum
+	set curr_section_type chapter
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_chapter $references($title,index)
+	set sec_prefix ""
+	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter " }
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h2>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h2>"
+	handle_txtblock chapter [lrange $txtblock 2 end]
+}
+
+### SECTION ###
+proc process_section_html {txtblock} {
+	global references curr_chapter curr_section curr_section_type text_color config_html_sec_enum
+	set curr_section_type section
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_section $references($title,index)
+	set sec_prefix ""
+	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h3>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h3>"
+	handle_txtblock section [lrange $txtblock 2 end]
+}
+
+### SUBSECTION ###
+proc process_subsection_html {txtblock} {
+	global references curr_chapter curr_section curr_subsection curr_section_type text_color config_html_sec_enum
+	set curr_section_type subsection
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_subsection $references($title,index)
+	set sec_prefix ""
+	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h4>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h4>"
+	handle_txtblock subsection [lrange $txtblock 2 end]
+}
+
+### PARAGRAPH ###
+proc process_paragraph_html {txtblock} {
+	global curr_section_type text_color
+	set curr_section_type paragraph
+	set title [linetxt [lindex $txtblock 0]]
+	printline "<a name=\"[label_html $title]\"></a>"
+	printline "<h5>[font_style_begin][out_html $title][font_style_end]</h5>"
+	handle_txtblock paragraph [lrange $txtblock 2 end]
+}
