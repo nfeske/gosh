@@ -1,0 +1,374 @@
+
+#############################
+#                           #
+# RESTRUCTURED TEXT BACKEND #
+#                           #
+#############################
+
+
+proc printline {string} {
+	global config_indent strip_space_prefix
+	if {$config_indent} {
+		set string "[indent]$string"
+	}
+	for {set i 0} {$i < $strip_space_prefix} {incr i} {
+		regsub {^ } $string "" string
+	}
+	set strip_space_prefix 0
+	regsub {^ *$} $string "" string
+	puts $string
+}
+
+
+### FILTER TEXTUAL OUTPUT ###
+proc out_rst {string} {
+	global references
+
+	set string " $string "
+
+	# italic style #
+	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?])} $string dummy head_char emph_text tail_char]} {
+		regsub -all {_} $emph_text " " emph_text
+		regsub {([ \"\(])_(.+?)_([ \)\.\",!?])} $string [seal_repl "$head_char*$emph_text*$tail_char"] string
+	}
+
+	# bold style #
+	while {[regexp {([ \"\(])\*([^\*]+?)\*([ \)\.\",!?])} $string dummy head_char bf_text tail_char]} {
+		regsub -all {\*} [seal_repl $bf_text] " " bf_text
+		regsub {([ \"\(])\*([^\*]+?)\*([ \)\.\",!?])} $string [seal_repl "$head_char**$bf_text**$tail_char"] string
+	}
+	
+	# monospace style #
+	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
+		regsub -all " " $code_text "\\\&nbsp;" code_text
+		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string [seal_repl "$head_char``$code_text``$tail_char"] string
+	}
+	
+	# FIXME: kick out monospace style via hashes #
+	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
+		regsub {\#([^#]+)\#} $string [seal_repl "``$code_text``"] string
+		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
+		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
+	}
+	
+	# hexadecimal numbers #
+	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "``&``" string
+	
+	set linktext ""
+	# insert references and citations #
+	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
+		if {[info exists references($ref_text,type)]} {
+			if {$references($ref_text,type) == "tabcap"} {
+				puts stderr "Rst backend does not support table captions as reference"
+			} else {
+				regsub {\[([^\]]+)\]} $string [seal_repl "_`$ref_text`"] string
+			}
+		} else {
+			set url ""
+			set linktext ""
+			set tooltip ""
+			regexp {^(\w+:[^ ]+)} $ref_text url
+			regexp {^(\w+:[^ ]+) - ([^\(]+)} $ref_text dummy dummy linktext
+			regexp {\((.*)\)} $ref_text dummy tooltip
+			if {$url == ""} {
+				set url $ref_text
+			}
+			if {$linktext == ""} {
+				set linktext $url
+			}
+			set tooltiptext " title=\"$tooltip\""
+			if {$tooltip == ""} {
+				set tooltiptext ""
+			}
+			regsub {^http:([^/])} $url {\1} url
+			regsub { +$} $linktext "" linktext
+			regsub -all {&} $url "_§%and%§_" url
+			regsub -all -- {---} $url      "_§%3xminus%§_" url
+			regsub -all -- {--}  $url      "_§%2xminus%§_" url
+			regsub -all -- {---} $linktext "_§%3xminus%§_" alttext
+			regsub -all -- {--}  $linktext "_§%2xminus%§_" alttext
+			regsub {\[([^\]]+)\]} $string [seal_repl "`$linktext <$url>`_"] string
+		}
+	}
+	regsub -all {_§%and%§_} $string {\&} string
+	regsub -all -- {\-\-\-} $string {\&mdash;} string
+	regsub -all -- {\-\-} $string {\&ndash;} string
+	regsub -all {_§%3xminus%§_} $string {---} string
+	regsub -all {_§%2xminus%§_} $string {--} string
+
+	# clear spaces at the end of a line #
+	regsub { +$} $string "" string
+	regsub {^ } $string "" string
+	
+	return $string
+}
+
+### FILTER LABEL ###
+proc label_rst {string} {
+	regsub -all {"} $string ""  string
+	regsub -all { } $string "_" string
+	return $string
+}
+
+### WRITE HEADER OF TEX FILE ###
+proc produce_head_rst {} {
+	global title authors references toc_refs
+	regsub -all {.} $title "=" title_frame
+	printline "$title_frame"
+	printline "$title"
+	printline "$title_frame"
+	printline ""
+#	if {$title != ""} {
+#		printline "<h1><center>$title</center></h1>"
+#	}
+#	if {$authors != ""} {
+#		printline "<b><center>$authors</center></b>"
+#	}
+#	printline "<center>[exec date --iso-8601]</center>"
+}
+
+### WRITE TAIL OF TEX FILE ###
+proc produce_tail_rst {} {
+}
+
+### VERBATIM  ###
+proc process_verbatim_rst {txtblock} {
+	global depth
+	while {[lindex $txtblock end] == ""} {
+		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
+	}
+	incr depth -1
+	printline "::"
+	printline ""
+	incr depth 2
+	foreach txtline $txtblock {
+		set txt [linetxt $txtline]
+		regsub {^\!} $txt "" txt
+		regsub -all {\t} $txt "  " txt
+		regsub -all {&} $txt "_§%and%§_" txt
+		regsub -all {_§%and%§_} $txt {\&} txt
+		printline "$txt"
+	}
+	incr depth -1
+	printline ""
+}
+
+### ITEMIZE ###
+proc process_itemize_rst {txtblock} {
+	global depth
+	incr depth -1
+	handle_txtblock itemize $txtblock
+	incr depth
+}
+
+### ITEM ###
+proc process_item_rst {itemtxtblock} {
+	global strip_space_prefix
+	global depth
+	incr depth -1
+	puts -nonewline "[indent]- "
+	set strip_space_prefix 2
+	incr depth 2
+	handle_txtblock item [extract_item_text $itemtxtblock]
+	incr depth -1
+}
+
+### DESCRIPTION ###
+proc process_description_rst {txtblock} {
+	global depth
+	incr depth -1
+	handle_txtblock description $txtblock
+	incr depth
+}
+
+### DESCRIPTION ITEM ###
+proc process_descitem_rst {itemtxtblock} {
+	global depth
+	set txtline [lindex $itemtxtblock 0]
+	set desc_name ""
+	set txt [linetxt $txtline]
+	regexp {^\:(.+)\:} $txt dummy desc_name
+	set txtline [lineregsub {^\:(.+)\: *} $txtline ""]
+	incr depth -1
+	printline ":[out_rst $desc_name]:"
+	incr depth 2
+	lappend txtblock $txtline
+	foreach txtline [lrange $itemtxtblock 1 end] {
+		set txtline [lineregsub {^\ \ } $txtline ""]
+		lappend txtblock $txtline
+	}
+	handle_txtblock descitem $txtblock
+	incr depth -1
+}
+
+### ENUMERATION ###
+proc process_enumeration_rst {txtblock} {
+	global enum_level enum_cnt depth
+	incr depth -1
+	incr enum_level
+	set enum_cnt($enum_level) 0
+	handle_txtblock enumeration $txtblock
+	incr enum_level -1
+	incr depth
+}
+
+### ENUM ITEM ###
+proc process_enum_rst {itemtxtblock} {
+	global enum_level enum_cnt depth strip_space_prefix
+	incr enum_cnt($enum_level)
+	incr depth -1
+	set tag "$enum_cnt($enum_level). "
+	puts -nonewline "[indent]$tag"
+	incr depth [string length $tag]
+	set strip_space_prefix [string length $tag]
+	handle_txtblock item [extract_item_text $itemtxtblock]
+	incr depth -2
+}
+
+
+### PLAIN ###
+proc process_plain_rst {plaintxtblock} {
+	global depth
+	incr depth -1
+	foreach txtline $plaintxtblock {
+		printline "[out_rst [linetxt $txtline]]"
+	}
+	printline ""
+	incr depth
+}
+
+### ABSTRACT ###
+proc process_abstract_rst {txtblock} {
+	handle_txtblock abstract [lrange $txtblock 2 end]
+}
+
+### CHAPTER ###
+proc process_chapter_rst {txtblock} {
+	global references curr_chapter curr_section_type depth
+	incr depth -1
+	set curr_section_type chapter
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_section $references($title,index)
+
+	printline "$title"
+	regsub -all {.} $title "#" underline
+	printline "$underline"
+	printline ""
+	handle_txtblock chapter [lrange $txtblock 2 end]
+	incr depth
+}
+
+### SECTION ###
+proc process_section_rst {txtblock} {
+	global references curr_chapter curr_section curr_section_type depth
+	incr depth -1
+	set curr_section_type section
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_section $references($title,index)
+
+	printline "$title"
+	regsub -all {.} $title "=" underline
+	printline "$underline"
+	printline ""
+	handle_txtblock section [lrange $txtblock 2 end]
+	incr depth
+}
+
+### SUBSECTION ###
+proc process_subsection_rst {txtblock} {
+	global references curr_chapter curr_section curr_subsection curr_section_type text_color
+	incr depth -1
+	set curr_section_type subsection
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_subsection $references($title,index)
+
+	printline "$title"
+	regsub -all {.} $title "~" underline
+	printline "$underline"
+	printline ""
+	handle_txtblock subsection [lrange $txtblock 2 end]
+	incr depth
+}
+
+### PARAGRAPH ###
+proc process_paragraph_rst {txtblock} {
+	global curr_section_type text_color
+	set curr_section_type paragraph
+	set title [linetxt [lindex $txtblock 0]]
+
+	printline "$title"
+	regsub -all {.} $title "-" underline
+	printline "$underline"
+	handle_txtblock paragraph [lrange $txtblock 2 end]
+}
+
+### IMAGE ###
+proc process_image_rst {txtblock} {
+	set img_info ""
+	set img_size 80
+	set img_angle "0"
+	regexp {\[(image \w+.*)\]} [lindex $txtblock 0] dummy img_info
+	if {$img_info == ""} return
+	set img_name [lindex $img_info 1]
+	regexp { (\d+)%} $img_info dummy img_size
+	regexp { (\d+)°} $img_info dummy img_angle
+	
+	set img_cap ""
+	foreach img_capline $txtblock {
+		set txt [linetxt $img_capline]
+		regsub {^\[.*\]} $txt "" txt
+		regsub {^ *} $txt "" txt
+		append img_cap $txt " "
+	}
+	regsub { *$} $img_cap "" img_cap
+
+	printline ""
+	printline ".. image:: $img_name"
+	printline ""
+}
+
+
+### DETERMINE NUMBER OF TABLE COLUMNS
+#
+# 'rows' contains the complete table information as a list of rows.
+# Each row is a two-element list {<rowtype> <rowtextlines>}.
+# Each rowtextline is a two-element list of {<line number> <string>}.
+# A table string is contains pipe symbols as column separators.
+#
+proc table_num_cols {rows} {
+	return [llength [split [lindex [lindex [lindex [lindex $rows 0] 1] 0] 1] "|"]]
+}
+
+
+### REQUEST LIST OF TEXT LINES OF SPECIFIED TABLE CELL ###
+proc table_row_cell_txt {row col_idx} {
+	set row_type  [lindex $row 0]
+	set row_lines [lindex $row 1]
+
+	set cell_txt ""
+
+	if {$row_type == "tabrow"} {
+		foreach row_line $row_lines {
+
+			set col_txt_list [split [linetxt $row_line] "|"]
+
+			if {$col_idx < [llength $col_txt_list]} {
+				set col_txt [lindex $col_txt_list $col_idx]
+				lappend cell_txt $col_txt
+			}
+		}
+	}
+	return $cell_txt
+}
+
+
+### TABLE ###
+proc output_table_rst {col_attr rows caption} {
+	puts stderr "Table not supported by rst backend"
+}
+
+set enum_level 0
+set curr_section_type default
+set outmode rst
+set strip_space_prefix 0
+
