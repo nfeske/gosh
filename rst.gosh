@@ -26,18 +26,18 @@ proc out_rst {string} {
 
 	set string " $string "
 
+	# bold style #
+	while {[regexp {([ \"\(])\*([^\*]+?)\*([ \)\.\",!?])} $string dummy head_char bf_text tail_char]} {
+		regsub -all {\*} [seal_repl $bf_text] " " bf_text
+		regsub {([ \"\(])\*([^\*]+?)\*([ \)\.\",!?])} $string [seal_repl "$head_char**$bf_text**$tail_char"] string
+	}
+
 	# italic style #
 	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",!?])} $string dummy head_char emph_text tail_char]} {
 		regsub -all {_} $emph_text " " emph_text
 		regsub {([ \"\(])_(.+?)_([ \)\.\",!?])} $string [seal_repl "$head_char*$emph_text*$tail_char"] string
 	}
 
-	# bold style #
-	while {[regexp {([ \"\(])\*([^\*]+?)\*([ \)\.\",!?])} $string dummy head_char bf_text tail_char]} {
-		regsub -all {\*} [seal_repl $bf_text] " " bf_text
-		regsub {([ \"\(])\*([^\*]+?)\*([ \)\.\",!?])} $string [seal_repl "$head_char**$bf_text**$tail_char"] string
-	}
-	
 	# monospace style #
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
 		regsub -all " " $code_text "\\\&nbsp;" code_text
