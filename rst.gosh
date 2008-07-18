@@ -8,6 +8,12 @@
 
 proc printline {string} {
 	global config_indent strip_space_prefix
+	global select select_chapter curr_chapter
+
+	if {$select} {
+		if {"$select_chapter" != "$curr_chapter"} { return }
+	}
+
 	if {$config_indent} {
 		set string "[indent]$string"
 	}
@@ -60,8 +66,10 @@ proc out_rst {string} {
 		if {[info exists references($ref_text,type)]} {
 			if {$references($ref_text,type) == "tabcap"} {
 				puts stderr "Rst backend does not support table captions as reference"
+			} elseif {$references($ref_text,type) == "image"} {
+				regsub {\[([^\]]+)\]} $string [seal_repl "`$references($ref_text,index)`_"] string
 			} else {
-				regsub {\[([^\]]+)\]} $string [seal_repl "_`$ref_text`"] string
+				regsub {\[([^\]]+)\]} $string [seal_repl "`$ref_text`_"] string
 			}
 		} else {
 			set url ""
@@ -245,11 +253,11 @@ proc process_abstract_rst {txtblock} {
 ### CHAPTER ###
 proc process_chapter_rst {txtblock} {
 	global references curr_chapter curr_section_type depth
-	incr depth -1
 	set curr_section_type chapter
 	set title [linetxt [lindex $txtblock 0]]
-	set curr_section $references($title,index)
+	set curr_chapter $references($title,index)
 
+	incr depth -1
 	printline "$title"
 	regsub -all {.} $title "#" underline
 	printline "$underline"
@@ -304,6 +312,7 @@ proc process_paragraph_rst {txtblock} {
 
 ### IMAGE ###
 proc process_image_rst {txtblock} {
+	global depth references
 	set img_info ""
 	set img_size 80
 	set img_angle "0"
@@ -312,19 +321,23 @@ proc process_image_rst {txtblock} {
 	set img_name [lindex $img_info 1]
 	regexp { (\d+)%} $img_info dummy img_size
 	regexp { (\d+)°} $img_info dummy img_angle
-	
-	set img_cap ""
+	incr depth -1
+	printline ".. _`$references($img_name,index)`:"
+	printline ".. figure:: $img_name.png"
+	printline ""
+	printline "   Figure $references($img_name,index):"
+
 	foreach img_capline $txtblock {
 		set txt [linetxt $img_capline]
-		regsub {^\[.*\]} $txt "" txt
+		if {[regexp {^\[.*\]} $txt dummy]} {
+			regsub {^\[.*\]} $txt "" txt
+			if {[regexp {^ *$} $txt dummy]} { continue }
+		}
 		regsub {^ *} $txt "" txt
-		append img_cap $txt " "
+		printline "   $txt"
 	}
-	regsub { *$} $img_cap "" img_cap
-
 	printline ""
-	printline ".. image:: $img_name"
-	printline ""
+	incr depth
 }
 
 
@@ -371,4 +384,7 @@ set enum_level 0
 set curr_section_type default
 set outmode rst
 set strip_space_prefix 0
+set curr_chapter 1
+
+set select [regexp {\--chapter +(\d+)} $argv dummy select_chapter]
 
