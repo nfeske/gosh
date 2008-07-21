@@ -85,7 +85,7 @@ proc out_html {string} {
 	# insert references and citations #
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
-			if {$references($ref_text,type) == "tabcap"} {
+			if {$references($ref_text,type) == "tabcap" || $references($ref_text,type) == "image"} {
 				regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"#[label_html $ref_text]\">$references($ref_text,index)</a>"] string
 			} else {
 				regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"#[label_html $ref_text]\">$ref_text</a>"] string
@@ -187,11 +187,13 @@ proc produce_tail_html {} {
 
 ### VERBATIM  ###
 proc process_verbatim_html {txtblock} {
-	global config_html_keep_tags
+	global config_html_keep_tags depth
 	while {[lindex $txtblock end] == ""} {
 		set txtblock [lrange $txtblock 0 [expr [llength $txtblock]-2]]
 	}
-	puts "<pre>"
+	set orig_depth $depth
+	set depth 0
+	printline "<pre>"
 	foreach txtline $txtblock {
 		set txt [linetxt $txtline]
 		regsub {^\!} $txt "" txt
@@ -202,9 +204,10 @@ proc process_verbatim_html {txtblock} {
 			regsub -all {>} $txt {_§%and%§_gt;} txt
 		}
 		regsub -all {_§%and%§_} $txt {\&} txt
-		puts "$txt"
+		printline "$txt"
 	}
-	puts "</pre>"
+	printline "</pre>"
+	set depth $orig_depth
 }
 
 ### ITEMIZE ###
@@ -286,7 +289,7 @@ proc process_chapter_html {txtblock} {
 	global config_marshal authors
 	set curr_section_type chapter
 	set title [linetxt [lindex $txtblock 0]]
-	set curr_chapter_idx $references($title,index)
+	set curr_chapter $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter " }
 	if {$config_select} {
@@ -342,6 +345,7 @@ proc process_paragraph_html {txtblock} {
 
 ### IMAGE ###
 proc process_image_html {txtblock} {
+	global config_html_img_format
 	set img_info ""
 	set img_size 80
 	set img_angle "0"
@@ -360,10 +364,11 @@ proc process_image_html {txtblock} {
 	}
 	regsub { *$} $img_cap "" img_cap
 	
-	printline "<table><tr><td>"
-	printline "  <img src=\"$img_name.jpg\">"
+	printline "<a name=\"$img_name\"></a>"
+	printline "<table class=\"captionedimage\"><tr><td>"
+	printline "  <img src=\"$img_name.$config_html_img_format\">"
 	if {$img_cap != ""} {
-		printline "</td><td>"
+		printline "</td></tr><tr><td>"
 		printline "  <div class=\"caption\">$img_cap</div>"
 	}
 	printline "</td></tr></table>"
@@ -462,14 +467,17 @@ set text_color(chapter)    "#000014"
 set text_color(section)    "#202040"
 set text_color(subsection) "#404060"
 set text_color(paragraph)  "#505090"
-set curr_section_type default
-set outmode html
+set curr_section_type      default
+set outmode                html
+
+set config_html_img_format "jpg"
+regexp -- {\--html-img-format\s+(\w+)} $argv dummy config_html_img_format
 
 #
 # Process command line arguments
 #
-set config_html_toc       [regexp {\--html-toc}       $argv dummy]
-set config_html_p_justify [regexp {\--html-p-justify} $argv dummy]
-set config_html_p_colored [regexp {\--html-p-colored} $argv dummy]
-set config_html_sec_enum  [regexp {\--html-sec-enum}  $argv dummy]
-set config_html_keep_tags [regexp {\--html-keep-tags} $argv dummy]
+set config_html_toc        [regexp {\--html-toc}       $argv dummy]
+set config_html_p_justify  [regexp {\--html-p-justify} $argv dummy]
+set config_html_p_colored  [regexp {\--html-p-colored} $argv dummy]
+set config_html_sec_enum   [regexp {\--html-sec-enum}  $argv dummy]
+set config_html_keep_tags  [regexp {\--html-keep-tags} $argv dummy]
