@@ -126,9 +126,18 @@ proc seal_repl {replace_string} {
 
 
 proc printline {string} {
-	global config_indent
+	global config_indent strip_space_prefix
+	global config_select select_chapter curr_chapter
+
+	if {$config_select} {
+		if {"$select_chapter" != "$curr_chapter"} { return } }
+
 	if {$config_indent} {
 		set string "[indent]$string"
+		for {set i 0} {$i < $strip_space_prefix} {incr i} {
+			regsub {^ } $string "" string
+		}
+		set strip_space_prefix 0
 	}
 	regsub {^ *$} $string "" string
 	puts $string
@@ -326,8 +335,10 @@ proc section_env_latex {title} {
 
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
-	set title [linetxt [lindex $txtblock 0]]
+	global curr_chapter references
 	global chapter_tag;
+	set title [linetxt [lindex $txtblock 0]]
+	set curr_chapter $references($title,index)
 	printline ""
 	printline "%     -+*|\[ [string toupper $title] \]|*+-\n"
 	printline "\\$chapter_tag[section_env_latex $title]"
@@ -1109,6 +1120,16 @@ proc extract_tables {} {
 }
 
 
+proc print_marshal_header {title authors content_type} {
+	if {$title != ""} {
+		puts "title: $title" }
+	puts "Content-Type: $content_type"
+	if {$authors != ""} {
+		puts "creators: $authors" }
+	puts ""
+}
+
+
 ################
 #              #
 # MAIN PROGRAM #
@@ -1121,6 +1142,8 @@ set title ""
 set authors ""
 set toc_refs {}
 set config_indent 1
+set strip_space_prefix 0
+set curr_chapter 1
 
 # assist the user a bit
 if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
@@ -1175,6 +1198,12 @@ while {[regexp {\--style ([^ ]+)} $argv dummy style_name]} {
 	catch { source [get_style_file $style_name] }
 	regsub {\--style [^ ]+} $argv "" argv
 }
+
+# output filter (strip single chapter from document)
+set config_select [regexp {\--chapter +(\d+)} $argv dummy select_chapter]
+
+# prepend output with marshalling information
+set config_marshal [regexp {\--marshal\s} $argv dummy]
 
 # find out about internal references
 collect_references $txtcontent

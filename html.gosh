@@ -140,15 +140,23 @@ proc label_html {string} {
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_html {} {
 	global title authors references toc_refs config_html_toc
-	printline "<html><head><title>$title</title></head>"
-	printline "<body>"
-	if {$title != ""} {
-		printline "<h1><center>$title</center></h1>"
+	global config_marshal config_select
+
+	if {$config_marshal} {
+		if {!$config_select} {
+			print_marshal_header $title $authors "text/html"
+			puts "<html><head><title>$title</title></head>"
+			puts "<body>"
+		}
+	} else {
+		printline "<html><head><title>$title</title></head>"
+		printline "<body>"
+		if {$title != ""} {
+			printline "<h1><center>$title</center></h1>" }
+		if {$authors != ""} {
+			printline "<b><center>$authors</center></b>" }
+		printline "<center>[exec date --iso-8601]</center>"
 	}
-	if {$authors != ""} {
-		printline "<b><center>$authors</center></b>"
-	}
-	printline "<center>[exec date --iso-8601]</center>"
 	
 	# table of contents #
 	if {$config_html_toc} {
@@ -168,16 +176,13 @@ proc produce_head_html {} {
 		}
 		printline "</td></tr></table>"
 	}
-	printline "<hr/><br/>"
+	#printline "<hr/><br/>"
 }
 
 ### WRITE TAIL OF TEX FILE ###
 proc produce_tail_html {} {
-	global authors
-	printline "<hr/><br/>"
-	printline "<i>$authors</i>"
-	printline "</body>"
-	printline "</html>"
+	puts "</body>"
+	puts "</html>"
 }
 
 ### VERBATIM  ###
@@ -271,20 +276,32 @@ proc process_abstract_html {txtblock} {
 	printline "<h1>Abstract</h1>"
 	printline "<i>"
 	handle_txtblock abstract [lrange $txtblock 2 end]
-	printline "</i><hr/><br/>"
+	printline "</i>"
 }
 
 ### CHAPTER ###
 proc process_chapter_html {txtblock} {
 	global references curr_chapter curr_section_type config_html_sec_enum
+	global config_select select_chapter
+	global config_marshal authors
 	set curr_section_type chapter
 	set title [linetxt [lindex $txtblock 0]]
-	set curr_chapter $references($title,index)
+	set curr_chapter_idx $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter " }
-	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<h1>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h1>"
+	if {$config_select} {
+		if {"$select_chapter" == "$curr_chapter" && $config_marshal} {
+			print_marshal_header $title $authors "text/html"
+			puts "<html><body>"
+		}
+	} else {
+		printline "<a name=\"[label_html $title]\"></a>"
+		printline "<h1>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h1>"
+	}
 	handle_txtblock chapter [lrange $txtblock 2 end]
+	if {$config_select} {
+		if {"$select_chapter" == "$curr_chapter" && $config_marshal} {
+			puts "</body></html>" } }
 }
 
 ### SECTION ###
@@ -418,7 +435,7 @@ proc output_table_html {col_attr rows caption} {
 
 				set cell_out " <$cell_tag>"
 				foreach cell_txt_line $cell_txt {
-					append cell_out "[out_html $cell_txt_line]<br/>"
+					append cell_out "[out_html $cell_txt_line]"
 				}
 				append cell_out "</$cell_tag>"
 				printline "$cell_out"

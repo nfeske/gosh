@@ -6,26 +6,6 @@
 #############################
 
 
-proc printline {string} {
-	global config_indent strip_space_prefix
-	global select select_chapter curr_chapter
-
-	if {$select} {
-		if {"$select_chapter" != "$curr_chapter"} { return }
-	}
-
-	if {$config_indent} {
-		set string "[indent]$string"
-	}
-	for {set i 0} {$i < $strip_space_prefix} {incr i} {
-		regsub {^ } $string "" string
-	}
-	set strip_space_prefix 0
-	regsub {^ *$} $string "" string
-	puts $string
-}
-
-
 ### FILTER TEXTUAL OUTPUT ###
 proc out_rst {string} {
 	global references
@@ -121,11 +101,25 @@ proc label_rst {string} {
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_rst {} {
 	global title authors references toc_refs
+	global select config_marshal
 	regsub -all {.} $title "=" title_frame
-	printline "$title_frame"
-	printline "$title"
-	printline "$title_frame"
-	printline ""
+
+	if {$select == 0} {
+		#
+		# If marshalling is activated, we provide the
+		# title as "title" tag and ommit the top-level
+		# headline. Otherwise the title is printed
+		# using a a nice rst frame style.
+		#
+		if {$config_marshal} {
+			print_marshal_header $title $authors "text/restructured"
+		} else {
+			printline "$title_frame"
+			printline "$title"
+			printline "$title_frame"
+			printline ""
+		}
+	}
 #	if {$title != ""} {
 #		printline "<h1><center>$title</center></h1>"
 #	}
@@ -247,20 +241,30 @@ proc process_plain_rst {plaintxtblock} {
 
 ### ABSTRACT ###
 proc process_abstract_rst {txtblock} {
+	global depth
+	incr depth -1
 	handle_txtblock abstract [lrange $txtblock 2 end]
+	incr depth
 }
 
 ### CHAPTER ###
 proc process_chapter_rst {txtblock} {
 	global references curr_chapter curr_section_type depth
+	global select select_chapter config_marshal
+	global authors
 	set curr_section_type chapter
 	set title [linetxt [lindex $txtblock 0]]
 	set curr_chapter $references($title,index)
 
 	incr depth -1
-	printline "$title"
-	regsub -all {.} $title "#" underline
-	printline "$underline"
+	if {$select} {
+		if {"$select_chapter" == "$curr_chapter" && $config_marshal} {
+			print_marshal_header $title $authors "text/restructured" }
+	} else {
+		printline "$title"
+		regsub -all {.} $title "#" underline
+		printline "$underline"
+	}
 	printline ""
 	handle_txtblock chapter [lrange $txtblock 2 end]
 	incr depth
@@ -284,7 +288,7 @@ proc process_section_rst {txtblock} {
 
 ### SUBSECTION ###
 proc process_subsection_rst {txtblock} {
-	global references curr_chapter curr_section curr_subsection curr_section_type text_color
+	global depth references curr_chapter curr_section curr_subsection curr_section_type text_color
 	incr depth -1
 	set curr_section_type subsection
 	set title [linetxt [lindex $txtblock 0]]
@@ -383,8 +387,3 @@ proc output_table_rst {col_attr rows caption} {
 set enum_level 0
 set curr_section_type default
 set outmode rst
-set strip_space_prefix 0
-set curr_chapter 1
-
-set select [regexp {\--chapter +(\d+)} $argv dummy select_chapter]
-
