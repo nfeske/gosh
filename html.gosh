@@ -70,14 +70,7 @@ proc out_html {string} {
 		regsub -all " " $code_text "\\\&nbsp;" code_text
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string [seal_repl "$head_char<code>$code_text</code>$tail_char"] string
 	}
-	
-	# FIXME: kick out monospace style via hashes #
-	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
-		regsub {\#([^#]+)\#} $string [seal_repl "<code>$code_text</code>"] string
-		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
-		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
-	}
-	
+
 	# hexadecimal numbers #
 	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "<code>&</code>" string
 	
