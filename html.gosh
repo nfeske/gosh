@@ -100,7 +100,8 @@ proc out_html {string} {
 			if {$tooltip == ""} {
 				set tooltiptext ""
 			}
-			regsub {^http:([^/])} $url {\1} url
+			if {[regexp {^http:/?[^/]} $url dummy]} {
+				regsub {^http:} $url {} url }
 			regsub { +$} $linktext "" linktext
 			regsub -all {&} $url "_§%and%§_" url
 			regsub -all -- {---} $url      "_§%3xminus%§_" url
