@@ -119,7 +119,12 @@ proc out_html {string} {
 	# clear spaces at the end of a line #
 	regsub { +$} $string "" string
 	regsub {^ } $string "" string
-	
+
+	set priv_function out_html_private
+	if {[info procs $priv_function] == $priv_function} {
+		set string [eval "$priv_function [list $string]"]
+	}
+
 	return $string
 }
 
@@ -280,6 +285,7 @@ proc process_chapter_html {txtblock} {
 	global references curr_chapter curr_section_type config_html_sec_enum
 	global config_select select_chapter
 	global config_marshal authors
+	global chapter_title_tag
 	set curr_section_type chapter
 	set title [linetxt [lindex $txtblock 0]]
 	set curr_chapter $references($title,index)
@@ -292,7 +298,7 @@ proc process_chapter_html {txtblock} {
 		}
 	} else {
 		printline "<a name=\"[label_html $title]\"></a>"
-		printline "<h1>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h1>"
+		printline "<$chapter_title_tag>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$chapter_title_tag>"
 	}
 	handle_txtblock chapter [lrange $txtblock 2 end]
 	if {$config_select} {
@@ -303,36 +309,41 @@ proc process_chapter_html {txtblock} {
 ### SECTION ###
 proc process_section_html {txtblock} {
 	global references curr_chapter curr_section curr_section_type text_color config_html_sec_enum
+	global section_title_tag
 	set curr_section_type section
 	set title [linetxt [lindex $txtblock 0]]
 	set curr_section $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
 	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<h2>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h2>"
+	printline "<$section_title_tag>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$section_title_tag>"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
 ### SUBSECTION ###
 proc process_subsection_html {txtblock} {
 	global references curr_chapter curr_section curr_subsection curr_section_type text_color config_html_sec_enum
+	global subsection_title_tag
 	set curr_section_type subsection
 	set title [linetxt [lindex $txtblock 0]]
 	set curr_subsection $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
 	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<h3>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</h3>"
+	printline "<$subsection_title_tag>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$subsection_title_tag>"
+	printline "<div class=\"subsection\">"
 	handle_txtblock subsection [lrange $txtblock 2 end]
+	printline "</div>"
 }
 
 ### PARAGRAPH ###
 proc process_paragraph_html {txtblock} {
 	global curr_section_type text_color
+	global paragraph_title_tag
 	set curr_section_type paragraph
 	set title [linetxt [lindex $txtblock 0]]
 	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<h4>[font_style_begin][out_html $title][font_style_end]</h4>"
+	printline "<$paragraph_title_tag>[font_style_begin][out_html $title][font_style_end]</$paragraph_title_tag>"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
@@ -462,6 +473,11 @@ set text_color(subsection) "#404060"
 set text_color(paragraph)  "#505090"
 set curr_section_type      default
 set outmode                html
+
+set chapter_title_tag       "h1"
+set section_title_tag       "h2"
+set subsection_title_tag    "h3"
+set paragraph_title_tag     "h4"
 
 set config_html_img_format "jpg"
 regexp -- {\--html-img-format\s+(\w+)} $argv dummy config_html_img_format
