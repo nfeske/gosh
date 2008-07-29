@@ -101,10 +101,10 @@ proc label_rst {string} {
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_rst {} {
 	global title authors references toc_refs
-	global select config_marshal
+	global config_select config_marshal
 	regsub -all {.} $title "=" title_frame
 
-	if {$select == 0} {
+	if {$config_select == 0} {
 		#
 		# If marshalling is activated, we provide the
 		# title as "title" tag and ommit the top-level
@@ -250,14 +250,14 @@ proc process_abstract_rst {txtblock} {
 ### CHAPTER ###
 proc process_chapter_rst {txtblock} {
 	global references curr_chapter curr_section_type depth
-	global select select_chapter config_marshal
+	global config_select select_chapter config_marshal
 	global authors
 	set curr_section_type chapter
 	set title [linetxt [lindex $txtblock 0]]
 	set curr_chapter $references($title,index)
 
 	incr depth -1
-	if {$select} {
+	if {$config_select} {
 		if {"$select_chapter" == "$curr_chapter" && $config_marshal} {
 			print_marshal_header $title $authors "text/restructured" }
 	} else {
