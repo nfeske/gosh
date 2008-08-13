@@ -412,7 +412,7 @@ proc process_image_latex {txtblock} {
 
 ### TABLE ###
 proc output_table_latex {colattr rows caption} {
-	global config_tex_table_floating
+	global config_tex_table_floating config_tex_table_noenv
 
 	set tabenv "table"
 
@@ -421,12 +421,14 @@ proc output_table_latex {colattr rows caption} {
 		if {[regexp {full-span} $attr]} { set tabenv "table*" }
 	}
 
-	if {$config_tex_table_floating} {
-		printline "\\begin\{$tabenv\}\[ht\]"
-	} else {
-		printline "\\begin\{$tabenv\}\[ht!]"
+	if {$config_tex_table_noenv == 0} {
+		if {$config_tex_table_floating} {
+			printline "\\begin\{$tabenv\}\[ht\]"
+		} else {
+			printline "\\begin\{$tabenv\}\[ht!]"
+		}
 	}
-	printline "\{\\center"
+	printline "\\begin{center}"
 	print "[indent] \\begin\{tabular\}\{|"
 	foreach attr $colattr {
 		if {$attr == "left"} {
@@ -486,14 +488,17 @@ proc output_table_latex {colattr rows caption} {
 		printline " \\caption\{[out_latex $captxt]\}"
 		printline " \\label\{[label_latex $caplab]\}"
 	}
-	printline "\}"
-	printline "\\end\{$tabenv\}"
+	printline "\\end{center}"
+	if {$config_tex_table_noenv == 0} {
+		printline "\\end\{$tabenv\}"
+	}
 }
 
 #
 # Process command line arguments for the Latex backend
 #
 set config_tex_table_floating [regexp {\--tex-table-floating} $argv dummy]
+set config_tex_table_noenv    [regexp {\--tex-table-noenv}    $argv dummy]
 
 #
 # Set defaults for document-structure commands
@@ -776,7 +781,7 @@ set style_begin(abstract)     {^Abstract.*}
 set style_next(abstract)      {^\#\#\#}
 set style_continue(abstract)  {.*}
 set style_contnext(abstract)  {(^[^(\#\#\#)])|(^\n)}
-set style_substyles(abstract) {itemize enumeration plain}
+set style_substyles(abstract) {itemize enumeration description plain}
 
 ### BIBLIOGRAPHY ###
 set style_begin(bibliography)     {^Bibliography}
