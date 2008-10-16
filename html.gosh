@@ -136,7 +136,7 @@ proc label_html {string} {
 	return $string
 }
 
-### WRITE HEADER OF TEX FILE ###
+### WRITE HEADER OF HTML FILE ###
 proc produce_head_html {} {
 	global title authors references toc_refs config_html_toc
 	global config_marshal config_select
@@ -178,7 +178,7 @@ proc produce_head_html {} {
 	#printline "<hr/><br/>"
 }
 
-### WRITE TAIL OF TEX FILE ###
+### WRITE TAIL OF HTML FILE ###
 proc produce_tail_html {} {
 	puts "</body>"
 	puts "</html>"

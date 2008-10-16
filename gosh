@@ -687,8 +687,10 @@ proc process_header {txtblock} {
 	foreach txtline $txtblock {
 		set txtline [lineregsub {^\ +} $txtline ""]
 #		regsub {^\ +} $txtline "" txtline
-		if {[linetxt $txtline] != ""} {
-			set block [append block " " [linetxt $txtline]]
+		set txt [linetxt $txtline]
+		regsub -all {===*} $txt "" txt
+		if {$txt != ""} {
+			set block [append block " " $txt]
 		} else {
 			regsub {^\ +} $block "" block
 			if {$block != ""} {
