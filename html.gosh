@@ -68,11 +68,11 @@ proc out_html {string} {
 	# monospace style #
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
 		regsub -all " " $code_text "\\\&nbsp;" code_text
-		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string [seal_repl "$head_char<code>$code_text</code>$tail_char"] string
+		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string [seal_repl "$head_char<tt>$code_text</tt>$tail_char"] string
 	}
 
 	# hexadecimal numbers #
-	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "<code>&</code>" string
+	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "<tt>&</tt>" string
 	
 	set linktext ""
 	# insert references and citations #
@@ -167,10 +167,10 @@ proc produce_head_html {} {
 				printline "<b><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a></b><br/>"
 			}
 			if {$references($ref_name,type) == "section"} {
-				printline "<code>&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
+				printline "<tt>&nbsp;&nbsp;</tt><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
 			}
 			if {$references($ref_name,type) == "subsection"} {
-				printline "<code>&nbsp;&nbsp;&nbsp;&nbsp;</code><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
+				printline "<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a href=\"#[label_html $ref_name]\">$references($ref_name,index). $ref_name</a><br/>"
 			}
 		}
 		printline "</td></tr></table>"
@@ -225,9 +225,9 @@ proc process_item_html {itemtxtblock} {
 
 ### DESCRIPTION ###
 proc process_description_html {txtblock} {
-	printline "<dl>"
+	printline "<div><dl>"
 	handle_txtblock description $txtblock
-	printline "</dl>"
+	printline "</dl></div>"
 }
 
 ### DESCRIPTION ITEM ###
