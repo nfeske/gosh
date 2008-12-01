@@ -10,6 +10,7 @@ proc produce_head_latex {} {
 	printline {\usepackage[utf8x]{inputenc}}
 	printline {\usepackage[small,bf,hang]{caption2}}
 	printline {\usepackage[ngerman]{babel}}
+	printline {\usepackage{epsfig}}
 	printline {\usepackage{mathptmx}}
 	printline {\usepackage{helvet}}
 	printline {\usepackage{courier}}
