@@ -1,0 +1,26 @@
+
+                Description of the inline GOSH back end for
+
+                    Martin Pohlack, Norman Feske
+
+The 'inline' back end allows for converting snippets of GOSH-style text to
+Latex code. It is meant to be used from Emacs to ease the writing of Latex
+documents. By using the 'inline' back end, you can edit normal GOSH text and
+once you are finished with your paragraph, you can press 'F6' to convert the
+selected text portion automatically to Latex code without writing Latex command
+by hand.
+
+The following Emacs macro is glue betweeen Emacs and the GOSH:
+
+! (defun gosh-to-tex ()
+!   "Calls a gosh converter on the active region and replaces the
+!    region with its output."
+!   (interactive)
+!   (shell-command-on-region
+!    (mark) (point) "gosh --style inline -" t t)
+!   (if (< (mark) (point))
+!       (indent-region (mark) (point))
+!     (indent-region (point) (mark))))
+!
+! (global-set-key [f6] 'gosh-to-tex)
+
