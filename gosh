@@ -164,7 +164,8 @@ proc produce_head_latex {} {
 	
 	printline {\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
 	printline {\usepackage[T1]{fontenc}}
-	printline {\usepackage[latin1]{inputenc}}
+#	printline {\usepackage[latin1]{inputenc}}
+	printline {\usepackage[utf8]{inputenc}}
 	printline {\usepackage[small,bf,hang]{caption2}}
 	printline {\usepackage[ngerman]{babel}}
 	printline {\usepackage{epsfig}}
@@ -1049,10 +1050,10 @@ proc detect_table {start_idx max_idx} {
 	global txtcontent
 
 	# first line must start with a space and must contain at least one pipe symbol
+	# furthermore, it must not interfere with verbatim text blocks
 	set line [linetxt [lindex $txtcontent $start_idx]]
-	if {![regexp { .*[|]} $line]} {
-		return 0
-	}
+	if {[regexp  {^\s*!}  $line]} { return 0 }
+	if {![regexp { .*[|]} $line]} { return 0 }
 
 	# further lines must contain either '---' or pipes
 	set idx [expr $start_idx + 1]
