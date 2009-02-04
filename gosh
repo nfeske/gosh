@@ -160,12 +160,15 @@ proc label_latex {string} {
 
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_latex {} {
-	global title authors
+	global title authors txtencoding
 	
 	printline {\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
 	printline {\usepackage[T1]{fontenc}}
-#	printline {\usepackage[latin1]{inputenc}}
-	printline {\usepackage[utf8]{inputenc}}
+	if {$txtencoding == "UTF-8"} {
+		printline {\usepackage[utf8]{inputenc}}
+	} else {
+		printline {\usepackage[latin1]{inputenc}}
+	}
 	printline {\usepackage[small,bf,hang]{caption2}}
 	printline {\usepackage[ngerman]{babel}}
 	printline {\usepackage{epsfig}}
@@ -1161,9 +1164,19 @@ if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 	exit
 }
 
-# read text file and kick out any comments
+# determine encoding and read text file
 set txtfilename [lindex $argv end]
+set txtinfo [exec file $txtfilename]
+
+if {[regexp {UTF-8} $txtinfo]} {
+	set txtencoding "UTF-8"
+} else {
+	set txtencoding "ISO-8859"
+}
+
 set txtlines [split [exec cat $txtfilename] "\n"]
+
+# convert text into a list and remove all comment lines
 set txtcontent {}
 set cnt 1
 foreach txtline $txtlines {
