@@ -180,8 +180,11 @@ proc produce_head_html {} {
 
 ### WRITE TAIL OF HTML FILE ###
 proc produce_tail_html {} {
-	puts "</body>"
-	puts "</html>"
+	global config_select
+	if {!$config_select} {
+		puts "</body>"
+		puts "</html>"
+	}
 }
 
 ### VERBATIM  ###
