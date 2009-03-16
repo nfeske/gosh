@@ -422,7 +422,7 @@ If you have comments, tips or bug reports regarding GOSH, please do not
 hesitate to contact me via
 
 :Email:
-  nf2@inf.tu-dresden.de
+  norman.feske@genode-labs.com
 
 For new versions of GOSH and information about its development, you might
 visit
