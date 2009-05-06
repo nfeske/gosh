@@ -192,7 +192,7 @@ proc process_descitem_rst {itemtxtblock} {
 	regexp {^\:(.+)\:} $txt dummy desc_name
 	set txtline [lineregsub {^\:(.+)\: *} $txtline ""]
 	incr depth -1
-	printline ":[out_rst $desc_name]:"
+	printline "[out_rst $desc_name]"
 	incr depth 2
 	lappend txtblock $txtline
 	foreach txtline [lrange $itemtxtblock 1 end] {
