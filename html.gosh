@@ -100,8 +100,10 @@ proc out_html {string} {
 			if {$tooltip == ""} {
 				set tooltiptext ""
 			}
-			if {[regexp {^http:/?[^/]} $url dummy]} {
-				regsub {^http:} $url {} url }
+			if {[regexp {^http:/[^/]} $url dummy]} {
+				regsub {^http:/} $url "[doc_root]/" url }
+			if {[regexp {^http:[^/]} $url dummy]} {
+				regsub {^http:} $url "" url }
 			regsub { +$} $linktext "" linktext
 			regsub -all {&} $url "_§%and%§_" url
 			regsub -all -- {---} $url      "_§%3xminus%§_" url
@@ -288,21 +290,25 @@ proc process_abstract_html {txtblock} {
 proc process_chapter_html {txtblock} {
 	global references curr_chapter curr_section_type config_html_sec_enum
 	global config_select select_chapter
-	global config_marshal authors
+	global config_marshal authors title
 	global chapter_title_tag
 	set curr_section_type chapter
-	set title [linetxt [lindex $txtblock 0]]
-	set curr_chapter $references($title,index)
+	set chapter_title [linetxt [lindex $txtblock 0]]
+	set curr_chapter $references($chapter_title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter " }
 	if {$config_select} {
-		if {"$select_chapter" == "$curr_chapter" && $config_marshal} {
-			print_marshal_header $title $authors "text/html"
-			puts "<html><body>"
+		if {"$select_chapter" == "$curr_chapter"} {
+			if {$config_marshal} {
+				print_marshal_header $chapter_title $authors "text/html"
+				puts "<html><body>"
+			} else {
+				puts "<h1>$title: $chapter_title</h1>"
+			}
 		}
 	} else {
-		printline "<a name=\"[label_html $title]\"></a>"
-		printline "<$chapter_title_tag>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$chapter_title_tag>"
+		printline "<a name=\"[label_html $chapter_title]\"></a>"
+		printline "<$chapter_title_tag>[font_style_begin]$sec_prefix[out_html $chapter_title][font_style_end]</$chapter_title_tag>"
 	}
 	handle_txtblock chapter [lrange $txtblock 2 end]
 	if {$config_select} {
@@ -494,3 +500,16 @@ set config_html_p_justify  [regexp {\--html-p-justify} $argv dummy]
 set config_html_p_colored  [regexp {\--html-p-colored} $argv dummy]
 set config_html_sec_enum   [regexp {\--html-sec-enum}  $argv dummy]
 set config_html_keep_tags  [regexp {\--html-keep-tags} $argv dummy]
+
+##
+# Return relative path to root of document
+#
+proc doc_root {} {
+	global _doc_root
+	if {[info exists _doc_root]} { return $_doc_root }
+	set _doc_root ""
+	global argv
+	if {[regexp {\--doc-root +([^\s]+)} $argv dummy value] && $value != "{}"} {
+		set _doc_root $value }
+	return $_doc_root
+}
