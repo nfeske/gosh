@@ -100,10 +100,20 @@ proc out_html {string} {
 			if {$tooltip == ""} {
 				set tooltiptext ""
 			}
+
+			# handle links that are local to the document tree
+			set is_local_url 0
 			if {[regexp {^http:/[^/]} $url dummy]} {
-				regsub {^http:/} $url "[doc_root]/" url }
+				set is_local_url 1
+				regsub {^http:/} $url "[doc_root]/" url
+			}
 			if {[regexp {^http:[^/]} $url dummy]} {
-				regsub {^http:} $url "" url }
+				set is_local_url 1
+				regsub {^http:} $url "" url
+			}
+			# add customizable URL suffix to links local to the document tree
+			if {$is_local_url} { set url "$url[doc_url_suffix]" }
+
 			regsub { +$} $linktext "" linktext
 			regsub -all {&} $url "_§%and%§_" url
 			regsub -all -- {---} $url      "_§%3xminus%§_" url
@@ -513,3 +523,9 @@ proc doc_root {} {
 		set _doc_root $value }
 	return $_doc_root
 }
+
+##
+# Return suffix appended to URLs that are local to the document-tree local
+#
+proc doc_url_suffix {} { return "" }
+
