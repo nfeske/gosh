@@ -390,7 +390,23 @@ proc process_image_html {txtblock} {
 	
 	printline "<a name=\"$img_name\"></a>"
 	printline "<table class=\"captionedimage\"><tr><td>"
-	printline "  <img src=\"$img_name.$config_html_img_format\">"
+
+
+	set img_format $config_html_img_format
+
+	#
+	# If no file can be found, try to find a matching image file and use its
+	# file type.
+	#
+	if {![file exists "$img_name.$img_format"]} {
+		foreach format {png jpg jpeg} {
+			if {[file exists "$img_name.$format"]} {
+				set img_format "$format"
+			}
+		}
+	}
+
+	printline "  <img src=\"$img_name.$img_format\">"
 	if {$img_cap != ""} {
 		printline "</td></tr><tr><td>"
 		printline "  <div class=\"caption\">$img_cap</div>"
