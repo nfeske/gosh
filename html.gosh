@@ -49,8 +49,8 @@ proc out_html {string} {
 
 	# prevent < and > to be interpreted as html tags #
 	if {!$config_html_keep_tags} {
-		regsub -all {<} $string {_§%and%§_lt;} string
-		regsub -all {>} $string {_§%and%§_gt;} string
+		regsub -all {<} $string {§%and%§lt;} string
+		regsub -all {>} $string {§%and%§gt;} string
 	}
 
 	# italic style #
@@ -116,19 +116,19 @@ proc out_html {string} {
 			if {$is_local_url} { set url "$url[doc_url_suffix]" }
 
 			regsub { +$} $linktext "" linktext
-			regsub -all {&} $url "_§%and%§_" url
-			regsub -all -- {---} $url      "_§%3xminus%§_" url
-			regsub -all -- {--}  $url      "_§%2xminus%§_" url
-			regsub -all -- {---} $linktext "_§%3xminus%§_" alttext
-			regsub -all -- {--}  $linktext "_§%2xminus%§_" alttext
+			regsub -all {&} $url "§%and%§" url
+			regsub -all -- {---} $url      "§%3xminus%§" url
+			regsub -all -- {--}  $url      "§%2xminus%§" url
+			regsub -all -- {---} $linktext "§%3xminus%§" alttext
+			regsub -all -- {--}  $linktext "§%2xminus%§" alttext
 			regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"$url\" alt=\"$alttext\"$tooltiptext>$linktext</a>"] string
 		}
 	}
-	regsub -all {_§%and%§_} $string {\&} string
+	regsub -all {§%and%§} $string {\&} string
 	regsub -all -- {\-\-\-} $string {\&mdash;} string
 	regsub -all -- {\-\-} $string {\&ndash;} string
-	regsub -all {_§%3xminus%§_} $string {---} string
-	regsub -all {_§%2xminus%§_} $string {--} string
+	regsub -all {§%3xminus%§} $string {---} string
+	regsub -all {§%2xminus%§} $string {--} string
 
 	# clear spaces at the end of a line #
 	regsub { +$} $string "" string
@@ -213,12 +213,12 @@ proc process_verbatim_html {txtblock} {
 		set txt [linetxt $txtline]
 		regsub {^\!} $txt "" txt
 		regsub -all {\t} $txt "  " txt
-		regsub -all {&} $txt "_§%and%§_" txt
+		regsub -all {&} $txt "§%and%§" txt
 		if {!$config_html_keep_tags} {
-			regsub -all {<} $txt {_§%and%§_lt;} txt
-			regsub -all {>} $txt {_§%and%§_gt;} txt
+			regsub -all {<} $txt {§%and%§lt;} txt
+			regsub -all {>} $txt {§%and%§gt;} txt
 		}
-		regsub -all {_§%and%§_} $txt {\&} txt
+		regsub -all {§%and%§} $txt {\&} txt
 		printline "$txt"
 	}
 	printline "</pre>"
