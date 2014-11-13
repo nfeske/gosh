@@ -218,6 +218,25 @@ The image can be rotated via:
 Of course, you can specify both parameters for the same image, too.
 
 
+Tikz images
+===========
+
+Tikz images in the form of individual files can be incorporated into the
+document. A tikz file contains one 'tikzpicture'. It can be inserted as
+follows:
+
+![tikz filename]
+!  The optional caption describes the tikz image.
+
+Note that there should be an empty line above and below the statement.
+Otherwise, the statement will be interpreted as a reference that appears within
+the surrounding paragraph. The filename must be specified without the '.tikz'
+file extension. When no caption is provided, the image will be inserted at the
+current text position. In contrast, when providing a caption, the image will
+appear as a (potentially floating) figure that can be referenced via the
+filename.
+
+
 Tables
 ======
 

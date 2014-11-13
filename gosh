@@ -415,6 +415,43 @@ proc process_image_latex {txtblock} {
 	
 }
 
+### IMAGE ###
+proc process_tikz_latex {txtblock} {
+
+	regexp {\[(tikz \w+.*)\]} [lindex $txtblock 0] dummy tikz_info
+	if {$tikz_info == ""} return
+	set tikz_name [lindex $tikz_info 1]
+
+	set tikz_cap ""
+	foreach tikz_capline $txtblock {
+		set txt [linetxt $tikz_capline]
+		regsub {^\[.*\]} $txt "" txt
+		regsub {^ *}     $txt "" txt
+		append tikz_cap $txt " "
+	}
+	regsub { *$} $tikz_cap "" tikz_cap
+
+
+	#
+	# If no caption is provided, we insert the tikz image as is. If a caption
+	# is provided, we host the tikz image in a figure environment.
+	#
+	if {$tikz_cap == ""} {
+		printline "\\begin{center}"
+		printline " \\input{$tikz_name.tikz}"
+		printline "\\end{center}"
+	} else {
+		printline ""
+		printline " \\begin{figure}\[tbp\]"
+		printline "  \\begin{center}"
+		printline "   \\input{$tikz_name.tikz}"
+		printline "   \\caption{[out_latex $tikz_cap]}"
+		printline "   \\label{[label_latex $tikz_name]}"
+		printline "  \\end{center}"
+		printline " \\end{figure}"
+	}
+}
+
 ### TABLE ###
 proc output_table_latex {colattr rows caption} {
 	global config_tex_table_floating config_tex_table_noenv
@@ -628,6 +665,13 @@ proc process_image_struct {txtblock} {
 	}
 }
 
+proc process_tikz_struct {txtblock} {
+	printline "TIKZ"
+	foreach txtline $txtblock {
+		printline " $txtline"
+	}
+}
+
 proc output_table_struct {head cells caption} {
 	printline "TABLE"
 }
@@ -806,32 +850,36 @@ set style_begin(chapter)     $style_begin(plain)
 set style_next(chapter)      {^\#{3}}
 set style_continue(chapter)  {.*}
 set style_contnext(chapter)  {^#{0,2}[^#]}
-set style_substyles(chapter) {section paragraph image table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(chapter) {section paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
 
 ### SECTION ###
 set style_begin(section)     $style_begin(plain)
 set style_next(section)      {^\={3}}
 set style_continue(section)  {.*}
 set style_contnext(section)  {^\={0,2}[^\=]}
-set style_substyles(section) {subsection paragraph image table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(section) {subsection paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
 
 ### SUBSECTION ###
 set style_begin(subsection)     $style_begin(plain)
 set style_next(subsection)      {^\~{3}}
 set style_continue(subsection)  {.*}
 set style_contnext(subsection)  {^\~{0,2}[^\~]}
-set style_substyles(subsection) {paragraph image table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(subsection) {paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
 
 ### PARAGRAPH ###
 set style_begin(paragraph)     $style_begin(plain)
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
 set style_contnext(paragraph)  {^[\-~=#]{0,2}[^\-~=#]}
-set style_substyles(paragraph) {image table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(paragraph) {image tikz table annotation raw itemize enumeration description verbatim plain}
 
 ### IMAGE ###
 set style_begin(image)     {^\[image .+\]}
 set style_continue(image)  {(^  .+)|(^$)}
+
+### TIKZ IMAGE ###
+set style_begin(tikz)    {^\[tikz .+\]}
+set style_continue(tikz) {(^  .+)|(^$)}
 
 ### TABLE ###
 set style_begin(table)    {\[tabref[^\]]*\]}
@@ -871,7 +919,8 @@ set style_continue(undefined) {\\{100}}
 set style_substyles(documenthead) {header afterheader}
 
 ### DOCUMENT MAIN ###
-set style_substyles(documentmain) {header abstract bibliography chapter paragraph image table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(documentmain) {header abstract bibliography chapter paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
+
 
 ####################
 #                  #
@@ -1002,7 +1051,7 @@ proc collect_references {txtblock} {
 	set curr_section ""
 	set curr_line [lindex $txtblock 0]
 	foreach next_line [lrange $txtblock 1 end] {
-		set style [get_style [list chapter section subsection image tabcap] $curr_line $next_line]
+		set style [get_style [list chapter section subsection image tikz tabcap] $curr_line $next_line]
 		set txt [linetxt $curr_line]
 		if {(($style == "chapter") || ($style == "section") || ($style == "subsection"))} {
 			set references($txt,type) $style
@@ -1030,6 +1079,13 @@ proc collect_references {txtblock} {
 				set img_name [lindex $img_info 1]
 				set references($img_name,type) $style
 				set references($img_name,index) $image_cnt
+			}
+		} elseif {$style == "tikz"} {
+			if {[regexp {\[(tikz \w+.*)\]} $txt dummy tikz_info]} {
+				incr image_cnt
+				set tikz_name [lindex $tikz_info 1]
+				set references($tikz_name,type)  $style
+				set references($tikz_name,index) $image_cnt
 			}
 		} elseif {$style == "tabcap"} {
 			if {[regexp {\[(table \w+.*)\]} $txt dummy tab_info]} {
