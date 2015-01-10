@@ -57,12 +57,12 @@ proc out_latex {string} {
 		if {[info exists references($ref_text,type)]} {
 			regsub {\[([^\]]+)\]} $string [seal_repl "\\ref{[label_latex $ref_text]}"] string
 		} else {
-			if {[regexp {^http://} $ref_text dummy]} {
+			if {[regexp {^https?://} $ref_text dummy]} {
 				set url ""
 				set linktext ""
 				set tooltip ""
 				regexp {^(\w+:[^ ]+)} $ref_text url
-				regsub {\[([^\]]+)\]} $string [seal_repl "\\texttt{$url}"] string
+				regsub {\[([^\]]+)\]} $string [seal_repl "\\url{$url}"] string
 			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
 				regsub {\[([^\]]+)\]} $string "_citation_gap_" string
 			} else {
@@ -341,7 +341,7 @@ proc section_env_latex {title} {
 ### CHAPTER ###
 proc process_chapter_latex {txtblock} {
 	global curr_chapter references
-	global chapter_tag;
+	global chapter_tag
 	set title [linetxt [lindex $txtblock 0]]
 	set curr_chapter $references($title,index)
 	printline ""
