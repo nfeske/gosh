@@ -463,7 +463,7 @@ proc output_table_html {col_attr rows caption} {
 		printline "<a name=\"[label_html \"$cap_lab\"]\"></a>"
 	}
 
-	printline "<table>"
+	printline "<table class=\"gosh_table\">"
 	printline "<tr>"
 
 	set num_cols [table_num_cols $rows]
