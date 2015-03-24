@@ -415,7 +415,7 @@ proc process_image_latex {txtblock} {
 	
 }
 
-### IMAGE ###
+### TIKZ IMAGE ###
 proc process_tikz_latex {txtblock} {
 
 	regexp {\[(tikz \w+.*)\]} [lindex $txtblock 0] dummy tikz_info
@@ -430,7 +430,6 @@ proc process_tikz_latex {txtblock} {
 		append tikz_cap $txt " "
 	}
 	regsub { *$} $tikz_cap "" tikz_cap
-
 
 	#
 	# If no caption is provided, we insert the tikz image as is. If a caption
@@ -450,6 +449,16 @@ proc process_tikz_latex {txtblock} {
 		printline "  \\end{center}"
 		printline " \\end{figure}"
 	}
+}
+
+### RAW INCLUDE ###
+proc process_rawinclude_latex {txtblock} {
+
+	regexp {\[(raw \w+.*)\]} [lindex $txtblock 0] dummy raw_info
+	if {$raw_info == ""} return
+	set raw_name [lindex $raw_info 1]
+
+	printline "\\input{$raw_name.tex}"
 }
 
 ### TABLE ###
@@ -672,6 +681,13 @@ proc process_tikz_struct {txtblock} {
 	}
 }
 
+proc process_rawinclude_struct {txtblock} {
+	printline "RAWINCLUDE"
+	foreach txtline $txtblock {
+		printline " $txtline"
+	}
+}
+
 proc output_table_struct {head cells caption} {
 	printline "TABLE"
 }
@@ -850,28 +866,28 @@ set style_begin(chapter)     $style_begin(plain)
 set style_next(chapter)      {^\#{3}}
 set style_continue(chapter)  {.*}
 set style_contnext(chapter)  {^#{0,2}[^#]}
-set style_substyles(chapter) {section paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(chapter) {section paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
 
 ### SECTION ###
 set style_begin(section)     $style_begin(plain)
 set style_next(section)      {^\={3}}
 set style_continue(section)  {.*}
 set style_contnext(section)  {^\={0,2}[^\=]}
-set style_substyles(section) {subsection paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(section) {subsection paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
 
 ### SUBSECTION ###
 set style_begin(subsection)     $style_begin(plain)
 set style_next(subsection)      {^\~{3}}
 set style_continue(subsection)  {.*}
 set style_contnext(subsection)  {^\~{0,2}[^\~]}
-set style_substyles(subsection) {paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(subsection) {paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
 
 ### PARAGRAPH ###
 set style_begin(paragraph)     $style_begin(plain)
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
 set style_contnext(paragraph)  {^[\-~=#]{0,2}[^\-~=#]}
-set style_substyles(paragraph) {image tikz table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(paragraph) {image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
 
 ### IMAGE ###
 set style_begin(image)     {^\[image .+\]}
@@ -880,6 +896,10 @@ set style_continue(image)  {(^  .+)|(^$)}
 ### TIKZ IMAGE ###
 set style_begin(tikz)    {^\[tikz .+\]}
 set style_continue(tikz) {(^  .+)|(^$)}
+
+### RAWINCLUDE ###
+set style_begin(rawinclude)    {^\[raw .+\]}
+set style_continue(rawinclude) {(^  .+)|(^$)}
 
 ### TABLE ###
 set style_begin(table)    {\[tabref[^\]]*\]}
@@ -919,7 +939,7 @@ set style_continue(undefined) {\\{100}}
 set style_substyles(documenthead) {header afterheader}
 
 ### DOCUMENT MAIN ###
-set style_substyles(documentmain) {header abstract bibliography chapter paragraph image tikz table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(documentmain) {header abstract bibliography chapter paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
 
 
 ####################
