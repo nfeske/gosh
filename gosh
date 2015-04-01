@@ -19,11 +19,11 @@
 #############################
 
 ### FILTER TEXTUAL OUTPUT ###
-proc out_latex {string} {
+proc out_latex {string {line -1}} {
 	global references
-	
+
 	set string " $string "
-	
+
 	# italic style
 	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string dummy head_char emph_text tail_char]} {
 		regsub {^_} $emph_text " " emph_text
@@ -54,7 +54,17 @@ proc out_latex {string} {
 
 	# insert references and citations
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
-		if {[info exists references($ref_text,type)]} {
+		if {[regexp {\[(\d+)\]} $string dummy footnote_marker]} {
+
+			set footnote_idx [query_footnote $line $footnote_marker]
+			set footnote_out ""
+			if {$footnote_idx != -1} {
+				set footnote_out "\\footnote{[out_latex [footnote_text $footnote_idx]]}"
+			}
+
+			regsub {\[([^\]]+)\]} $string [seal_repl "$footnote_out"] string
+
+		} elseif {[info exists references($ref_text,type)]} {
 			regsub {\[([^\]]+)\]} $string [seal_repl "\\ref{[label_latex $ref_text]}"] string
 		} else {
 			if {[regexp {^https?://} $ref_text dummy]} {
@@ -273,7 +283,7 @@ proc process_descitem_latex {itemtxtblock} {
 	set desc_name ""
 	regexp {^\:([^\:]+)\:} [linetxt $txtline] dummy desc_name
 	set txtline [lineregsub {^\:([^\:]+)\: *} $txtline ""]
-	printline "\\item\[[out_latex $desc_name]\]"
+	printline "\\item\[[out_latex $desc_name [linenum $txtline]]\]"
 
 	if {[linetxt $txtline] == ""} {
 		set txtline [lineset $txtline "\\mbox{}[linetxt $txtline]"]
@@ -301,7 +311,7 @@ proc process_enum_latex {itemtxtblock} {
 ### PLAIN ###
 proc process_plain_latex {plaintxtblock} {
 	foreach txtline $plaintxtblock {
-		printline [out_latex [linetxt $txtline]]
+		printline [out_latex [linetxt $txtline] [linenum $txtline]]
 	}
 }
 
@@ -825,7 +835,7 @@ set style_substyles(description) {descitem}
 ### DESCRIPTION ITEM ###
 set style_begin(descitem)     {^\:[^\:]+\:}
 set style_continue(descitem)  {(^\ \ .+)|(^\n)}
-set style_substyles(descitem) {annotation table raw itemize enumeration description verbatim plain}
+set style_substyles(descitem) {annotation table footnote raw itemize enumeration description verbatim plain}
 
 ### ENUMERATION ###
 set style_begin(enumeration)     {^\#\ .+}
@@ -866,28 +876,28 @@ set style_begin(chapter)     $style_begin(plain)
 set style_next(chapter)      {^\#{3}}
 set style_continue(chapter)  {.*}
 set style_contnext(chapter)  {^#{0,2}[^#]}
-set style_substyles(chapter) {section paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(chapter) {section paragraph image tikz rawinclude table footnote annotation raw itemize enumeration description verbatim plain}
 
 ### SECTION ###
 set style_begin(section)     $style_begin(plain)
 set style_next(section)      {^\={3}}
 set style_continue(section)  {.*}
 set style_contnext(section)  {^\={0,2}[^\=]}
-set style_substyles(section) {subsection paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(section) {subsection paragraph image tikz rawinclude table footnote annotation raw itemize enumeration description verbatim plain}
 
 ### SUBSECTION ###
 set style_begin(subsection)     $style_begin(plain)
 set style_next(subsection)      {^\~{3}}
 set style_continue(subsection)  {.*}
 set style_contnext(subsection)  {^\~{0,2}[^\~]}
-set style_substyles(subsection) {paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(subsection) {paragraph image tikz rawinclude table footnote annotation raw itemize enumeration description verbatim plain}
 
 ### PARAGRAPH ###
 set style_begin(paragraph)     $style_begin(plain)
 set style_next(paragraph)      {^\-{3}}
 set style_continue(paragraph)  {.*}
 set style_contnext(paragraph)  {^[\-~=#]{0,2}[^\-~=#]}
-set style_substyles(paragraph) {image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(paragraph) {image tikz rawinclude table footnote annotation raw itemize enumeration description verbatim plain}
 
 ### IMAGE ###
 set style_begin(image)     {^\[image .+\]}
@@ -904,14 +914,14 @@ set style_continue(rawinclude) {(^  .+)|(^$)}
 ### TABLE ###
 set style_begin(table)    {\[tabref[^\]]*\]}
 set style_continue(table) {^$}
-#set style_continue(table) {(^\n)|(^\[table[^\]]*\])|(^  .+\n)}
-#set style_begin(table)     {\|}
-#set style_next(table)      {\-\-\-}
-#set style_continue(table)  {(\|)|(\-\-\-)|(^\n)|(^\[table.*\])|(^  .+\n)}
 
 ### TABLE CAPTION ###
 set style_begin(tabcap)     {^\[table .+\]}
 set style_continue(tabcap)  {^.+\n}
+
+### FOOTNOTE ###
+set style_begin(footnote)    {\[footnoteref[^\]]*\]}
+set style_continue(footnote) {^$}
 
 ### MAIN PART OF TABLE ###
 set style_begin(tabmain)    {\|}
@@ -939,7 +949,7 @@ set style_continue(undefined) {\\{100}}
 set style_substyles(documenthead) {header afterheader}
 
 ### DOCUMENT MAIN ###
-set style_substyles(documentmain) {header abstract bibliography chapter paragraph image tikz rawinclude table annotation raw itemize enumeration description verbatim plain}
+set style_substyles(documentmain) {header abstract bibliography chapter paragraph image tikz rawinclude table footnote annotation raw itemize enumeration description verbatim plain}
 
 
 ####################
@@ -1208,6 +1218,122 @@ proc extract_tables {} {
 }
 
 
+### DETECT PRESENCE OF A FOOT NOTE AT SPECIFIED LINE INDEX ###
+#
+# Returns number of text lines that make up the foot note.
+# A number of less than 1 indicates an invalid foot note
+#
+proc detect_footnote {start_idx max_idx} {
+	global txtcontent
+
+	# first line must start with the pattern [\d+]
+	set line [linetxt [lindex $txtcontent $start_idx]]
+	if {![regexp {^\[\d+\]} $line]} { return 0 }
+
+	# there may be subsequent lines with indented text
+	set idx [expr $start_idx + 1]
+	set valid 0
+	while {$idx < $max_idx} {
+
+		set line [linetxt [lindex $txtcontent $idx]]
+		if {[regexp {^\s*$} $line]} break
+		if {[regexp {^[^ ]} $line]} break
+
+		incr idx
+	}
+	return [expr $idx - $start_idx + 1]
+}
+
+
+### EXTRACT FOOT NOTES FROM TEXT ###
+#
+# Each foot note gets inserted into the 'footnotes' array.
+# The corresponding array index is kept within the
+# text as attribute of the foot note label.
+#
+proc extract_footnotes {} {
+	global txtcontent footnotes num_footnotes
+
+	set num_footnotes 0
+
+	set max_idx [llength $txtcontent]
+
+	for {set idx 0} {$idx < $max_idx} {incr idx} {
+		set footnote_len [detect_footnote $idx $max_idx]
+
+		# a valid foot note consumes at least one line of text
+		if {$footnote_len >= 1} {
+			incr num_footnotes
+			set footnote_end [expr $idx + $footnote_len - 1]
+
+			# store text lines of the footnote in 'footnotes' array
+			set footnotes($num_footnotes) [lrange $txtcontent $idx $footnote_end]
+
+			# replace footnote in text by a reference token pointing to the
+			# corresponding 'footnotes' index
+			set footnote_ref [list "-1" "\[footnoteref $num_footnotes\]"]
+			set txtcontent [lreplace $txtcontent $idx $footnote_end $footnote_ref]
+		}
+	}
+}
+
+
+###
+# Return index of nearest foot note that matches the token at the specified line
+#
+proc query_footnote {line token} {
+
+	global footnotes
+
+	if {$line == -1} { return "" }
+
+	# we search for the footnote with the minimum distance from the reference
+	set lowest_line_number 10000000
+	set result ""
+
+	foreach idx [array names footnotes] {
+
+		set footnote $footnotes($idx)
+
+		# footnote must appear after the line where it is referenced
+		set footnote_first_line [lindex $footnote 0]
+		set footnote_line_number [linenum $footnote_first_line]
+		if {$footnote_line_number <= $line} continue
+
+		# the marker of the footnote must match the token
+		regexp {^\[(\d+)\]} [linetxt $footnote_first_line] dummy marker
+		if {$token == $marker} {
+
+			if {$footnote_line_number < $lowest_line_number} {
+				set result $idx
+				set lowest_line_number $footnote_line_number
+			}
+		}
+	}
+	return $result
+}
+
+
+###
+# Return text of the foot note with the specified index
+#
+proc footnote_text {footnote_idx} {
+
+	global footnotes
+
+	set lines {}
+	foreach line $footnotes($footnote_idx) {
+		lappend lines [concat [linetxt $line]] }
+
+	set result [join $lines "\n"]
+
+	# strip off the leading marker
+	regsub {^\[\d+\]\s*} $result "" result
+
+	return $result
+}
+
+
 proc print_marshal_header {title authors content_type} {
 	if {$title != ""} {
 		puts "title: $title" }
@@ -1308,6 +1434,9 @@ collect_references $txtcontent
 
 # parse text for tables
 extract_tables
+
+# parse text for footnotes
+extract_footnotes
 
 # find out about title and authors
 handle_txtblock documenthead $txtcontent
