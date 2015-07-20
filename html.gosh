@@ -121,7 +121,7 @@ proc out_html {string} {
 			regsub -all -- {--}  $url      "§%2xminus%§" url
 			regsub -all -- {---} $linktext "§%3xminus%§" alttext
 			regsub -all -- {--}  $linktext "§%2xminus%§" alttext
-			regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"$url\" alt=\"$alttext\"$tooltiptext>$linktext</a>"] string
+			regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"$url\"$tooltiptext>$linktext</a>"] string
 		}
 	}
 	regsub -all {§%and%§} $string {\&} string
@@ -144,10 +144,15 @@ proc out_html {string} {
 
 ### FILTER LABEL ###
 proc label_html {string} {
-	regsub -all {"} $string ""  string
-	regsub -all { } $string "_" string
+	regsub -all {[()/:" ',+]} $string "_" string
 	return $string
 }
+
+
+proc print_html_label {label} {
+	printline "<a name=\"[label_html $label]\"></a>"
+}
+
 
 ### WRITE HEADER OF HTML FILE ###
 proc produce_head_html {} {
@@ -318,8 +323,9 @@ proc process_chapter_html {txtblock} {
 			}
 		}
 	} else {
-		printline "<a name=\"[label_html $chapter_title]\"></a>"
-		printline "<$chapter_title_tag>[font_style_begin]$sec_prefix[out_html $chapter_title][font_style_end]</$chapter_title_tag>"
+		printline "<$chapter_title_tag>"
+		print_html_label $chapter_title
+		printline "[font_style_begin]$sec_prefix[out_html $chapter_title][font_style_end]</$chapter_title_tag>"
 	}
 	handle_txtblock chapter [lrange $txtblock 2 end]
 	if {$config_select} {
@@ -336,8 +342,9 @@ proc process_section_html {txtblock} {
 	set curr_section $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section " }
-	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<$section_title_tag>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$section_title_tag>"
+	printline "<$section_title_tag>"
+	print_html_label $title
+	printline "[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$section_title_tag>"
 	handle_txtblock section [lrange $txtblock 2 end]
 }
 
@@ -350,8 +357,9 @@ proc process_subsection_html {txtblock} {
 	set curr_subsection $references($title,index)
 	set sec_prefix ""
 	if {$config_html_sec_enum} { set sec_prefix "$curr_chapter.$curr_section.$curr_subsection " }
-	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<$subsection_title_tag>[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$subsection_title_tag>"
+	printline "<$subsection_title_tag>"
+	print_html_label $title
+	printline "[font_style_begin]$sec_prefix[out_html $title][font_style_end]</$subsection_title_tag>"
 	printline "<div class=\"subsection\">"
 	handle_txtblock subsection [lrange $txtblock 2 end]
 	printline "</div>"
@@ -363,8 +371,9 @@ proc process_paragraph_html {txtblock} {
 	global paragraph_title_tag
 	set curr_section_type paragraph
 	set title [linetxt [lindex $txtblock 0]]
-	printline "<a name=\"[label_html $title]\"></a>"
-	printline "<$paragraph_title_tag>[font_style_begin][out_html $title][font_style_end]</$paragraph_title_tag>"
+	printline "<$paragraph_title_tag>"
+	print_html_label $title
+	printline "[font_style_begin][out_html $title][font_style_end]</$paragraph_title_tag>"
 	handle_txtblock paragraph [lrange $txtblock 2 end]
 }
 
@@ -389,7 +398,7 @@ proc process_image_html {txtblock} {
 	}
 	regsub { *$} $img_cap "" img_cap
 	
-	printline "<a name=\"$img_name\"></a>"
+	print_html_label $img_name
 	printline "<table class=\"captionedimage\"><tr><td>"
 
 
@@ -460,7 +469,9 @@ proc output_table_html {col_attr rows caption} {
 		append cap $txt
 	}
 	if {[regexp {^\[table ([^ \]]+)} $cap dummy cap_lab cap_txt]} {
-		printline "<a name=\"[label_html \"$cap_lab\"]\"></a>"
+		printline "<p>"
+		print_html_label $cap_lab
+		printline "</p>"
 	}
 
 	printline "<table class=\"gosh_table\">"
@@ -499,7 +510,9 @@ proc output_table_html {col_attr rows caption} {
 
 	if {[regexp {^\[table ([^ \]]+)[^\]]*\](.*)$} $cap dummy cap_lab cap_txt]} {
 		regsub  {^ +} $cap_txt ""  cap_txt
+		printline "<p>"
 		printline "Table $references($cap_lab,index): [out_html $cap_txt]"
+		printline "</p>"
 	}
 }
 
