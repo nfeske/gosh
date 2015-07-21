@@ -1,0 +1,20 @@
+source [get_style_file html]
+
+set html_path ""
+regexp -- {\--html-path\s+([^\s]+)} $argv dummy html_path
+
+### WRITE HEADER OF HTML FILE ###
+proc produce_head_html {} {
+
+	global html_path references toc_refs
+
+	foreach ref_name $toc_refs {
+
+		set ref_type $references($ref_name,type)
+		set ref_target "$html_path#[label_html $ref_name]"
+
+		puts [list $ref_name $ref_type $ref_target]
+	}
+
+	exit 0
+}

@@ -43,7 +43,7 @@ proc p_style_end {} {
 
 ### FILTER TEXTUAL OUTPUT ###
 proc out_html {string} {
-	global references config_html_keep_tags
+	global references config_html_keep_tags html_xrefs
 
 	set string " $string "
 
@@ -79,10 +79,20 @@ proc out_html {string} {
 	# insert references and citations #
 	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
 		if {[info exists references($ref_text,type)]} {
+
+			#
+			# Determine link target. Use target from references if defined
+			# (as is the case for cross references), otherwise constuct an html
+			# anchor.
+			#
+			set ref_target "#[label_html $ref_text]"
+			if {[info exists references($ref_text,target)]} {
+				set ref_target $references($ref_text,target) }
+
 			if {$references($ref_text,type) == "tabcap" || $references($ref_text,type) == "image"} {
-				regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"#[label_html $ref_text]\">$references($ref_text,index)</a>"] string
+				regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"$ref_target\">$references($ref_text,index)</a>"] string
 			} else {
-				regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"#[label_html $ref_text]\">$ref_text</a>"] string
+				regsub {\[([^\]]+)\]} $string [seal_repl "<a href=\"$ref_target\">$ref_text</a>"] string
 			}
 		} else {
 			set url ""
@@ -533,7 +543,14 @@ set config_html_img_format "jpg"
 regexp -- {\--html-img-format\s+(\w+)} $argv dummy config_html_img_format
 
 #
-# Process command line arguments
+# Read cross-reference database if specified
+#
+set html_xrefs {}
+if {[regexp -- {\--html-xrefs\s+(\w+)} $argv dummy xrefs_file]} {
+	set html_xrefs [split [exec cat $xrefs_file] "\n"] }
+
+#
+# Process command-line flags
 #
 set config_html_toc        [regexp {\--html-toc}       $argv dummy]
 set config_html_p_justify  [regexp {\--html-p-justify} $argv dummy]
@@ -558,4 +575,20 @@ proc doc_root {} {
 # Return suffix appended to URLs that are local to the document-tree local
 #
 proc doc_url_suffix {} { return "" }
+
+#
+# Extend references array with cross references supplied via the --html-xrefs
+# argument
+#
+foreach xref $html_xrefs {
+	set ref_name   [lindex $xref 0]
+	set ref_type   [lindex $xref 1]
+	set ref_target [lindex $xref 2]
+
+	if {![info exists references($ref_name,type)]} {
+		lappend toc_refs $ref_name
+		set references($ref_name,type)   $ref_type
+		set references($ref_name,target) $ref_target
+	}
+}
 
