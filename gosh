@@ -1417,12 +1417,6 @@ proc get_style_file {style_name} {
 	return $style_name
 }
 
-# process arguments
-while {[regexp {\--style ([^ ]+)} $argv dummy style_name]} {
-	catch { source [get_style_file $style_name] }
-	regsub {\--style [^ ]+} $argv "" argv
-}
-
 # output filter (strip single chapter from document)
 set config_select [regexp {\--chapter +(\d+)} $argv dummy select_chapter]
 
@@ -1437,6 +1431,12 @@ extract_tables
 
 # parse text for footnotes
 extract_footnotes
+
+# process style files
+while {[regexp {\--style ([^ ]+)} $argv dummy style_name]} {
+	catch { source [get_style_file $style_name] }
+	regsub {\--style [^ ]+} $argv "" argv
+}
 
 # find out about title and authors
 handle_txtblock documenthead $txtcontent
