@@ -114,13 +114,13 @@ proc out_html {string} {
 
 			# handle links that are local to the document tree
 			set is_local_url 0
-			if {[regexp {^http:/[^/]} $url dummy]} {
+			if {[regexp {^https?:/[^/]} $url dummy]} {
 				set is_local_url 1
-				regsub {^http:/} $url "[doc_root]/" url
+				regsub {^https?:/} $url "[doc_root]/" url
 			}
-			if {[regexp {^http:[^/]} $url dummy]} {
+			if {[regexp {^https?:[^/]} $url dummy]} {
 				set is_local_url 1
-				regsub {^http:} $url "" url
+				regsub {^https?:} $url "" url
 			}
 			# add customizable URL suffix to links local to the document tree
 			if {$is_local_url} { set url "$url[doc_url_suffix]" }
