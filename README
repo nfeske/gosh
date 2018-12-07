@@ -371,6 +371,15 @@ modifies the LaTeX output of GOSH to create Foiltex output. This way, you
 can use GOSH to create 'slides' very easily.
 
 
+File encodings
+==============
+
+By default, GOSH tries to detect the character encoding by examining the input
+text via the 'file' command. As this Unix command is not always available, it
+is possible to skip the detection mechanism and explicitely select the use of
+UTF-8 encoding via the '--utf8' command-line argument.
+
+
 Raw text
 ========
 

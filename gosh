@@ -1369,15 +1369,28 @@ if {([llength $argv] == 0) || ([regexp {\--help} $argv])} {
 
 # determine encoding and read text file
 set txtfilename [lindex $argv end]
-set txtinfo [exec file $txtfilename]
 
-if {[regexp {UTF-8} $txtinfo]} {
-	set txtencoding "UTF-8"
-} else {
-	set txtencoding "ISO-8859"
+# determine encoding, if not specified, use 'file' command to detect
+if {[regexp {\--utf8\s} $argv dummy]} { set txtencoding "UTF-8" }
+
+if {![info exists txtencoding]} {
+	set txtinfo [exec file $txtfilename]
+
+	if {[regexp {UTF-8} $txtinfo]} {
+		set txtencoding "UTF-8"
+	} else {
+		set txtencoding "ISO-8859"
+	}
 }
 
-set txtlines [split [exec cat $txtfilename] "\n"]
+proc file_content { path } {
+	set fh [open $path "RDONLY"]
+	set content [read $fh]
+	close $fh
+	return $content
+}
+
+set txtlines [split [file_content $txtfilename] "\n"]
 
 # convert text into a list and remove all comment lines
 set txtcontent {}
