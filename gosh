@@ -24,6 +24,43 @@ proc out_latex {string {line -1}} {
 
 	set string " $string "
 
+	set ref_pattern {\[([^\]]+)\]}
+	set replacement ""
+
+	# insert references and citations
+	while {[regexp $ref_pattern $string dummy ref_text]} {
+
+		# make sure 'replacement' is set in all branches
+		unset replacement
+
+		if {[regexp {^\d+$} $ref_text footnote_marker]} {
+			set footnote_idx [query_footnote $line $footnote_marker]
+			set footnote_out ""
+			if {$footnote_idx != -1} {
+				set footnote_out "\\footnote{[footnote_text $footnote_idx]}" }
+			set replacement "$footnote_out"
+
+		} elseif {[info exists references($ref_text,type)]} {
+			set replacement "\\ref{[label_latex $ref_text]}"
+
+		} else {
+			if {[regexp {^https?://} $ref_text dummy]} {
+				set url ""
+				set linktext ""
+				set tooltip ""
+				regexp {^(\w+:[^ ]+)} $ref_text url
+				set replacement "\\url{$url}"
+			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
+				set replacement "_citation_gap_"
+			} else {
+				regsub -all {_} $ref_text {adamndunderlineshite!} ref_text
+				set replacement "\\cite{$ref_text}"
+			}
+		}
+
+		regsub $ref_pattern $string [seal_repl $replacement] string
+	}
+
 	# italic style
 	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string dummy head_char emph_text tail_char]} {
 		regsub {^_} $emph_text " " emph_text
@@ -51,36 +88,6 @@ proc out_latex {string {line -1}} {
 	
 	# hexadecimal numbers
 #	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
-
-	# insert references and citations
-	while {[regexp {\[([^\]]+)\]} $string dummy ref_text]} {
-		if {[regexp {\[(\d+)\]} $string dummy footnote_marker]} {
-
-			set footnote_idx [query_footnote $line $footnote_marker]
-			set footnote_out ""
-			if {$footnote_idx != -1} {
-				set footnote_out "\\footnote{[out_latex [footnote_text $footnote_idx]]}"
-			}
-
-			regsub {\[([^\]]+)\]} $string [seal_repl "$footnote_out"] string
-
-		} elseif {[info exists references($ref_text,type)]} {
-			regsub {\[([^\]]+)\]} $string [seal_repl "\\ref{[label_latex $ref_text]}"] string
-		} else {
-			if {[regexp {^https?://} $ref_text dummy]} {
-				set url ""
-				set linktext ""
-				set tooltip ""
-				regexp {^(\w+:[^ ]+)} $ref_text url
-				regsub {\[([^\]]+)\]} $string [seal_repl "\\url{$url}"] string
-			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
-				regsub {\[([^\]]+)\]} $string "_citation_gap_" string
-			} else {
-				regsub -all {_} $ref_text {adamndunderlineshite!} ref_text
-				regsub {\[([^\]]+)\]} $string [seal_repl "\\cite{$ref_text}"] string
-			}
-		}
-	}
 
 	regsub -all {_citation_gap_} $string "\[\\ldots\{\}\]" string
 	regsub -all {"([\w\\])} $string "``\\1" string
