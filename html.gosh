@@ -69,6 +69,7 @@ proc out_html {string} {
 	# monospace style #
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string dummy head_char code_text tail_char]} {
 		regsub -all " " $code_text "\\\&nbsp;" code_text
+		regsub -all "&" $code_text "\\\&amp;" code_text
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",!?])} $string [seal_repl "$head_char<tt>$code_text</tt>$tail_char"] string
 	}
 
@@ -228,7 +229,7 @@ proc process_verbatim_html {txtblock} {
 		set txt [linetxt $txtline]
 		regsub {^\!} $txt "" txt
 		regsub -all {\t} $txt "  " txt
-		regsub -all {&} $txt "§%and%§" txt
+		regsub -all {&} $txt "§%and%§amp;" txt
 		if {!$config_html_keep_tags} {
 			regsub -all {<} $txt {§%and%§lt;} txt
 			regsub -all {>} $txt {§%and%§gt;} txt
