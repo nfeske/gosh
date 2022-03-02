@@ -33,9 +33,9 @@ Its features and usage may change in the future.
 How to get GOSH?
 ################
 
-You can download snapshots of GOSH at the
-[http://os.inf.tu-dresden.de/~nf2/files/GOSH/ - files section]
-of my website [http://os.inf.tu-dresden.de/~nf2].
+:GOSH is available at GitHub:
+
+  [https://github.com/nfeske/gosh]
 
 
 Licence
