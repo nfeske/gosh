@@ -8,8 +8,8 @@ proc produce_head_latex {} {
 	printline {\usepackage{textcomp}}
 	printline {\usepackage{ucs}}
 	printline {\usepackage[utf8x]{inputenc}}
-	printline {\usepackage[small,bf,hang]{caption2}}
-	printline {\usepackage[ngerman]{babel}}
+	printline {\usepackage[small,bf,hang]{caption}}
+	printline {\usepackage[english]{babel}}
 	printline {\usepackage{epsfig}}
 	printline {\usepackage{mathptmx}}
 	printline {\usepackage{helvet}}
@@ -20,7 +20,11 @@ proc produce_head_latex {} {
 	printline {\displaywidowpenalty = 10000}
 	printline {\usepackage{amsmath}}
 	printline {\usepackage{amssymb}}
+	printline {\usepackage{graphicx}}
+	printline {\usepackage{xcolor}}
+	printline {\usepackage[pdftex,pagebackref=true,colorlinks=true,linkcolor=darkblue,citecolor=darkblue,urlcolor=darkblue]{hyperref}}
 	printline {\begin{document}}
+	printline {\definecolor{darkblue}{rgb}{0.1,0,0.55}}
 	
 	if {$title != ""} {
 		printline "\\title{[out_latex $title]}"
