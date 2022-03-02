@@ -47,9 +47,13 @@ proc out_latex {string {line -1}} {
 			if {[regexp {^https?://} $ref_text dummy]} {
 				set url ""
 				set linktext ""
-				set tooltip ""
 				regexp {^(\w+:[^ ]+)} $ref_text url
-				set replacement "\\url{$url}"
+				regexp {^(\w+:[^ ]+) - ([^\(]+)} $ref_text dummy dummy linktext
+				if {$linktext != ""} {
+					set replacement "\\href{$url}{$linktext}\\footnote{\\url{$url}}"
+				} else {
+					set replacement "\\url{$url}"
+				}
 			} elseif {[regexp {^\.\.\.$} $ref_text dummy]} {
 				set replacement "_citation_gap_"
 			} else {
