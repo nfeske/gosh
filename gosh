@@ -73,19 +73,12 @@ proc out_latex {string {line -1}} {
 		regsub -all {\*} $bf_text " " bf_text
 		regsub {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string [seal_repl "$head_char\\textbf{$bf_text}$tail_char"] string
 	}
-	
+
 	# monospace style
 	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string dummy head_char code_text tail_char]} {
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string [seal_repl "$head_char\\texttt{$code_text}$tail_char"] string
 	}
-	
-	# FIXME: kick out monospace style via hashes
-	while {[regexp {\#([^#]+)\#} $string dummy code_text]} {
-		regsub {\#([^#]+)\#} $string [seal_repl "\\texttt{$code_text}"] string
-		puts stderr "Warning: Monospace using #hashes# is deprecated because it looks ugly."
-		puts stderr "         Please use 'apostrophes' instead. Thanks, your GOSH maintainer."
-	}
-	
+
 	# hexadecimal numbers
 #	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
 
@@ -109,7 +102,7 @@ proc out_latex {string {line -1}} {
 	regsub -all {<=>} $string "\$\\Leftrightarrow\$" string
 	regsub -all {=>} $string "\$\\Rightarrow\$" string
 	regsub -all {<=} $string "\$\\Leftarrow\$" string
-	
+
 	regsub -all {<} $string "\\mbox{\$<\$}" string
 	regsub -all {>} $string "\\mbox{\$>\$}" string
 
@@ -179,7 +172,7 @@ proc label_latex {string} {
 ### WRITE HEADER OF TEX FILE ###
 proc produce_head_latex {} {
 	global title authors txtencoding
-	
+
 	printline {\documentclass[11pt,ngerman,a4paper,normalheadings,DIV14]{scrartcl}}
 	printline {\usepackage[T1]{fontenc}}
 	if {$txtencoding == "UTF-8"} {
@@ -200,7 +193,7 @@ proc produce_head_latex {} {
 	printline {\usepackage{amsmath}}
 	printline {\usepackage{amssymb}}
 	printline {\begin{document}}
-	
+
 	if {$title != ""} {
 		printline "\\title{[out_latex $title]}"
 		if {$authors != ""} {
@@ -413,7 +406,7 @@ proc process_image_latex {txtblock} {
 		set img_star "*"
 		set img_relw "textwidth"
 	}
-	
+
 	set img_cap ""
 	foreach img_capline $txtblock {
 		set txt [linetxt $img_capline]
@@ -422,14 +415,14 @@ proc process_image_latex {txtblock} {
 		append img_cap $txt " "
 	}
 	regsub { *$} $img_cap "" img_cap
-	
+
 	printline ""
 	printline "\\begin{figure$img_star}\[tbp\]\n[indent] \\begin{center}"
 	printline "  \\epsfig{file=$img_name,angle=$img_angle,width=[expr $img_size.0/100]\\$img_relw}"
 	printline "  \\caption{[out_latex $img_cap]}"
 	printline "  \\label{[label_latex $img_name]}"
 	printline " \\end{center}\n[indent]\\end{figure$img_star}\n"
-	
+
 }
 
 ### TIKZ IMAGE ###
@@ -764,7 +757,7 @@ proc process_undefined {txtblock} {
 ### HEADER - FIND OUT ABOUT TITLE AND AUTHORS ###
 proc process_header {txtblock} {
 	global title authors
-	
+
 	set block ""
 	foreach txtline $txtblock {
 		set txtline [lineregsub {^\ +} $txtline ""]
@@ -1003,9 +996,9 @@ proc style_split {styles txtblock} {
 	set curr_txtline [lindex $txtblock 0]
 	set next_txtline [lindex $txtblock 1]
 	while {$i < $txtlen} {
-		
+
 		set style [get_style $styles $curr_txtline $next_txtline]
-		
+
 		# read current style block until its end
 		set style_block [list $curr_txtline]
 		incr i
@@ -1032,13 +1025,13 @@ proc handle_txtblock {txtstyle txtcontent} {
 		set style [lindex $style_block 0]
 		set content [lindex $style_block 1]
 		set process_function [append process_ $style _ $outmode]
-		
+
 		incr depth
 		set spec_function process_
 		append spec_function $style
 		set gen_function $spec_function
 		append spec_function _ $outmode
-		
+
 		if {[info procs $spec_function] == $spec_function} {
 			eval "$spec_function [list $content]"
 		} elseif {[info procs $gen_function] == $gen_function} {
@@ -1132,7 +1125,7 @@ proc collect_references {txtblock} {
 				set references($tab_name,index) $table_cnt
 			}
 		}
-		
+
 		set curr_line $next_line
 	}
 }
@@ -1164,7 +1157,7 @@ proc detect_table {start_idx max_idx} {
 		incr idx
 	}
 
-	if {$valid == 0} { 
+	if {$valid == 0} {
 		return 0
 	}
 
@@ -1482,7 +1475,7 @@ if {[info procs $produce_function] == $produce_function} {
 # generate main output
 handle_txtblock documentmain $txtcontent
 
-# generate output tail 
+# generate output tail
 set produce_function "produce_tail_$outmode"
 if {[info procs $produce_function] == $produce_function} {
 	eval $produce_function
