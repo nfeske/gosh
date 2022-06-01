@@ -1295,7 +1295,7 @@ proc query_footnote {line token} {
 
 	# we search for the footnote with the minimum distance from the reference
 	set lowest_line_number 10000000
-	set result ""
+	set result -1
 
 	foreach idx [array names footnotes] {
 
