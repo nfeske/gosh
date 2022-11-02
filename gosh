@@ -24,6 +24,29 @@ proc out_latex {string {line -1}} {
 
 	set string " $string "
 
+	# italic style
+	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string dummy head_char emph_text tail_char]} {
+		regsub {^_} $emph_text " " emph_text
+		regsub {_$} $emph_text " " emph_text
+		regsub {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string [seal_repl "$head_char\\emph{$emph_text}$tail_char"] string
+	}
+
+	# bold style
+	while {[regexp {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string dummy head_char bf_text tail_char]} {
+		regsub -all {\*} $bf_text " " bf_text
+		regsub {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string [seal_repl "$head_char\\textbf{$bf_text}$tail_char"] string
+	}
+
+	# monospace style
+	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string dummy head_char code_text tail_char]} {
+		regsub -all "\\\[" $code_text "\\lbrack" code_text
+		regsub -all "\\\]" $code_text "\\rbrack" code_text
+		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string [seal_repl "$head_char\\texttt{$code_text}$tail_char"] string
+	}
+
+	# hexadecimal numbers
+#	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
+
 	set ref_pattern {\[([^\]]+)\]}
 	set replacement ""
 
@@ -64,27 +87,6 @@ proc out_latex {string {line -1}} {
 
 		regsub $ref_pattern $string [seal_repl $replacement] string
 	}
-
-	# italic style
-	while {[regexp {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string dummy head_char emph_text tail_char]} {
-		regsub {^_} $emph_text " " emph_text
-		regsub {_$} $emph_text " " emph_text
-		regsub {([ \"\(])_(.+?)_([ \)\.\",:!?\-])} $string [seal_repl "$head_char\\emph{$emph_text}$tail_char"] string
-	}
-
-	# bold style
-	while {[regexp {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string dummy head_char bf_text tail_char]} {
-		regsub -all {\*} $bf_text " " bf_text
-		regsub {([ \"\(])\*(.+?)\*([ \)\.\",:!?])} $string [seal_repl "$head_char\\textbf{$bf_text}$tail_char"] string
-	}
-
-	# monospace style
-	while {[regexp {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string dummy head_char code_text tail_char]} {
-		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string [seal_repl "$head_char\\texttt{$code_text}$tail_char"] string
-	}
-
-	# hexadecimal numbers
-#	regsub -all {0x(([a-fA-F0-9]+)[\+\-\*\/]?(0x)?)+} $string "\\texttt{&}" string
 
 	regsub -all {_citation_gap_} $string "\[\\ldots\{\}\]" string
 	regsub -all {"([\w\\])} $string "``\\1" string
