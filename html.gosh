@@ -72,6 +72,8 @@ proc out_html {string} {
 		regsub -all " " $code_text "\\\&nbsp;" code_text
 		regsub -all "\\\[" $code_text "\\\&lbrack;" code_text
 		regsub -all "\\\]" $code_text "\\\&rbrack;" code_text
+		regsub -all -- {---} $code_text "§%3xminus%§" code_text
+		regsub -all -- {--}  $code_text "§%2xminus%§" code_text
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\",:!?])} $string [seal_repl "$head_char<tt>$code_text</tt>$tail_char"] string
 	}
 
