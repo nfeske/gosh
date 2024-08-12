@@ -42,6 +42,7 @@ proc out_latex {string {line -1}} {
 		regsub -all "\\\[" $code_text "\\lbrack" code_text
 		regsub -all "\\\]" $code_text "\\rbrack" code_text
 		regsub -all {\\} $code_text "\\textbackslash{}" code_text
+		regsub -all {\-\-} $code_text "-\\!-" code_text
 		regsub {([ \"\(])\'(.+?)\'([ \-\)\.\"\',:!?])} $string [seal_repl "$head_char\\texttt{$code_text}$tail_char"] string
 	}
 
