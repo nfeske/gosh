@@ -431,7 +431,7 @@ proc process_image_html {txtblock} {
 		}
 	}
 
-	printline "  <img src=\"$img_name.$img_format\">"
+	printline "  <img src=\"$img_name.$img_format\" width=\"$img_size%\">"
 	if {$img_cap != ""} {
 		printline "</td></tr><tr><td>"
 		printline "  <div class=\"caption\">$img_cap</div>"
