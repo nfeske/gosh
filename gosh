@@ -113,8 +113,8 @@ proc out_latex {string {line -1}} {
 
 	regsub -all {\\<} $string "\\textbackslash<" string
 	regsub -all {\\>} $string "\\textbackslash>" string
-	regsub -all {<} $string "\\mbox{\$<\$}" string
-	regsub -all {>} $string "\\mbox{\$>\$}" string
+	regsub -all {<} $string "\\textless{}" string
+	regsub -all {>} $string "\\textgreater{}" string
 
 	regsub -all {e\.g\.} $string "e.\\,g." string
 	regsub -all {i\.e\.} $string "i.\\,e." string
